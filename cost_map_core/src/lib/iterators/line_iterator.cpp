@@ -14,7 +14,7 @@ using namespace std;
 
 namespace cost_map {
 
-LineIterator::LineIterator(const cost_map::GridMap& gridMap, const Eigen::Array2i& start, const Eigen::Array2i& end)
+LineIterator::LineIterator(const cost_map::CostMap& gridMap, const Eigen::Array2i& start, const Eigen::Array2i& end)
     : start_(start),
       end_(end)
 {
@@ -28,7 +28,7 @@ LineIterator::LineIterator(const cost_map::GridMap& gridMap, const Eigen::Array2
   initializeParameters();
 }
 
-LineIterator::LineIterator(const cost_map::GridMap& gridMap, const Eigen::Vector2d& start, const Eigen::Vector2d& end)
+LineIterator::LineIterator(const cost_map::CostMap& gridMap, const Eigen::Vector2d& start, const Eigen::Vector2d& end)
 {
   // TODO Implement this constructor with range checking.
 }

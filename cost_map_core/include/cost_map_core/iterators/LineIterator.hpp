@@ -28,7 +28,7 @@ public:
    * @param start the starting index of the line.
    * @param end the ending index of the line.
    */
-  LineIterator(const cost_map::GridMap& gridMap, const Eigen::Array2i& start, const Eigen::Array2i& end);
+  LineIterator(const cost_map::CostMap& gridMap, const Eigen::Array2i& start, const Eigen::Array2i& end);
 
   /*!
    * Constructor.
@@ -36,7 +36,7 @@ public:
    * @param start the starting point of the line.
    * @param end the ending point of the line.
    */
-  LineIterator(const cost_map::GridMap& gridMap, const Eigen::Vector2d& start, const Eigen::Vector2d& end);
+  LineIterator(const cost_map::CostMap& gridMap, const Eigen::Vector2d& start, const Eigen::Vector2d& end);
 
   /*!
    * Assignment operator.

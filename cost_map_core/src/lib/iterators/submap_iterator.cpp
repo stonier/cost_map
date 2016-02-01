@@ -19,14 +19,14 @@ SubmapIterator::SubmapIterator(const cost_map::SubmapGeometry& submap)
 {
 }
 
-SubmapIterator::SubmapIterator(const cost_map::GridMap& gridMap,
+SubmapIterator::SubmapIterator(const cost_map::CostMap& gridMap,
                                const cost_map::BufferRegion& bufferRegion)
     : SubmapIterator(gridMap, bufferRegion.getStartIndex(), bufferRegion.getSize())
 {
 }
 
 
-SubmapIterator::SubmapIterator(const cost_map::GridMap& gridMap, const Index& submapStartIndex,
+SubmapIterator::SubmapIterator(const cost_map::CostMap& gridMap, const Index& submapStartIndex,
                                const Size& submapSize)
 {
   size_ = gridMap.getSize();

@@ -8,11 +8,14 @@
 
 #pragma once
 
-#include <Eigen/Core>
+
 #include <vector>
 #include <map>
-#include "BufferRegion.hpp"
-#include "typedefs.hpp"
+
+#include <Eigen/Core>
+#include <grid_map_core/BufferRegion.hpp>
+#include "common.hpp"
+
 
 namespace cost_map {
 

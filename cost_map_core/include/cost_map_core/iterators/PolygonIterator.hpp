@@ -8,12 +8,11 @@
 
 #pragma once
 
-#include <Eigen/Core>
+#include "../common.hpp"
 
 // unique_ptr
 #include <memory>
 #include "../iterators/SubmapIterator.hpp"
-#include "../Polygon.hpp"
 #include "../CostMap.hpp"
 
 namespace cost_map {
@@ -30,7 +29,7 @@ public:
    * @param gridMap the grid map to iterate on.
    * @param polygon the polygonal area to iterate on.
    */
-  PolygonIterator(const cost_map::GridMap& gridMap, const cost_map::Polygon& polygon);
+  PolygonIterator(const cost_map::CostMap& gridMap, const cost_map::Polygon& polygon);
 
   /*!
    * Assignment operator.

@@ -32,7 +32,7 @@ public:
    * @param length the length of the main axis.
    * @param angle the rotation angle of the ellipse (in [rad]).
    */
-  EllipseIterator(const GridMap& gridMap, const Position& center, const Length& length, const double rotation = 0.0);
+  EllipseIterator(const CostMap& gridMap, const Position& center, const Length& length, const double rotation = 0.0);
 
   /*!
    * Assignment operator.

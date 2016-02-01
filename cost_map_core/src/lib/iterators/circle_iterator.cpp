@@ -14,7 +14,7 @@ using namespace std;
 
 namespace cost_map {
 
-CircleIterator::CircleIterator(const GridMap& gridMap, const Position& center, const double radius)
+CircleIterator::CircleIterator(const CostMap& gridMap, const Position& center, const double radius)
     : center_(center),
       radius_(radius)
 {

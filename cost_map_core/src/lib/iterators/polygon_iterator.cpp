@@ -14,7 +14,7 @@ using namespace std;
 
 namespace cost_map {
 
-PolygonIterator::PolygonIterator(const cost_map::GridMap& gridMap, const cost_map::Polygon& polygon)
+PolygonIterator::PolygonIterator(const cost_map::CostMap& gridMap, const cost_map::Polygon& polygon)
     : polygon_(polygon)
 {
   mapLength_ = gridMap.getLength();

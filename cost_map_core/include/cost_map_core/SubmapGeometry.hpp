@@ -8,11 +8,12 @@
 
 #pragma once
 
+#include "common.hpp"
 #include "CostMap.hpp"
 
 namespace cost_map {
 
-class GridMap;
+class CostMap;
 
 /*!
  * This class holds information about the geometry of submap
@@ -32,12 +33,12 @@ class SubmapGeometry
    * @param[in] length the requested submap length.
    * @param[out] isSuccess true if successful, false otherwise.
    */
-  SubmapGeometry(const GridMap& gridMap, const Position& position, const Length& length,
+  SubmapGeometry(const CostMap& gridMap, const Position& position, const Length& length,
                  bool& isSuccess);
 
   virtual ~SubmapGeometry();
 
-  const GridMap& getGridMap() const;
+  const CostMap& getGridMap() const;
   const Length& getLength() const;
   const Position& getPosition() const;
   const Index& getRequestedIndexInSubmap() const;
@@ -48,7 +49,7 @@ class SubmapGeometry
  private:
 
   //! Parent grid map of the submap.
-  const GridMap& gridMap_;
+  const CostMap& gridMap_;
 
   //! Start index (typically top left) index of the submap.
   Index startIndex_;

@@ -12,8 +12,9 @@
 ** Includes
 *****************************************************************************/
 
-#include "typedefs.hpp"
-#include "BufferRegion.hpp"
+#include <grid_map_core/grid_map_core.hpp>
+
+#include "common.hpp"
 #include "iterators/iterators.hpp"
 #include "Polygon.hpp"
 #include "SubmapGeometry.hpp"

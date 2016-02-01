@@ -12,7 +12,7 @@
 
 namespace cost_map {
 
-GridMapIterator::GridMapIterator(const cost_map::GridMap& gridMap)
+CostMapIterator::CostMapIterator(const cost_map::CostMap& gridMap)
 {
   size_ = gridMap.getSize();
   startIndex_ = gridMap.getStartIndex();
@@ -22,7 +22,7 @@ GridMapIterator::GridMapIterator(const cost_map::GridMap& gridMap)
   isPastEnd_ = false;
 }
 
-GridMapIterator::GridMapIterator(const GridMapIterator* other)
+CostMapIterator::CostMapIterator(const CostMapIterator* other)
 {
   size_ = other->size_;
   startIndex_ = other->startIndex_;
@@ -31,7 +31,7 @@ GridMapIterator::GridMapIterator(const GridMapIterator* other)
   isPastEnd_ = other->isPastEnd_;
 }
 
-GridMapIterator& GridMapIterator::operator =(const GridMapIterator& other)
+CostMapIterator& CostMapIterator::operator =(const CostMapIterator& other)
 {
   size_ = other.size_;
   startIndex_ = other.startIndex_;
@@ -41,35 +41,35 @@ GridMapIterator& GridMapIterator::operator =(const GridMapIterator& other)
   return *this;
 }
 
-bool GridMapIterator::operator !=(const GridMapIterator& other) const
+bool CostMapIterator::operator !=(const CostMapIterator& other) const
 {
   return (index_ != other.index_).any();
 }
 
-const Index& GridMapIterator::operator *() const
+const Index& CostMapIterator::operator *() const
 {
   return index_;
 }
 
-const Index GridMapIterator::getUnwrappedIndex() const
+const Index CostMapIterator::getUnwrappedIndex() const
 {
   return getIndexFromBufferIndex(index_, size_, startIndex_);
 }
 
-GridMapIterator& GridMapIterator::operator ++()
+CostMapIterator& CostMapIterator::operator ++()
 {
   isPastEnd_ = !incrementIndex(index_, size_, startIndex_);
   return *this;
 }
 
-GridMapIterator GridMapIterator::end() const
+CostMapIterator CostMapIterator::end() const
 {
-  GridMapIterator res(this);
+  CostMapIterator res(this);
   res.index_ = endIndex_;
   return res;
 }
 
-bool GridMapIterator::isPastEnd() const
+bool CostMapIterator::isPastEnd() const
 {
   return isPastEnd_;
 }

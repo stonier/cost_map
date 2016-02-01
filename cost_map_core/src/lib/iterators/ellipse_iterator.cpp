@@ -16,7 +16,7 @@ using namespace std;
 
 namespace cost_map {
 
-EllipseIterator::EllipseIterator(const GridMap& gridMap, const Position& center, const Length& length, const double rotation)
+EllipseIterator::EllipseIterator(const CostMap& gridMap, const Position& center, const Length& length, const double rotation)
     : center_(center)
 {
   semiAxisSquare_ = (0.5 * length).square();

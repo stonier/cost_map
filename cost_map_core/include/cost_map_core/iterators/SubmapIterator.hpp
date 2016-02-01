@@ -8,8 +8,7 @@
 
 #pragma once
 
-#include <Eigen/Core>
-#include "../BufferRegion.hpp"
+#include "../common.hpp"
 #include "../CostMap.hpp"
 #include "../SubmapGeometry.hpp"
 
@@ -34,7 +33,7 @@ public:
    * Constructor.
    * @param submap the buffer region of a grid map to iterate over.
    */
-  SubmapIterator(const cost_map::GridMap& gridMap, const cost_map::BufferRegion& bufferRegion);
+  SubmapIterator(const cost_map::CostMap& gridMap, const cost_map::BufferRegion& bufferRegion);
 
   /*!
    * Constructor.
@@ -42,7 +41,7 @@ public:
    * @param submapStartIndex the start index of the submap, typically top-left index.
    * @param submapSize the size of the submap to iterate on.
    */
-  SubmapIterator(const cost_map::GridMap& gridMap, const Index& submapStartIndex,
+  SubmapIterator(const cost_map::CostMap& gridMap, const Index& submapStartIndex,
                  const Size& submapSize);
 
   /*!

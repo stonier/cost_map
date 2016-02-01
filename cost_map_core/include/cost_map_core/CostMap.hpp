@@ -13,9 +13,9 @@
 
 // Eigen
 #include <Eigen/Core>
-#include "BufferRegion.hpp"
+#include <grid_map_core/BufferRegion.hpp>
+#include "common.hpp"
 #include "SubmapGeometry.hpp"
-#include "typedefs.hpp"
 
 namespace cost_map {
 
@@ -34,24 +34,24 @@ class SubmapGeometry;
  * - "surface_normal_x", "surface_normal_y", "surface_normal_z"
  * etc.
  */
-class GridMap
+class CostMap
 {
- public:
+public:
   /*!
    * Constructor.
    * @param layers a vector of strings containing the definition/description of the data layer.
    */
-  GridMap(const std::vector<std::string>& layers);
+  CostMap(const std::vector<std::string>& layers);
 
   /*!
    * Emtpy constructor.
    */
-  GridMap();
+  CostMap();
 
   /*!
    * Destructor.
    */
-  virtual ~GridMap();
+  virtual ~CostMap();
 
   /*!
    * Set the geometry of the grid map. Clears all the data.
@@ -59,8 +59,8 @@ class GridMap
    * @param resolution the cell size in [m/cell].
    * @param position the 2d position of the grid map in the grid map frame [m].
    */
-  void setGeometry(const cost_map::Length& length, const double resolution,
-                   const cost_map::Position& position = cost_map::Position::Zero());
+  void setGeometry(const Length& length, const double resolution,
+                   const Position& position = Position::Zero());
 
   /*!
    * Set the geometry of the grid map from submap geometry information.
@@ -80,7 +80,7 @@ class GridMap
    * @param layer the name of the layer.
    * @param data the data to be added.
    */
-  void add(const std::string& layer, const cost_map::Matrix& data);
+  void add(const std::string& layer, const Matrix& data);
 
   /*!
    * Checks if data layer exists.
@@ -95,7 +95,7 @@ class GridMap
    * @return grid map data as matrix.
    * @throw std::out_of_range if no map layer with name `layer` is present.
    */
-  const cost_map::Matrix& get(const std::string& layer) const;
+  const Matrix& get(const std::string& layer) const;
 
   /*!
    * Returns the grid map data for a layer as non-const. Use this method
@@ -104,7 +104,7 @@ class GridMap
    * @return grid map data.
    * @throw std::out_of_range if no map layer with name `layer` is present.
    */
-  cost_map::Matrix& get(const std::string& layer);
+  Matrix& get(const std::string& layer);
 
   /*!
    * Returns the grid map data for a layer as matrix.
@@ -112,7 +112,7 @@ class GridMap
    * @return grid map data as matrix.
    * @throw std::out_of_range if no map layer with name `layer` is present.
    */
-  const cost_map::Matrix& operator [](const std::string& layer) const;
+  const Matrix& operator [](const std::string& layer) const;
 
   /*!
    * Returns the grid map data for a layer as non-const. Use this method
@@ -121,7 +121,7 @@ class GridMap
    * @return grid map data.
    * @throw std::out_of_range if no map layer with name `layer` is present.
    */
-  cost_map::Matrix& operator [](const std::string& layer);
+  Matrix& operator [](const std::string& layer);
 
   /*!
    * Removes a layer from the grid map.
@@ -157,7 +157,7 @@ class GridMap
    * @param other the other grid map.
    * @return true if the other grid map has the same layers, false otherwise.
    */
-  bool hasSameLayers(const cost_map::GridMap& other) const;
+  bool hasSameLayers(const CostMap& other) const;
 
   /*!
    * Get cell data at requested position.
@@ -166,7 +166,7 @@ class GridMap
    * @return the data of the cell.
    * @throw std::out_of_range if no map layer with name `layer` is present.
    */
-  float& atPosition(const std::string& layer, const cost_map::Position& position);
+  DataType& atPosition(const std::string& layer, const Position& position);
 
   /*!
    * Get cell data at requested position. Const version form above.
@@ -175,7 +175,7 @@ class GridMap
    * @return the data of the cell.
    * @throw std::out_of_range if no map layer with name `layer` is present.
    */
-  float atPosition(const std::string& layer, const cost_map::Position& position) const;
+  DataType atPosition(const std::string& layer, const Position& position) const;
 
   /*!
    * Get cell data for requested index.
@@ -184,7 +184,7 @@ class GridMap
    * @return the data of the cell.
    * @throw std::out_of_range if no map layer with name `layer` is present.
    */
-  float& at(const std::string& layer, const cost_map::Index& index);
+  DataType& at(const std::string& layer, const Index& index);
 
   /*!
    * Get cell data for requested index. Const version form above.
@@ -193,7 +193,7 @@ class GridMap
    * @return the data of the cell.
    * @throw std::out_of_range if no map layer with name `layer` is present.
    */
-  float at(const std::string& layer, const cost_map::Index& index) const;
+  DataType at(const std::string& layer, const Index& index) const;
 
   /*!
    * Gets the corresponding cell index for a position.
@@ -201,7 +201,7 @@ class GridMap
    * @param[out] index the corresponding index.
    * @return true if successful, false if position outside of map.
    */
-  bool getIndex(const cost_map::Position& position, cost_map::Index& index) const;
+  bool getIndex(const Position& position, Index& index) const;
 
   /*!
    * Gets the 2d position of cell specified by the index (x, y of cell position) in
@@ -210,14 +210,14 @@ class GridMap
    * @param[out] position the position of the data point in the parent frame.
    * @return true if successful, false if index not within range of buffer.
    */
-  bool getPosition(const cost_map::Index& index, cost_map::Position& position) const;
+  bool getPosition(const Index& index, Position& position) const;
 
   /*!
    * Check if position is within the map boundaries.
    * @param position the position to be checked.
    * @return true if position is within map, false otherwise.
    */
-  bool isInside(const cost_map::Position& position) const;
+  bool isInside(const Position& position) const;
 
   /*!
    * Checks if the index of all layers defined as basic types are valid,
@@ -225,7 +225,7 @@ class GridMap
    * @param index the index to check.
    * @return true if cell is valid, false otherwise.
    */
-  bool isValid(const cost_map::Index& index) const;
+  bool isValid(const Index& index) const;
 
   /*!
    * Checks if cell at index is a valid (finite) for a certain layer.
@@ -233,7 +233,7 @@ class GridMap
    * @param layer the name of the layer to be checked for validity.
    * @return true if cell is valid, false otherwise.
    */
-  bool isValid(const cost_map::Index& index, const std::string& layer) const;
+  bool isValid(const Index& index, const std::string& layer) const;
 
   /*!
    * Checks if cell at index is a valid (finite) for certain layers.
@@ -241,7 +241,7 @@ class GridMap
    * @param layers the layers to be checked for validity.
    * @return true if cell is valid, false otherwise.
    */
-  bool isValid(const cost_map::Index& index, const std::vector<std::string>& layers) const;
+  bool isValid(const Index& index, const std::vector<std::string>& layers) const;
 
   /*!
    * Gets the 3d position of a data point (x, y of cell position & cell value as z) in
@@ -251,8 +251,8 @@ class GridMap
    * @param position the position of the data point in the parent frame.
    * @return true if successful, false if no valid data available.
    */
-  bool getPosition3(const std::string& layer, const cost_map::Index& index,
-                    cost_map::Position3& position) const;
+  bool getPosition3(const std::string& layer, const Index& index,
+                    Position3& position) const;
 
   /*!
    * Gets the 3d vector of three layers with suffixes 'x', 'y', and 'z'.
@@ -261,7 +261,7 @@ class GridMap
    * @param vector the vector with the values of the data type.
    * @return true if successful, false if no valid data available.
    */
-  bool getVector(const std::string& layerPrefix, const cost_map::Index& index,
+  bool getVector(const std::string& layerPrefix, const Index& index,
                  Eigen::Vector3d& vector) const;
 
   /*!
@@ -272,7 +272,7 @@ class GridMap
    * @param[out] isSuccess true if successful, false otherwise.
    * @return submap (is empty if success is false).
    */
-  GridMap getSubmap(const cost_map::Position& position, const cost_map::Length& length,
+  CostMap getSubmap(const Position& position, const Length& length,
                     bool& isSuccess);
 
   /*!
@@ -284,8 +284,8 @@ class GridMap
    * @param[out] isSuccess true if successful, false otherwise.
    * @return submap (is empty if success is false).
    */
-  GridMap getSubmap(const cost_map::Position& position, const cost_map::Length& length,
-                    cost_map::Index& indexInSubmap, bool& isSuccess);
+  CostMap getSubmap(const Position& position, const Length& length,
+                    Index& indexInSubmap, bool& isSuccess);
 
   /*!
    * Move the grid map w.r.t. to the grid map frame. Use this to move the grid map
@@ -295,7 +295,7 @@ class GridMap
    * @param newRegions the regions of the newly covered / previously uncovered regions of the buffer.
    * @return true if map has been moved, false otherwise.
    */
-  bool move(const cost_map::Position& position, std::vector<BufferRegion>& newRegions);
+  bool move(const Position& position, std::vector<BufferRegion>& newRegions);
 
   /*!
    * Move the grid map w.r.t. to the grid map frame. Use this to move the grid map
@@ -304,7 +304,7 @@ class GridMap
    * @param position the new location of the grid map in the map frame.
    * @return true if map has been moved, false otherwise.
    */
-  bool move(const cost_map::Position& position);
+  bool move(const Position& position);
 
   /*!
    * Adds data from an other grid map to this grid map
@@ -315,7 +315,7 @@ class GridMap
    * @param layers the layers that are copied if not all layers are used.
    * @return true if successful.
    */
-  bool addDataFrom(const cost_map::GridMap& other, bool extendMap,
+  bool addDataFrom(const CostMap& other, bool extendMap,
                    bool overwriteData, bool copyAllLayers,
                    std::vector<std::string> layers = std::vector<std::string>());
 
@@ -324,7 +324,7 @@ class GridMap
    * @param other the grid map to extend the size to.
    * @return true if successful.
    */
-  bool extendToInclude(const cost_map::GridMap& other);
+  bool extendToInclude(const CostMap& other);
 
   /*!
    * Clears all cells (set to NAN) for a layer.
@@ -378,13 +378,13 @@ class GridMap
    * Get the side length of the grid map.
    * @return side length of the grid map.
    */
-  const cost_map::Length& getLength() const;
+  const Length& getLength() const;
 
   /*!
    * Get the 2d position of the grid map in the grid map frame.
    * @return position of the grid map in the grid map frame.
    */
-  const cost_map::Position& getPosition() const;
+  const Position& getPosition() const;
 
   /*!
    * Get the resolution of the grid map.
@@ -396,20 +396,20 @@ class GridMap
    * Get the grid map size (rows and cols of the data structure).
    * @return grid map size.
    */
-  const cost_map::Size& getSize() const;
+  const Size& getSize() const;
 
   /*!
    * Set the start index of the circular buffer.
    * Use this method with caution!
    * @return buffer start index.
    */
-  void setStartIndex(const cost_map::Index& startIndex);
+  void setStartIndex(const Index& startIndex);
 
   /*!
    * Get the start index of the circular buffer.
    * @return buffer start index.
    */
-  const cost_map::Index& getStartIndex() const;
+  const Index& getStartIndex() const;
 
  private:
 
@@ -440,7 +440,7 @@ class GridMap
   Time timestamp_;
 
   //! Grid map data stored as layers of matrices.
-  std::unordered_map<std::string, Eigen::MatrixXf> data_;
+  std::unordered_map<std::string, Matrix> data_;
 
   //! Names of the data layers.
   std::vector<std::string> layers_;
@@ -451,19 +451,19 @@ class GridMap
   std::vector<std::string> basicLayers_;
 
   //! Side length of the map in x- and y-direction [m].
-  cost_map::Length length_;
+  Length length_;
 
   //! Map resolution in xy plane [m/cell].
   double resolution_;
 
   //! Map position in the grid map frame [m].
-  cost_map::Position position_;
+  Position position_;
 
   //! Size of the buffer (rows and cols of the data structure).
-  cost_map::Size size_;
+  Size size_;
 
   //! Circular buffer start indeces.
-  cost_map::Index startIndex_;
+  Index startIndex_;
 };
 
 } /* namespace */

@@ -16,7 +16,7 @@ namespace cost_map {
 /*!
  * Iterator class to iterate trough the entire grid map.
  */
-class GridMapIterator
+class CostMapIterator
 {
 public:
 
@@ -24,26 +24,26 @@ public:
    * Constructor.
    * @param gridMap the grid map to iterate on.
    */
-  GridMapIterator(const cost_map::GridMap &gridMap);
+  CostMapIterator(const cost_map::CostMap &gridMap);
 
   /*!
    * Copy constructor.
    * @param other the object to copy.
    */
-  GridMapIterator(const GridMapIterator* other);
+  CostMapIterator(const CostMapIterator* other);
 
   /*!
    * Assignment operator.
    * @param iterator the iterator to copy data from.
    * @return a reference to *this.
    */
-  GridMapIterator& operator =(const GridMapIterator& other);
+  CostMapIterator& operator =(const CostMapIterator& other);
 
   /*!
    * Compare to another iterator.
    * @return whether the current iterator points to a different address than the other one.
    */
-  bool operator !=(const GridMapIterator& other) const;
+  bool operator !=(const CostMapIterator& other) const;
 
   /*!
    * Dereference the iterator with const.
@@ -61,13 +61,13 @@ public:
    * Increase the iterator to the next element.
    * @return a reference to the updated iterator.
    */
-  GridMapIterator& operator ++();
+  CostMapIterator& operator ++();
 
   /*!
    * Return the end iterator
    * @return the end iterator (useful when performing normal iterator processing with ++).
    */
-  GridMapIterator end() const;
+  CostMapIterator end() const;
 
   /*!
    * Indicates if iterator is past end.

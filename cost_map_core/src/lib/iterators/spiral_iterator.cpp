@@ -15,7 +15,7 @@ using namespace std;
 
 namespace cost_map {
 
-SpiralIterator::SpiralIterator(const cost_map::GridMap& gridMap, const Eigen::Vector2d& center,
+SpiralIterator::SpiralIterator(const cost_map::CostMap& gridMap, const Eigen::Vector2d& center,
                                const double radius)
     : center_(center),
       radius_(radius),

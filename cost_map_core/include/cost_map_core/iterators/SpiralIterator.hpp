@@ -31,7 +31,7 @@ public:
    * @param center the position of the circle center.
    * @param radius the radius of the circle.
    */
-  SpiralIterator(const cost_map::GridMap& gridMap, const Eigen::Vector2d& center, const double radius);
+  SpiralIterator(const cost_map::CostMap& gridMap, const Eigen::Vector2d& center, const double radius);
 
   /*!
    * Assignment operator.

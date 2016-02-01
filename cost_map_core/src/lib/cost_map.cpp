@@ -16,12 +16,9 @@
 #include <stdexcept>
 #include "../include/cost_map_core/SubmapGeometry.hpp"
 
-using namespace std;
-using namespace cost_map;
-
 namespace cost_map {
 
-GridMap::GridMap(const std::vector<std::string>& layers)
+CostMap::CostMap(const std::vector<std::string>& layers)
 {
   position_.setZero();
   length_.setZero();
@@ -36,16 +33,16 @@ GridMap::GridMap(const std::vector<std::string>& layers)
   }
 }
 
-GridMap::GridMap() :
-    GridMap(std::vector<std::string>())
+CostMap::CostMap() :
+    CostMap(std::vector<std::string>())
 {
 }
 
-GridMap::~GridMap()
+CostMap::~CostMap()
 {
 }
 
-void GridMap::setGeometry(const cost_map::Length& length, const double resolution,
+void CostMap::setGeometry(const cost_map::Length& length, const double resolution,
                           const cost_map::Position& position)
 {
   assert(length(0) > 0.0);
@@ -66,22 +63,22 @@ void GridMap::setGeometry(const cost_map::Length& length, const double resolutio
   return;
 }
 
-void GridMap::setGeometry(const SubmapGeometry& geometry)
+void CostMap::setGeometry(const SubmapGeometry& geometry)
 {
   setGeometry(geometry.getLength(), geometry.getResolution(), geometry.getPosition());
 }
 
-void GridMap::setBasicLayers(const std::vector<std::string>& basicLayers)
+void CostMap::setBasicLayers(const std::vector<std::string>& basicLayers)
 {
   basicLayers_ = basicLayers;
 }
 
-const std::vector<std::string>& GridMap::getBasicLayers() const
+const std::vector<std::string>& CostMap::getBasicLayers() const
 {
   return basicLayers_;
 }
 
-bool GridMap::hasSameLayers(const cost_map::GridMap& other) const
+bool CostMap::hasSameLayers(const cost_map::CostMap& other) const
 {
   for (const auto& layer : layers_) {
     if (!other.exists(layer)) return false;
@@ -89,12 +86,12 @@ bool GridMap::hasSameLayers(const cost_map::GridMap& other) const
   return true;
 }
 
-void GridMap::add(const std::string& layer, const double value)
+void CostMap::add(const std::string& layer, const double value)
 {
   add(layer, Matrix::Constant(size_(0), size_(1), value));
 }
 
-void GridMap::add(const std::string& layer, const Matrix& data)
+void CostMap::add(const std::string& layer, const Matrix& data)
 {
   assert(size_(0) == data.rows());
   assert(size_(1) == data.cols());
@@ -109,40 +106,40 @@ void GridMap::add(const std::string& layer, const Matrix& data)
   }
 }
 
-bool GridMap::exists(const std::string& layer) const
+bool CostMap::exists(const std::string& layer) const
 {
   return !(data_.find(layer) == data_.end());
 }
 
-const cost_map::Matrix& GridMap::get(const std::string& layer) const
+const cost_map::Matrix& CostMap::get(const std::string& layer) const
 {
   try {
     return data_.at(layer);
   } catch (const std::out_of_range& exception) {
-    throw std::out_of_range("GridMap::get(...) : No map layer '" + layer + "' available.");
+    throw std::out_of_range("CostMap::get(...) : No map layer '" + layer + "' available.");
   }
 }
 
-cost_map::Matrix& GridMap::get(const std::string& layer)
+cost_map::Matrix& CostMap::get(const std::string& layer)
 {
   try {
     return data_.at(layer);
   } catch (const std::out_of_range& exception) {
-    throw std::out_of_range("GridMap::get(...) : No map layer of type '" + layer + "' available.");
+    throw std::out_of_range("CostMap::get(...) : No map layer of type '" + layer + "' available.");
   }
 }
 
-const cost_map::Matrix& GridMap::operator [](const std::string& layer) const
+const cost_map::Matrix& CostMap::operator [](const std::string& layer) const
 {
   return get(layer);
 }
 
-cost_map::Matrix& GridMap::operator [](const std::string& layer)
+cost_map::Matrix& CostMap::operator [](const std::string& layer)
 {
   return get(layer);
 }
 
-bool GridMap::erase(const std::string& layer)
+bool CostMap::erase(const std::string& layer)
 {
   const auto dataIterator = data_.find(layer);
   if (dataIterator == data_.end()) return false;
@@ -158,83 +155,83 @@ bool GridMap::erase(const std::string& layer)
   return true;
 }
 
-const std::vector<std::string>& GridMap::getLayers() const
+const std::vector<std::string>& CostMap::getLayers() const
 {
   return layers_;
 }
 
-float& GridMap::atPosition(const std::string& layer, const cost_map::Position& position)
+DataType& CostMap::atPosition(const std::string& layer, const cost_map::Position& position)
 {
   Eigen::Array2i index;
   if (getIndex(position, index)) {
     return at(layer, index);
   }
-  throw std::out_of_range("GridMap::atPosition(...) : Position is out of range.");
+  throw std::out_of_range("CostMap::atPosition(...) : Position is out of range.");
 }
 
-float GridMap::atPosition(const std::string& layer, const cost_map::Position& position) const
+DataType CostMap::atPosition(const std::string& layer, const cost_map::Position& position) const
 {
   Eigen::Array2i index;
   if (getIndex(position, index)) {
     return at(layer, index);
   }
-  throw std::out_of_range("GridMap::atPosition(...) : Position is out of range.");
+  throw std::out_of_range("CostMap::atPosition(...) : Position is out of range.");
 }
 
-float& GridMap::at(const std::string& layer, const cost_map::Index& index)
+DataType& CostMap::at(const std::string& layer, const cost_map::Index& index)
 {
   try {
     return data_.at(layer)(index(0), index(1));
   } catch (const std::out_of_range& exception) {
-    throw std::out_of_range("GridMap::at(...) : No map layer '" + layer + "' available.");
+    throw std::out_of_range("CostMap::at(...) : No map layer '" + layer + "' available.");
   }
 }
 
-float GridMap::at(const std::string& layer, const Eigen::Array2i& index) const
+DataType CostMap::at(const std::string& layer, const Eigen::Array2i& index) const
 {
   try {
     return data_.at(layer)(index(0), index(1));
   } catch (const std::out_of_range& exception) {
-    throw std::out_of_range("GridMap::at(...) : No map layer '" + layer + "' available.");
+    throw std::out_of_range("CostMap::at(...) : No map layer '" + layer + "' available.");
   }
 }
 
-bool GridMap::getIndex(const cost_map::Position& position, cost_map::Index& index) const
+bool CostMap::getIndex(const cost_map::Position& position, cost_map::Index& index) const
 {
   return getIndexFromPosition(index, position, length_, position_, resolution_, size_, startIndex_);
 }
 
-bool GridMap::getPosition(const cost_map::Index& index, cost_map::Position& position) const
+bool CostMap::getPosition(const cost_map::Index& index, cost_map::Position& position) const
 {
   return getPositionFromIndex(position, index, length_, position_, resolution_, size_, startIndex_);
 }
 
-bool GridMap::isInside(const cost_map::Position& position) const
+bool CostMap::isInside(const cost_map::Position& position) const
 {
   return checkIfPositionWithinMap(position, length_, position_);
 }
 
-bool GridMap::isValid(const cost_map::Index& index) const
+bool CostMap::isValid(const cost_map::Index& index) const
 {
   return isValid(index, basicLayers_);
 }
 
-bool GridMap::isValid(const cost_map::Index& index, const std::string& layer) const
+bool CostMap::isValid(const cost_map::Index& index, const std::string& layer) const
 {
-  if (!isfinite(at(layer, index))) return false;
+  if (!std::isfinite(at(layer, index))) return false;
   return true;
 }
 
-bool GridMap::isValid(const cost_map::Index& index, const std::vector<std::string>& layers) const
+bool CostMap::isValid(const cost_map::Index& index, const std::vector<std::string>& layers) const
 {
   if (layers.empty()) return false;
   for (auto& layer : layers) {
-    if (!isfinite(at(layer, index))) return false;
+    if (!std::isfinite(at(layer, index))) return false;
   }
   return true;
 }
 
-bool GridMap::getPosition3(const std::string& layer, const cost_map::Index& index,
+bool CostMap::getPosition3(const std::string& layer, const cost_map::Index& index,
                            cost_map::Position3& position) const
 {
   if (!isValid(index, layer)) return false;
@@ -245,7 +242,7 @@ bool GridMap::getPosition3(const std::string& layer, const cost_map::Index& inde
   return true;
 }
 
-bool GridMap::getVector(const std::string& layerPrefix, const cost_map::Index& index,
+bool CostMap::getVector(const std::string& layerPrefix, const cost_map::Index& index,
                         Eigen::Vector3d& vector) const
 {
   std::vector<std::string> layers;
@@ -259,25 +256,25 @@ bool GridMap::getVector(const std::string& layerPrefix, const cost_map::Index& i
   return true;
 }
 
-GridMap GridMap::getSubmap(const cost_map::Position& position, const cost_map::Length& length,
+CostMap CostMap::getSubmap(const cost_map::Position& position, const cost_map::Length& length,
                            bool& isSuccess)
 {
   Index index;
   return getSubmap(position, length, index, isSuccess);
 }
 
-GridMap GridMap::getSubmap(const cost_map::Position& position, const cost_map::Length& length,
+CostMap CostMap::getSubmap(const cost_map::Position& position, const cost_map::Length& length,
                            cost_map::Index& indexInSubmap, bool& isSuccess)
 {
   // Submap the generate.
-  GridMap submap(layers_);
+  CostMap submap(layers_);
   submap.setBasicLayers(basicLayers_);
   submap.setTimestamp(timestamp_);
   submap.setFrameId(frameId_);
 
   // Get submap geometric information.
   SubmapGeometry submapInformation(*this, position, length, isSuccess);
-  if (isSuccess == false) return GridMap(layers_);
+  if (isSuccess == false) return CostMap(layers_);
   submap.setGeometry(submapInformation);
   submap.startIndex_.setZero(); // Because of the way we copy the data below.
 
@@ -286,9 +283,9 @@ GridMap GridMap::getSubmap(const cost_map::Position& position, const cost_map::L
 
   if (!getBufferRegionsForSubmap(bufferRegions, submapInformation.getStartIndex(),
                                  submap.getSize(), size_, startIndex_)) {
-    cout << "Cannot access submap of this size." << endl;
+    std::cout << "Cannot access submap of this size." << std::endl;
     isSuccess = false;
-    return GridMap(layers_);
+    return CostMap(layers_);
   }
 
   for (auto& data : data_) {
@@ -313,7 +310,7 @@ GridMap GridMap::getSubmap(const cost_map::Position& position, const cost_map::L
   return submap;
 }
 
-bool GridMap::move(const cost_map::Position& position, std::vector<BufferRegion>& newRegions)
+bool CostMap::move(const cost_map::Position& position, std::vector<BufferRegion>& newRegions)
 {
   Index indexShift;
   Position positionShift = position - position_;
@@ -381,13 +378,13 @@ bool GridMap::move(const cost_map::Position& position, std::vector<BufferRegion>
   return (indexShift.any() != 0);
 }
 
-bool GridMap::move(const cost_map::Position& position)
+bool CostMap::move(const cost_map::Position& position)
 {
   std::vector<BufferRegion> newRegions;
   return move(position, newRegions);
 }
 
-bool GridMap::addDataFrom(const cost_map::GridMap& other, bool extendMap, bool overwriteData,
+bool CostMap::addDataFrom(const cost_map::CostMap& other, bool extendMap, bool overwriteData,
                           bool copyAllLayers, std::vector<std::string> layers)
 {
   // Set the layers to copy.
@@ -403,7 +400,7 @@ bool GridMap::addDataFrom(const cost_map::GridMap& other, bool extendMap, bool o
     }
   }
   // Copy data.
-  for (GridMapIterator iterator(*this); !iterator.isPastEnd(); ++iterator) {
+  for (CostMapIterator iterator(*this); !iterator.isPastEnd(); ++iterator) {
     if (isValid(*iterator) && !overwriteData) continue;
     Position position;
     getPosition(*iterator, position);
@@ -419,7 +416,7 @@ bool GridMap::addDataFrom(const cost_map::GridMap& other, bool extendMap, bool o
   return true;
 }
 
-bool GridMap::extendToInclude(const cost_map::GridMap& other)
+bool CostMap::extendToInclude(const cost_map::CostMap& other)
 {
   // Get dimension of maps.
   Position topLeftCorner(position_.x() + length_.x() / 2.0, position_.y() + length_.y() / 2.0);
@@ -452,7 +449,7 @@ bool GridMap::extendToInclude(const cost_map::GridMap& other)
   }
   // Resize map and copy data to new map.
   if (resizeMap) {
-    GridMap mapCopy = *this;
+    CostMap mapCopy = *this;
     setGeometry(extendedMapLength, resolution_, extendedMapPosition);
     // Align new map with old one.
     Vector shift = position_ - mapCopy.getPosition();
@@ -475,7 +472,7 @@ bool GridMap::extendToInclude(const cost_map::GridMap& other)
       position_.y() += -std::copysign(resolution_ / 2.0, shift.y());
     }
     // Copy data.
-    for (GridMapIterator iterator(*this); !iterator.isPastEnd(); ++iterator) {
+    for (CostMapIterator iterator(*this); !iterator.isPastEnd(); ++iterator) {
       if (isValid(*iterator)) continue;
       Position position;
       getPosition(*iterator, position);
@@ -490,84 +487,84 @@ bool GridMap::extendToInclude(const cost_map::GridMap& other)
   return true;
 }
 
-void GridMap::setTimestamp(const Time timestamp)
+void CostMap::setTimestamp(const Time timestamp)
 {
   timestamp_ = timestamp;
 }
 
-Time GridMap::getTimestamp() const
+Time CostMap::getTimestamp() const
 {
   return timestamp_;
 }
 
-void GridMap::resetTimestamp()
+void CostMap::resetTimestamp()
 {
   timestamp_ = 0.0;
 }
 
-void GridMap::setFrameId(const std::string& frameId)
+void CostMap::setFrameId(const std::string& frameId)
 {
   frameId_ = frameId;
 }
 
-const std::string& GridMap::getFrameId() const
+const std::string& CostMap::getFrameId() const
 {
   return frameId_;
 }
 
-const Eigen::Array2d& GridMap::getLength() const
+const Eigen::Array2d& CostMap::getLength() const
 {
   return length_;
 }
 
-const Eigen::Vector2d& GridMap::getPosition() const
+const Eigen::Vector2d& CostMap::getPosition() const
 {
   return position_;
 }
 
-double GridMap::getResolution() const
+double CostMap::getResolution() const
 {
   return resolution_;
 }
 
-const cost_map::Size& GridMap::getSize() const
+const cost_map::Size& CostMap::getSize() const
 {
   return size_;
 }
 
-void GridMap::setStartIndex(const cost_map::Index& startIndex) {
+void CostMap::setStartIndex(const cost_map::Index& startIndex) {
   startIndex_ = startIndex;
 }
 
-const cost_map::Index& GridMap::getStartIndex() const
+const cost_map::Index& CostMap::getStartIndex() const
 {
   return startIndex_;
 }
 
-void GridMap::clear(const std::string& layer)
+void CostMap::clear(const std::string& layer)
 {
   try {
     data_.at(layer).setConstant(NAN);
   } catch (const std::out_of_range& exception) {
-    throw std::out_of_range("GridMap::clear(...) : No map layer '" + layer + "' available.");
+    throw std::out_of_range("CostMap::clear(...) : No map layer '" + layer + "' available.");
   }
 }
 
-void GridMap::clearBasic()
+void CostMap::clearBasic()
 {
   for (auto& layer : basicLayers_) {
     clear(layer);
   }
 }
 
-void GridMap::clearAll()
+void CostMap::clearAll()
 {
   for (auto& data : data_) {
     data.second.setConstant(NAN);
   }
 }
 
-void GridMap::clearRows(unsigned int index, unsigned int nRows)
+void CostMap::clearRows(unsigned int index, unsigned int nRows)
 {
   std::vector<std::string> layersToClear;
   if (basicLayers_.size() > 0) layersToClear = basicLayers_;
@@ -577,7 +574,7 @@ void GridMap::clearRows(unsigned int index, unsigned int nRows)
   }
 }
 
-void GridMap::clearCols(unsigned int index, unsigned int nCols)
+void CostMap::clearCols(unsigned int index, unsigned int nCols)
 {
   std::vector<std::string> layersToClear;
   if (basicLayers_.size() > 0) layersToClear = basicLayers_;
@@ -587,7 +584,7 @@ void GridMap::clearCols(unsigned int index, unsigned int nCols)
   }
 }
 
-void GridMap::resize(const Eigen::Array2i& size)
+void CostMap::resize(const Eigen::Array2i& size)
 {
   size_ = size;
   for (auto& data : data_) {

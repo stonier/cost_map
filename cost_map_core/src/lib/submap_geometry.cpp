@@ -12,7 +12,7 @@
 
 namespace cost_map {
 
-SubmapGeometry::SubmapGeometry(const GridMap& gridMap, const Position& position,
+SubmapGeometry::SubmapGeometry(const CostMap& gridMap, const Position& position,
                                      const Length& length, bool& isSuccess)
     : gridMap_(gridMap)
 {
@@ -26,7 +26,7 @@ SubmapGeometry::~SubmapGeometry()
 {
 }
 
-const GridMap& SubmapGeometry::getGridMap() const
+const CostMap& SubmapGeometry::getGridMap() const
 {
   return gridMap_;
 }
