@@ -6,7 +6,7 @@
  *   Institute: ETH Zurich, Autonomous Systems Lab
  */
 
-#include <cost_map_core/CostMapMath.hpp>
+#include <grid_map_core/GridMapMath.hpp>
 #include "../../../include/cost_map_core/iterators/SpiralIterator.hpp"
 
 #include <cmath>
@@ -28,7 +28,7 @@ SpiralIterator::SpiralIterator(const cost_map::CostMap& gridMap, const Eigen::Ve
   bufferSize_ = gridMap.getSize();
   gridMap.getIndex(center_, indexCenter_);
   nRings_ = std::ceil(radius_ / resolution_);
-  if (checkIfIndexWithinRange(indexCenter_, bufferSize_)) pointsRing_.push_back(indexCenter_);
+  if (grid_map::checkIfIndexWithinRange(indexCenter_, bufferSize_)) pointsRing_.push_back(indexCenter_);
   else generateRing();
 }
 
@@ -73,7 +73,7 @@ bool SpiralIterator::isPastEnd() const
 bool SpiralIterator::isInside(const Index index)
 {
   Eigen::Vector2d position;
-  getPositionFromIndex(position, index, mapLength_, mapPosition_, resolution_, bufferSize_);
+  grid_map::getPositionFromIndex(position, index, mapLength_, mapPosition_, resolution_, bufferSize_);
   double squareNorm = (position - center_).array().square().sum();
   return (squareNorm <= radiusSquare_);
 }
@@ -87,7 +87,7 @@ void SpiralIterator::generateRing()
   do {
     pointInMap.x() = point.x() + indexCenter_.x();
     pointInMap.y() = point.y() + indexCenter_.y();
-    if (checkIfIndexWithinRange(pointInMap, bufferSize_)) {
+    if (grid_map::checkIfIndexWithinRange(pointInMap, bufferSize_)) {
       if (distance_ == nRings_ || distance_ == nRings_ - 1) {
         if (isInside(pointInMap))
           pointsRing_.push_back(pointInMap);

@@ -6,7 +6,7 @@
  *   Institute: ETH Zurich, Autonomous Systems Lab
  */
 
-#include <cost_map_core/CostMapMath.hpp>
+#include <grid_map_core/GridMapMath.hpp>
 #include "../../../include/cost_map_core/iterators/LineIterator.hpp"
 
 

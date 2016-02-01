@@ -6,7 +6,7 @@
  *   Institute: ETH Zurich, Autonomous Systems Lab
  */
 
-#include <cost_map_core/CostMapMath.hpp>
+#include <grid_map_core/GridMapMath.hpp>
 #include "../../../include/cost_map_core/iterators/PolygonIterator.hpp"
 
 
@@ -71,7 +71,7 @@ bool PolygonIterator::isPastEnd() const
 bool PolygonIterator::isInside()
 {
   Eigen::Vector2d position;
-  getPositionFromIndex(position, *(*internalIterator_), mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  grid_map::getPositionFromIndex(position, *(*internalIterator_), mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
   return polygon_.isInside(position);
 }
 
@@ -83,11 +83,11 @@ void PolygonIterator::findSubmapParameters(const cost_map::Polygon& polygon, Eig
     topLeft = topLeft.array().max(vertex.array());
     bottomRight = bottomRight.array().min(vertex.array());
   }
-  limitPositionToRange(topLeft, mapLength_, mapPosition_);
-  limitPositionToRange(bottomRight, mapLength_, mapPosition_);
-  getIndexFromPosition(startIndex, topLeft, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  grid_map::limitPositionToRange(topLeft, mapLength_, mapPosition_);
+  grid_map::limitPositionToRange(bottomRight, mapLength_, mapPosition_);
+  grid_map::getIndexFromPosition(startIndex, topLeft, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
   Eigen::Array2i endIndex;
-  getIndexFromPosition(endIndex, bottomRight, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  grid_map::getIndexFromPosition(endIndex, bottomRight, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
   bufferSize = endIndex - startIndex + Eigen::Array2i::Ones();
 }
 

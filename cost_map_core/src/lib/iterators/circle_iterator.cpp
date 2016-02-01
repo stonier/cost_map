@@ -6,7 +6,7 @@
  *   Institute: ETH Zurich, Autonomous Systems Lab
  */
 
-#include <cost_map_core/CostMapMath.hpp>
+#include <grid_map_core/GridMapMath.hpp>
 #include "../../../include/cost_map_core/iterators/CircleIterator.hpp"
 
 
@@ -75,7 +75,7 @@ bool CircleIterator::isPastEnd() const
 bool CircleIterator::isInside()
 {
   Position position;
-  getPositionFromIndex(position, *(*internalIterator_), mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  grid_map::getPositionFromIndex(position, *(*internalIterator_), mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
   double squareNorm = (position - center_).array().square().sum();
   return (squareNorm <= radiusSquare_);
 }
@@ -85,11 +85,11 @@ void CircleIterator::findSubmapParameters(const Position& center, const double r
 {
   Position topLeft = center.array() + radius;
   Position bottomRight = center.array() - radius;
-  limitPositionToRange(topLeft, mapLength_, mapPosition_);
-  limitPositionToRange(bottomRight, mapLength_, mapPosition_);
-  getIndexFromPosition(startIndex, topLeft, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  grid_map::limitPositionToRange(topLeft, mapLength_, mapPosition_);
+  grid_map::limitPositionToRange(bottomRight, mapLength_, mapPosition_);
+  grid_map::getIndexFromPosition(startIndex, topLeft, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
   Index endIndex;
-  getIndexFromPosition(endIndex, bottomRight, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  grid_map::getIndexFromPosition(endIndex, bottomRight, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
   bufferSize = endIndex - startIndex + Index::Ones();
 }
 

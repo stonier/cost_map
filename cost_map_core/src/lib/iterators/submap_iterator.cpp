@@ -6,7 +6,7 @@
  *   Institute: ETH Zurich, Autonomous Systems Lab
  */
 
-#include <cost_map_core/CostMapMath.hpp>
+#include <grid_map_core/GridMapMath.hpp>
 #include "../../../include/cost_map_core/iterators/SubmapIterator.hpp"
 
 
@@ -78,7 +78,7 @@ const Eigen::Array2i& SubmapIterator::getSubmapIndex() const
 
 SubmapIterator& SubmapIterator::operator ++()
 {
-  isPastEnd_ = !incrementIndexForSubmap(submapIndex_, index_, submapStartIndex_,
+  isPastEnd_ = !grid_map::incrementIndexForSubmap(submapIndex_, index_, submapStartIndex_,
                                          submapSize_, size_, startIndex_);
   return *this;
 }

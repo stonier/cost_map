@@ -6,7 +6,7 @@
  *   Institute: ETH Zurich, Autonomous Systems Lab
  */
 
-#include <cost_map_core/CostMapMath.hpp>
+#include <grid_map_core/GridMapMath.hpp>
 #include "../../../include/cost_map_core/iterators/EllipseIterator.hpp"
 
 #include <math.h>
@@ -79,7 +79,7 @@ bool EllipseIterator::isPastEnd() const
 bool EllipseIterator::isInside()
 {
   Position position;
-  getPositionFromIndex(position, *(*internalIterator_), mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  grid_map::getPositionFromIndex(position, *(*internalIterator_), mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
   double value = ((transformMatrix_ * (position - center_)).array().square() / semiAxisSquare_).sum();
   return (value <= 1);
 }
@@ -93,11 +93,11 @@ void EllipseIterator::findSubmapParameters(const Position& center, const Length&
   const Length boundingBoxHalfLength = (u.cwiseAbs2() + v.cwiseAbs2()).array().sqrt();
   Position topLeft = center.array() + boundingBoxHalfLength;
   Position bottomRight = center.array() - boundingBoxHalfLength;
-  limitPositionToRange(topLeft, mapLength_, mapPosition_);
-  limitPositionToRange(bottomRight, mapLength_, mapPosition_);
-  getIndexFromPosition(startIndex, topLeft, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  grid_map::limitPositionToRange(topLeft, mapLength_, mapPosition_);
+  grid_map::limitPositionToRange(bottomRight, mapLength_, mapPosition_);
+  grid_map::getIndexFromPosition(startIndex, topLeft, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
   Index endIndex;
-  getIndexFromPosition(endIndex, bottomRight, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
+  grid_map::getIndexFromPosition(endIndex, bottomRight, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
   bufferSize = endIndex - startIndex + Eigen::Array2i::Ones();
 }
 

@@ -16,10 +16,8 @@
 
 #include "common.hpp"
 #include "iterators/iterators.hpp"
-#include "Polygon.hpp"
 #include "SubmapGeometry.hpp"
 #include "CostMap.hpp"
-#include "CostMapMath.hpp"
 
 /*****************************************************************************
 ** Trailers

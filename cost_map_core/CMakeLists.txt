@@ -61,14 +61,12 @@ install(DIRECTORY doc DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 ## Add gtest based cpp test target and link libraries
 #catkin_add_gtest(${PROJECT_NAME}-test
-#  test/test_grid_map_core.cpp
-#  test/GridMapMathTest.cpp
-#  test/GridMapTest.cpp
+#  test/test_cost_map_core.cpp
+#  test/CostMapTest.cpp
 #  test/EllipseIteratorTest.cpp
 #  test/SubmapIteratorTest.cpp
 #  test/PolygonIteratorTest.cpp
-#  test/PolygonTest.cpp
-#  test/EigenPluginsTest.cpp)
+#)
 #if(TARGET ${PROJECT_NAME}-test)
 #  target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 #endif()

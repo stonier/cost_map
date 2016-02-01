@@ -6,7 +6,7 @@
  *   Institute: ETH Zurich, Autonomous Systems Lab
  */
 
-#include <cost_map_core/CostMapMath.hpp>
+#include <grid_map_core/GridMapMath.hpp>
 #include <cost_map_core/iterators/CostMapIterator.hpp>
 
 
@@ -17,7 +17,7 @@ CostMapIterator::CostMapIterator(const cost_map::CostMap& gridMap)
   size_ = gridMap.getSize();
   startIndex_ = gridMap.getStartIndex();
   endIndex_ = startIndex_ + gridMap.getSize() - Eigen::Array2i::Ones();
-  mapIndexWithinRange(endIndex_, size_);
+  grid_map::mapIndexWithinRange(endIndex_, size_);
   index_ = startIndex_;
   isPastEnd_ = false;
 }
@@ -53,12 +53,12 @@ const Index& CostMapIterator::operator *() const
 
 const Index CostMapIterator::getUnwrappedIndex() const
 {
-  return getIndexFromBufferIndex(index_, size_, startIndex_);
+  return grid_map::getIndexFromBufferIndex(index_, size_, startIndex_);
 }
 
 CostMapIterator& CostMapIterator::operator ++()
 {
-  isPastEnd_ = !incrementIndex(index_, size_, startIndex_);
+  isPastEnd_ = !grid_map::incrementIndex(index_, size_, startIndex_);
   return *this;
 }
 

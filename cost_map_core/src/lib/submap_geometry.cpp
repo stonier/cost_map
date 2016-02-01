@@ -6,7 +6,7 @@
  *   Institute: ETH Zurich, Autonomous Systems Lab
  */
 
-#include <cost_map_core/CostMapMath.hpp>
+#include <grid_map_core/GridMapMath.hpp>
 #include "../../include/cost_map_core/SubmapGeometry.hpp"
 
 
@@ -16,7 +16,7 @@ SubmapGeometry::SubmapGeometry(const CostMap& gridMap, const Position& position,
                                      const Length& length, bool& isSuccess)
     : gridMap_(gridMap)
 {
-  isSuccess = getSubmapInformation(startIndex_, size_, position_, length_,
+  isSuccess = grid_map::getSubmapInformation(startIndex_, size_, position_, length_,
                                    requestedIndexInSubmap_, position, length, gridMap_.getLength(),
                                    gridMap_.getPosition(), gridMap_.getResolution(),
                                    gridMap_.getSize(), gridMap_.getStartIndex());
