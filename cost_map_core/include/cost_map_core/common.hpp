@@ -29,6 +29,7 @@ namespace cost_map {
   // the biggie - this one is different
   typedef Eigen::Matrix<unsigned char, Eigen::Dynamic, Eigen::Dynamic> Matrix;
   typedef unsigned char DataType;
+  extern const unsigned char NO_INFORMATION;
 
   typedef grid_map::Matrix DataMatrix;
   //typedef grid_map::Matrix Matrix;

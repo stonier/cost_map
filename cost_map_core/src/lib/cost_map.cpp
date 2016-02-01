@@ -86,7 +86,7 @@ bool CostMap::hasSameLayers(const cost_map::CostMap& other) const
   return true;
 }
 
-void CostMap::add(const std::string& layer, const double value)
+void CostMap::add(const std::string& layer, const DataType value)
 {
   add(layer, Matrix::Constant(size_(0), size_(1), value));
 }
@@ -218,15 +218,14 @@ bool CostMap::isValid(const cost_map::Index& index) const
 
 bool CostMap::isValid(const cost_map::Index& index, const std::string& layer) const
 {
-  if (!std::isfinite(at(layer, index))) return false;
-  return true;
+  return (at(layer, index) != NO_INFORMATION);
 }
 
 bool CostMap::isValid(const cost_map::Index& index, const std::vector<std::string>& layers) const
 {
   if (layers.empty()) return false;
   for (auto& layer : layers) {
-    if (!std::isfinite(at(layer, index))) return false;
+    if (at(layer, index) == NO_INFORMATION) return false;
   }
   return true;
 }
@@ -447,6 +446,7 @@ bool CostMap::extendToInclude(const cost_map::CostMap& other)
     extendedMapLength.y() += bottomRightCorner.y() - bottomRightCornerOther.y();
     resizeMap = true;
   }
+
   // Resize map and copy data to new map.
   if (resizeMap) {
     CostMap mapCopy = *this;
@@ -544,7 +544,7 @@ const cost_map::Index& CostMap::getStartIndex() const
 void CostMap::clear(const std::string& layer)
 {
   try {
-    data_.at(layer).setConstant(NAN);
+    data_.at(layer).setConstant(NO_INFORMATION);
   } catch (const std::out_of_range& exception) {
     throw std::out_of_range("CostMap::clear(...) : No map layer '" + layer + "' available.");
   }
@@ -560,7 +560,7 @@ void CostMap::clearBasic()
 void CostMap::clearAll()
 {
   for (auto& data : data_) {
-    data.second.setConstant(NAN);
+    data.second.setConstant(NO_INFORMATION);
   }
 }
 
@@ -570,7 +570,7 @@ void CostMap::clearRows(unsigned int index, unsigned int nRows)
   if (basicLayers_.size() > 0) layersToClear = basicLayers_;
   else layersToClear = layers_;
   for (auto& layer : layersToClear) {
-    data_.at(layer).block(index, 0, nRows, getSize()(1)).setConstant(NAN);
+    data_.at(layer).block(index, 0, nRows, getSize()(1)).setConstant(NO_INFORMATION);
   }
 }
 
@@ -580,7 +580,7 @@ void CostMap::clearCols(unsigned int index, unsigned int nCols)
   if (basicLayers_.size() > 0) layersToClear = basicLayers_;
   else layersToClear = layers_;
   for (auto& layer : layersToClear) {
-    data_.at(layer).block(0, index, getSize()(0), nCols).setConstant(NAN);
+    data_.at(layer).block(0, index, getSize()(0), nCols).setConstant(NO_INFORMATION);
   }
 }
 

@@ -73,7 +73,7 @@ public:
    * @param layer the name of the layer.
    * @value value the value to initialize the cells with.
    */
-  void add(const std::string& layer, const double value = NAN);
+  void add(const std::string& layer, const DataType value = NO_INFORMATION);
 
   /*!
    * Add a new data layer (if the layer already exists, overwrite its data, otherwise add layer and data).
@@ -222,6 +222,10 @@ public:
   /*!
    * Checks if the index of all layers defined as basic types are valid,
    * i.e. if all basic types are finite. Returns `false` if no basic types are defined.
+   *
+   * For cost maps, this currently always returns true (cells
+   * are always initialised at zero, not nan).
+   *
    * @param index the index to check.
    * @return true if cell is valid, false otherwise.
    */
@@ -229,6 +233,10 @@ public:
 
   /*!
    * Checks if cell at index is a valid (finite) for a certain layer.
+   *
+   * For cost maps, this currently always returns true (cells
+   * are always initialised at zero, not nan).
+   *
    * @param index the index to check.
    * @param layer the name of the layer to be checked for validity.
    * @return true if cell is valid, false otherwise.
@@ -237,6 +245,10 @@ public:
 
   /*!
    * Checks if cell at index is a valid (finite) for certain layers.
+   *
+   * For cost maps, this currently always returns true (cells
+   * are always initialised at zero, not nan).
+   *
    * @param index the index to check.
    * @param layers the layers to be checked for validity.
    * @return true if cell is valid, false otherwise.
