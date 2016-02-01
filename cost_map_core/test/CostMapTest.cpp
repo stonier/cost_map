@@ -1,5 +1,5 @@
 /*
- * GridMapTest.cpp
+ * CostMapTest.cpp
  *
  *  Created on: Aug 26, 2015
  *      Author: Péter Fankhauser
@@ -13,11 +13,11 @@
 #include "../include/cost_map_core/CostMap.hpp"
 
 using namespace std;
-using namespace grid_map;
+using namespace cost_map;
 
-TEST(GridMap, Move)
+TEST(CostMap, Move)
 {
-  GridMap map;
+  CostMap map;
   map.setGeometry(Length(8.1, 5.1), 1.0, Position(0.0, 0.0)); // bufferSize(8, 5)
   map.add("layer", 0.0);
   map.setBasicLayers(map.getLayers());
@@ -28,6 +28,7 @@ TEST(GridMap, Move)
   EXPECT_EQ(3, startIndex(0));
   EXPECT_EQ(2, startIndex(1));
 
+  // costmaps always currently return true
   EXPECT_FALSE(map.isValid(Index(0, 0))); // TODO Check entire map.
   EXPECT_TRUE(map.isValid(Index(3, 2)));
   EXPECT_FALSE(map.isValid(Index(2, 2)));
@@ -48,16 +49,18 @@ TEST(GridMap, Move)
 
 TEST(AddDataFrom, extendMapAligned)
 {
-  GridMap map1, map2;
+  CostMap map1, map2;
   map1.setGeometry(Length(5.1, 5.1), 1.0, Position(0.0, 0.0)); // bufferSize(5, 5)
-  map1.add("zero", 0.0);
-  map1.add("one", 1.0);
+  map1.add("zero", 0);
+  map1.add("one", 1);
   map1.setBasicLayers(map1.getLayers());
 
   map2.setGeometry(Length(3.1, 3.1), 1.0, Position(2.0, 2.0));
-  map2.add("one", 1.1);
-  map2.add("two", 2.0);
+  map2.add("one", 2);
+  map2.add("two", 3);
   map2.setBasicLayers(map1.getLayers());
+
+  EXPECT_FALSE(map1.isInside(Position(3.0, 3.0)));
 
   map1.addDataFrom(map2, true, true, true);
 
@@ -67,28 +70,28 @@ TEST(AddDataFrom, extendMapAligned)
   EXPECT_DOUBLE_EQ(6.0, map1.getLength().y());
   EXPECT_DOUBLE_EQ(0.5, map1.getPosition().x());
   EXPECT_DOUBLE_EQ(0.5, map1.getPosition().y());
-  EXPECT_NEAR(1.1, map1.atPosition("one", Position(2, 2)), 1e-4);
-  EXPECT_DOUBLE_EQ(1.0, map1.atPosition("one", Position(-2, -2)));
-  EXPECT_DOUBLE_EQ(0.0, map1.atPosition("zero", Position(0.0, 0.0)));
+  EXPECT_EQ(2, static_cast<int>(map1.atPosition("one", Position(2, 2))));
+  EXPECT_EQ(1, static_cast<int>(map1.atPosition("one", Position(-2, -2))));
+  EXPECT_EQ(0, static_cast<int>(map1.atPosition("zero", Position(0.0, 0.0))));
 }
 
 TEST(AddDataFrom, extendMapNotAligned)
 {
-  GridMap map1, map2;
+  CostMap map1, map2;
   map1.setGeometry(Length(6.1, 6.1), 1.0, Position(0.0, 0.0)); // bufferSize(6, 6)
-  map1.add("nan");
-  map1.add("one", 1.0);
-  map1.add("zero", 0.0);
+  map1.add("no_information");
+  map1.add("one", 1);
+  map1.add("zero", 0);
   map1.setBasicLayers(map1.getLayers());
 
   map2.setGeometry(Length(3.1, 3.1), 1.0, Position(3.2, 3.2));
-  map2.add("nan", 1.0);
-  map2.add("one", 1.1);
-  map2.add("two", 2.0);
+  map2.add("no_information", 1);
+  map2.add("one", 1);
+  map2.add("two", 2);
   map2.setBasicLayers(map1.getLayers());
 
   std::vector<std::string> stringVector;
-  stringVector.push_back("nan");
+  stringVector.push_back("no_information");
   map1.addDataFrom(map2, true, false, false, stringVector);
   Index index;
   map1.getIndex(Position(-2, -2), index);
@@ -99,14 +102,14 @@ TEST(AddDataFrom, extendMapNotAligned)
   EXPECT_DOUBLE_EQ(8.0, map1.getLength().y());
   EXPECT_DOUBLE_EQ(1.0, map1.getPosition().x());
   EXPECT_DOUBLE_EQ(1.0, map1.getPosition().y());
-  EXPECT_FALSE(map1.isValid(index, "nan"));
-  EXPECT_DOUBLE_EQ(1.0, map1.atPosition("one", Position(0.0, 0.0)));
-  EXPECT_DOUBLE_EQ(1.0, map1.atPosition("nan", Position(3.0, 3.0)));
+  EXPECT_FALSE(map1.isValid(index, "no_information"));
+  EXPECT_DOUBLE_EQ(1, static_cast<int>(map1.atPosition("one", Position(0.0, 0.0))));
+  EXPECT_DOUBLE_EQ(1, static_cast<int>(map1.atPosition("no_information", Position(3.0, 3.0))));
 }
 
 TEST(AddDataFrom, copyData)
 {
-  GridMap map1, map2;
+  CostMap map1, map2;
   map1.setGeometry(Length(5.1, 5.1), 1.0, Position(0.0, 0.0)); // bufferSize(5, 5)
   map1.add("zero", 0.0);
   map1.add("one");
@@ -127,7 +130,7 @@ TEST(AddDataFrom, copyData)
   EXPECT_DOUBLE_EQ(5.0, map1.getLength().y());
   EXPECT_DOUBLE_EQ(0.0, map1.getPosition().x());
   EXPECT_DOUBLE_EQ(0.0, map1.getPosition().y());
-  EXPECT_DOUBLE_EQ(1.0, map1.atPosition("one", Position(2, 2)));
+  EXPECT_DOUBLE_EQ(1, static_cast<int>(map1.atPosition("one", Position(2, 2))));
   EXPECT_FALSE(map1.isValid(index, "one"));
-  EXPECT_DOUBLE_EQ(0.0, map1.atPosition("zero", Position(0.0, 0.0)));
+  EXPECT_DOUBLE_EQ(0, static_cast<int>(map1.atPosition("zero", Position(0.0, 0.0))));
 }

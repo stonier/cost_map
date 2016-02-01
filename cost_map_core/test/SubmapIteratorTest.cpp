@@ -6,6 +6,7 @@
  *	 Institute: ETH Zurich, Autonomous Systems Lab
  */
 
+#include "../include/cost_map_core/common.hpp"
 #include "../include/cost_map_core/iterators/SubmapIterator.hpp"
 
 #include <Eigen/Core>
@@ -18,11 +19,10 @@
 
 // Vector
 #include <vector>
-#include "../include/cost_map_core/GridMap.hpp"
+#include "../include/cost_map_core/CostMap.hpp"
 
 using namespace std;
 using namespace Eigen;
-using namespace grid_map;
 
 TEST(SubmapIterator, Simple)
 {
@@ -33,10 +33,10 @@ TEST(SubmapIterator, Simple)
 
   vector<string> types;
   types.push_back("type");
-  GridMap map(types);
+  cost_map::CostMap map(types);
   map.setGeometry(Array2d(8.1, 5.1), 1.0, Vector2d(0.0, 0.0)); // bufferSize(8, 5)
 
-  SubmapIterator iterator(map, submapTopLeftIndex, submapBufferSize);
+  cost_map::SubmapIterator iterator(map, submapTopLeftIndex, submapBufferSize);
 
   EXPECT_FALSE(iterator.isPastEnd());
   EXPECT_EQ(submapTopLeftIndex(0), (*iterator)(0));
@@ -96,11 +96,11 @@ TEST(SubmapIterator, CircularBuffer)
 
   vector<string> types;
   types.push_back("type");
-  GridMap map(types);
+  cost_map::CostMap map(types);
   map.setGeometry(Array2d(8.1, 5.1), 1.0, Vector2d(0.0, 0.0)); // bufferSize(8, 5)
   map.move(Vector2d(-3.0, -2.0)); // bufferStartIndex(3, 2)
 
-  SubmapIterator iterator(map, submapTopLeftIndex, submapBufferSize);
+  cost_map::SubmapIterator iterator(map, submapTopLeftIndex, submapBufferSize);
 
   EXPECT_FALSE(iterator.isPastEnd());
   EXPECT_EQ(submapTopLeftIndex(0), (*iterator)(0));

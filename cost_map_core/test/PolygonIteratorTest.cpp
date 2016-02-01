@@ -6,6 +6,7 @@
  *	 Institute: ETH Zurich, Autonomous Systems Lab
  */
 
+#include "../include/cost_map_core/common.hpp"
 #include "../include/cost_map_core/iterators/PolygonIterator.hpp"
 
 #include <Eigen/Core>
@@ -18,27 +19,26 @@
 
 // Vector
 #include <vector>
-#include "../include/cost_map_core/GridMap.hpp"
-#include "../include/cost_map_core/Polygon.hpp"
+#include "../include/cost_map_core/CostMap.hpp"
+#include <grid_map_core/Polygon.hpp>
 
 using namespace std;
 using namespace Eigen;
-using namespace grid_map;
 
 TEST(PolygonIterator, FullCover)
 {
   vector<string> types;
   types.push_back("type");
-  GridMap map(types);
-  map.setGeometry(Length(8.0, 5.0), 1.0, Position(0.0, 0.0)); // bufferSize(8, 5)
+  cost_map::CostMap map(types);
+  map.setGeometry(cost_map::Length(8.0, 5.0), 1.0, cost_map::Position(0.0, 0.0)); // bufferSize(8, 5)
 
-  Polygon polygon;
-  polygon.addVertex(Position(-100.0, 100.0));
-  polygon.addVertex(Position(100.0, 100.0));
-  polygon.addVertex(Position(100.0, -100.0));
-  polygon.addVertex(Position(-100.0, -100.0));
+  cost_map::Polygon polygon;
+  polygon.addVertex(cost_map::Position(-100.0, 100.0));
+  polygon.addVertex(cost_map::Position(100.0, 100.0));
+  polygon.addVertex(cost_map::Position(100.0, -100.0));
+  polygon.addVertex(cost_map::Position(-100.0, -100.0));
 
-  PolygonIterator iterator(map, polygon);
+  cost_map::PolygonIterator iterator(map, polygon);
 
   EXPECT_FALSE(iterator.isPastEnd());
   EXPECT_EQ(0, (*iterator)(0));
@@ -66,32 +66,32 @@ TEST(PolygonIterator, FullCover)
 
 TEST(PolygonIterator, Outside)
 {
-  GridMap map({"types"});
-  map.setGeometry(Length(8.0, 5.0), 1.0, Position(0.0, 0.0)); // bufferSize(8, 5)
+  cost_map::CostMap map({"types"});
+  map.setGeometry(cost_map::Length(8.0, 5.0), 1.0, cost_map::Position(0.0, 0.0)); // bufferSize(8, 5)
 
-  Polygon polygon;
-  polygon.addVertex(Position(99.0, 101.0));
-  polygon.addVertex(Position(101.0, 101.0));
-  polygon.addVertex(Position(101.0, 99.0));
-  polygon.addVertex(Position(99.0, 99.0));
+  cost_map::Polygon polygon;
+  polygon.addVertex(cost_map::Position(99.0, 101.0));
+  polygon.addVertex(cost_map::Position(101.0, 101.0));
+  polygon.addVertex(cost_map::Position(101.0, 99.0));
+  polygon.addVertex(cost_map::Position(99.0, 99.0));
 
-  PolygonIterator iterator(map, polygon);
+  cost_map::PolygonIterator iterator(map, polygon);
 
   EXPECT_TRUE(iterator.isPastEnd());
 }
 
 TEST(PolygonIterator, Square)
 {
-  GridMap map({"types"});
-  map.setGeometry(Length(8.0, 5.0), 1.0, Position(0.0, 0.0)); // bufferSize(8, 5)
+  cost_map::CostMap map({"types"});
+  map.setGeometry(cost_map::Length(8.0, 5.0), 1.0, cost_map::Position(0.0, 0.0)); // bufferSize(8, 5)
 
-  Polygon polygon;
-  polygon.addVertex(Position(-1.0, 1.5));
-  polygon.addVertex(Position(1.0, 1.5));
-  polygon.addVertex(Position(1.0, -1.5));
-  polygon.addVertex(Position(-1.0, -1.5));
+  cost_map::Polygon polygon;
+  polygon.addVertex(cost_map::Position(-1.0, 1.5));
+  polygon.addVertex(cost_map::Position(1.0, 1.5));
+  polygon.addVertex(cost_map::Position(1.0, -1.5));
+  polygon.addVertex(cost_map::Position(-1.0, -1.5));
 
-  PolygonIterator iterator(map, polygon);
+  cost_map::PolygonIterator iterator(map, polygon);
 
   EXPECT_FALSE(iterator.isPastEnd());
   EXPECT_EQ(3, (*iterator)(0));
@@ -128,15 +128,15 @@ TEST(PolygonIterator, Square)
 
 TEST(PolygonIterator, TopLeftTriangle)
 {
-  GridMap map({"types"});
-  map.setGeometry(Length(8.0, 5.0), 1.0, Position(0.0, 0.0)); // bufferSize(8, 5)
+  cost_map::CostMap map({"types"});
+  map.setGeometry(cost_map::Length(8.0, 5.0), 1.0, cost_map::Position(0.0, 0.0)); // bufferSize(8, 5)
 
-  Polygon polygon;
-  polygon.addVertex(Position(-40.1, 20.6));
-  polygon.addVertex(Position(40.1, 20.4));
-  polygon.addVertex(Position(-40.1, -20.6));
+  cost_map::Polygon polygon;
+  polygon.addVertex(cost_map::Position(-40.1, 20.6));
+  polygon.addVertex(cost_map::Position(40.1, 20.4));
+  polygon.addVertex(cost_map::Position(-40.1, -20.6));
 
-  PolygonIterator iterator(map, polygon);
+  cost_map::PolygonIterator iterator(map, polygon);
 
   EXPECT_FALSE(iterator.isPastEnd());
   EXPECT_EQ(0, (*iterator)(0));

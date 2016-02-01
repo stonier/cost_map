@@ -41,7 +41,12 @@ catkin_package(
 ecl_enable_cxx11_compiler()
 add_definitions(${catkin_DEFINITIONS})
 include_directories(include ${catkin_INCLUDE_DIRS})
+
 add_subdirectory(src)
+
+if(CATKIN_ENABLE_TESTING)
+  add_subdirectory(test)
+endif()
 
 ##############################################################################
 # Installs
@@ -53,21 +58,4 @@ install(
   FILES_MATCHING PATTERN "*.hpp"
 )
 install(DIRECTORY doc DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-
-##############################################################################
-# Tests
-##############################################################################
-
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-## Add gtest based cpp test target and link libraries
-#catkin_add_gtest(${PROJECT_NAME}-test
-#  test/test_cost_map_core.cpp
-#  test/CostMapTest.cpp
-#  test/EllipseIteratorTest.cpp
-#  test/SubmapIteratorTest.cpp
-#  test/PolygonIteratorTest.cpp
-#)
-#if(TARGET ${PROJECT_NAME}-test)
-#  target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-#endif()
 

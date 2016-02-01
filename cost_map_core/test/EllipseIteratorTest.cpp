@@ -6,6 +6,7 @@
  *	 Institute: ETH Zurich, Autonomous Systems Lab
  */
 
+#include "../include/cost_map_core/common.hpp"
 #include "../include/cost_map_core/iterators/EllipseIterator.hpp"
 
 #include <Eigen/Core>
@@ -18,18 +19,17 @@
 
 // Vector
 #include <vector>
-#include "../include/cost_map_core/GridMap.hpp"
+#include "../include/cost_map_core/CostMap.hpp"
 
 using namespace std;
 using namespace Eigen;
-using namespace grid_map;
 
 TEST(EllipseIterator, OneCellWideEllipse)
 {
-  GridMap map( { "types" });
-  map.setGeometry(Length(8.0, 5.0), 1.0, Position(0.0, 0.0));
+  cost_map::CostMap map( { "types" });
+  map.setGeometry(cost_map::Length(8.0, 5.0), 1.0, cost_map::Position(0.0, 0.0));
 
-  EllipseIterator iterator(map, Position(0.0, 0.0), Length(8.0, 1.0));
+  cost_map::EllipseIterator iterator(map, cost_map::Position(0.0, 0.0), cost_map::Length(8.0, 1.0));
 
   EXPECT_FALSE(iterator.isPastEnd());
   EXPECT_EQ(0, (*iterator)(0));
