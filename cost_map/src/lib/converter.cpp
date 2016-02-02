@@ -248,11 +248,6 @@ void toMessage(const cost_map::CostMap& cost_map, cost_map_msgs::CostMap& messag
   message.data.clear();
   for (const auto& layer : layers) {
     const cost_map::Matrix& data = cost_map.get(layer);
-    for ( unsigned int i = 0; i < data.rows(); ++i ) {
-      for ( unsigned int j = 0; j < data.cols(); ++j ) {
-        std::cout << "  " << i << "," << j << ": " << static_cast<int>(data(i,j)) << std::endl;
-      }
-    }
     std_msgs::UInt8MultiArray data_array;
     grid_map::matrixEigenCopyToMultiArrayMessage(cost_map.get(layer), data_array);
     message.data.push_back(data_array);
@@ -261,6 +256,72 @@ void toMessage(const cost_map::CostMap& cost_map, cost_map_msgs::CostMap& messag
   message.outer_start_index = cost_map.getStartIndex()(0);
   message.inner_start_index = cost_map.getStartIndex()(1);
 
+}
+
+bool fromMessage(const cost_map_msgs::CostMap& message, cost_map::CostMap& cost_map)
+{
+  cost_map.setTimestamp(message.info.header.stamp.toNSec());
+  cost_map.setFrameId(message.info.header.frame_id);
+  cost_map.setGeometry(Length(message.info.length_x, message.info.length_y), message.info.resolution,
+                      Position(message.info.pose.position.x, message.info.pose.position.y));
+
+  if (message.layers.size() != message.data.size()) {
+    // ROS_ERROR("Different number of layers and data in grid map message.");
+    return false;
+  }
+
+  for (unsigned int i = 0; i < message.layers.size(); i++) {
+    Matrix data;
+    // this is not a template function
+    // grid_map::multiArrayMessageCopyToMatrixEigen(message.data[i], data); // TODO Could we use the data mapping (instead of copying) method here?
+    multiArrayMessageCopyToMatrixEigen(message.data[i], data);
+    // TODO Check if size is good.   size_ << getRows(message.data[0]), getCols(message.data[0]);
+    cost_map.add(message.layers[i], data);
+  }
+
+  cost_map.setBasicLayers(message.basic_layers);
+  cost_map.setStartIndex(Index(message.outer_start_index, message.inner_start_index));
+  return true;
+}
+
+void toOccupancyGrid(const cost_map::CostMap& cost_map, const std::string& layer, nav_msgs::OccupancyGrid& msg) {
+  msg.header.frame_id = cost_map.getFrameId();
+  msg.header.stamp.fromNSec(cost_map.getTimestamp());
+  msg.info.map_load_time = msg.header.stamp;  // Same as header stamp as we do not load the map.
+  msg.info.resolution = cost_map.getResolution();
+  msg.info.width = cost_map.getSize()(0);
+  msg.info.height = cost_map.getSize()(1);
+  Position positionOfOrigin;
+  grid_map::getPositionOfDataStructureOrigin(cost_map.getPosition(), cost_map.getLength(), positionOfOrigin);
+  msg.info.origin.position.x = positionOfOrigin.x();
+  msg.info.origin.position.y = positionOfOrigin.y();
+  msg.info.origin.position.z = 0.0;
+  msg.info.origin.orientation.x = 0.0;
+  msg.info.origin.orientation.y = 0.0;
+  msg.info.origin.orientation.z = 1.0;  // yes, this is correct.
+  msg.info.origin.orientation.w = 0.0;
+  msg.data.resize(msg.info.width * msg.info.height);
+
+  // Occupancy probabilities are in the range [0,100].  Unknown is -1.
+  const float cellMin = 0;
+  const float cellMax = 100;
+  const float cellRange = cellMax - cellMin;
+
+  const float data_minimum = 0;
+  const float data_maximum = 254;
+  for (CostMapIterator iterator(cost_map); !iterator.isPastEnd(); ++iterator) {
+    float value;
+    if (cost_map.at(layer, *iterator) == cost_map::NO_INFORMATION) {
+      value = -1;
+    } else {
+      value = (cost_map.at(layer, *iterator) - data_minimum) / (data_maximum - data_minimum);
+      value = cellMin + std::min(std::max(0.0f, value), 1.0f) * cellRange;
+    }
+    // Occupancy grid claims to be row-major order, but it does not seem that way.
+    // http://docs.ros.org/api/nav_msgs/html/msg/OccupancyGrid.html.
+    unsigned int index = grid_map::get1dIndexFrom2dIndex(*iterator, cost_map.getSize(), false);
+    msg.data[index] = value;
+  }
 }
 
 grid_map::GridMap toGridMap(const cost_map::CostMap cost_map)

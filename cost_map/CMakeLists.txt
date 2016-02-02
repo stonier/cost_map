@@ -16,7 +16,9 @@ find_package(catkin
         cost_map_msgs
         ecl_build
         ecl_console
+        ecl_exceptions
         grid_map
+        nav_msgs
     )
 
 find_package(Boost REQUIRED COMPONENTS filesystem)
@@ -39,7 +41,9 @@ catkin_package(
         cost_map_msgs
         ecl_build
         ecl_console
+        ecl_exceptions
         grid_map
+        nav_msgs
     DEPENDS
         Boost
         YAML_CPP

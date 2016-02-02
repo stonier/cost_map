@@ -14,7 +14,11 @@ find_package(catkin
     COMPONENTS
         ecl_build
         ecl_console
+        cost_map
         cost_map_core
+        cost_map_msgs
+        nav_msgs
+        roscpp
     )
 
 ##############################################################################
@@ -29,7 +33,11 @@ catkin_package(
     CATKIN_DEPENDS
         ecl_build
         ecl_console
+        cost_map
         cost_map_core
+        cost_map_msgs
+        nav_msgs
+        roscpp
     )
 
 ##############################################################################
@@ -39,6 +47,12 @@ catkin_package(
 ecl_enable_cxx11_compiler()
 add_definitions(${catkin_DEFINITIONS})
 include_directories(include ${catkin_INCLUDE_DIRS})
+
+##############################################################################
+# Project Sources
+##############################################################################
+
+add_subdirectory(src)
 
 ##############################################################################
 # Installs

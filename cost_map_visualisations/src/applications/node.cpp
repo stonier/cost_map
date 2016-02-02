@@ -5,20 +5,18 @@
 ** Includes
 *****************************************************************************/
 
-#include "../../include/cost_map_visualisations/node.hpp"
+#include <cstdlib>
+#include <ros/ros.h>
+#include "../../include/cost_map_visualisations/occupancy_grid.hpp"
 
 /*****************************************************************************
-** Namespaces
+** Main
 *****************************************************************************/
 
-namespace cost_map_visualisations {
-
-/*****************************************************************************
-** Implementation
-*****************************************************************************/
-
-/*****************************************************************************
- ** Trailers
- *****************************************************************************/
-
-} // namespace cost_map_visualisations
+int main(int argc, char **argv) {
+  ros::init(argc, argv, "cost_map_visualisations");
+  ros::NodeHandle nodehandle("~");
+  cost_map::OccupancyGrid occupancy_grid(nodehandle);
+  ros::spin();
+  return EXIT_SUCCESS;
+}

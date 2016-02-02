@@ -41,6 +41,7 @@
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="include/cost_map_visualisations"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src/applications"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/lib"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

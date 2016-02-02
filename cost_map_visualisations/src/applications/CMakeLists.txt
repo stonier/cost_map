@@ -1,24 +1,23 @@
-############################################################################
-# Sources
-##############################################################################
+###############################################################################
+# Macro
+###############################################################################
 
-file(GLOB SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
-file(GLOB ITERATOR_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} iterators/*.cpp)
+macro(cost_map_visualisations_add_global_utility name)
+  add_executable(${name} ${name}.cpp)
+  target_link_libraries(gopher_${name} ${catkin_LIBRARIES} ${PROJECT_NAME})
+  set_target_properties(gopher_${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_BIN_DESTINATION})
+  install(TARGETS gopher_${name} RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
+endmacro()
 
-##############################################################################
-# Library
-##############################################################################
+macro(cost_map_visualisations_add_utility name)
+  add_executable(${name} ${name}.cpp)
+  target_link_libraries(${name} ${catkin_LIBRARIES} ${PROJECT_NAME})
+  install(TARGETS ${name} RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+endmacro()
 
-#add_library(${PROJECT_NAME} ${SOURCES} ${ITERATOR_SOURCES})
-#target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+###############################################################################
+# Setup
+###############################################################################
 
-##############################################################################
-# Installs
-##############################################################################
-
-install(TARGETS ${PROJECT_NAME}
-   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
-   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-   PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-)
+# cost_map_visualisations_add_global_utility(gopher_planner)
+cost_map_visualisations_add_utility(node)

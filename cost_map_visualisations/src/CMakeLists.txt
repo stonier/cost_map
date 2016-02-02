@@ -2,5 +2,5 @@
 # Subdirectories
 ##############################################################################
 
-#add_subdirectory(lib)
+add_subdirectory(lib)
 add_subdirectory(applications)
