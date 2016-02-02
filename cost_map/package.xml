@@ -1,0 +1,34 @@
+<package>
+  <name>cost_map</name>
+  <version>0.1.0</version>
+  <description>
+   Cost maps, following the style of ethz-asl's grid_map library.
+  </description>
+  <url type="repository">https://github.com/stonier/cost_map</url>
+  <url type="bugtracker">https://github.com/stonier/cost_map/issues</url>
+  <maintainer email="d.stonier@gmail.com">Daniel Stonier</maintainer>
+  <license>BSD</license>
+  <author>Daniel Stonier</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>boost</build_depend>
+  <build_depend>ecl_build</build_depend>
+  <build_depend>ecl_console</build_depend>
+  <build_depend>cost_map_core</build_depend>
+  <build_depend>grid_map</build_depend>
+  <build_depend>libopencv-dev</build_depend>
+  <build_depend>yaml-cpp</build_depend>
+
+  <run_depend>boost</run_depend>
+  <run_depend>ecl_build</run_depend>
+  <run_depend>ecl_console</run_depend>
+  <run_depend>cost_map_core</run_depend>
+  <run_depend>grid_map</run_depend>
+  <run_depend>libopencv-dev</run_depend>
+  <run_depend>yaml-cpp</run_depend>
+
+  <export>
+    <rosdoc config="rosdoc.yaml" />
+  </export>
+</package>
