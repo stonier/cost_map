@@ -1,0 +1,26 @@
+<package>
+  <name>cost_map_visualisations</name>
+  <version>0.1.0</version>
+  <description>
+   Visualisation tools for cost maps.
+  </description>
+  <url type="repository">https://github.com/stonier/cost_map</url>
+  <url type="bugtracker">https://github.com/stonier/cost_map/issues</url>
+  <maintainer email="stonier@yujinrobot.com">Daniel Stonier</maintainer>
+  <license>BSD</license>
+  <author>Daniel Stonier</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>ecl_build</build_depend>
+  <build_depend>ecl_console</build_depend>
+  <build_depend>cost_map_core</build_depend>
+
+  <run_depend>ecl_build</run_depend>
+  <run_depend>ecl_console</run_depend>
+  <run_depend>cost_map_core</run_depend>
+
+  <export>
+    <rosdoc config="rosdoc.yaml" />
+  </export>
+</package>
