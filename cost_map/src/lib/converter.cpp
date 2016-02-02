@@ -6,6 +6,7 @@
 *****************************************************************************/
 
 #include <cost_map_core/cost_map_core.hpp>
+#include <cost_map_msgs/CostMap.h>
 #include <cv_bridge/cv_bridge.h>
 #include <boost/filesystem.hpp>
 #include <ecl/console.hpp>
@@ -17,6 +18,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
+#include <std_msgs/UInt8MultiArray.h>
 #include <string>
 #include <yaml-cpp/yaml.h>
 #include "../../include/cost_map/converter.hpp"
@@ -223,7 +225,7 @@ bool addLayerFromROSImage(const sensor_msgs::Image& image,
 //
 // almost a carbon copy of grid_map::toMessage
 //
-void toMessage(const cost_map::CostMap& cost_map, grid_map_msgs::GridMap& message)
+void toMessage(const cost_map::CostMap& cost_map, cost_map_msgs::CostMap& message)
 {
   std::vector<std::string> layers = cost_map.getLayers();
 
@@ -245,9 +247,15 @@ void toMessage(const cost_map::CostMap& cost_map, grid_map_msgs::GridMap& messag
 
   message.data.clear();
   for (const auto& layer : layers) {
-    std_msgs::ByteMultiArray byte_array;
-    grid_map::matrixEigenCopyToMultiArrayMessage(cost_map.get(layer), byte_array);
-    message.costs.push_back(byte_array);
+    const cost_map::Matrix& data = cost_map.get(layer);
+    for ( unsigned int i = 0; i < data.rows(); ++i ) {
+      for ( unsigned int j = 0; j < data.cols(); ++j ) {
+        std::cout << "  " << i << "," << j << ": " << static_cast<int>(data(i,j)) << std::endl;
+      }
+    }
+    std_msgs::UInt8MultiArray data_array;
+    grid_map::matrixEigenCopyToMultiArrayMessage(cost_map.get(layer), data_array);
+    message.data.push_back(data_array);
   }
 
   message.outer_start_index = cost_map.getStartIndex()(0);

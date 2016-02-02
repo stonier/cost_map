@@ -14,6 +14,7 @@
 
 #include <grid_map/grid_map.hpp>
 #include <cost_map_core/cost_map_core.hpp>
+#include <cost_map_msgs/CostMap.h>
 #include <string>
 
 /*****************************************************************************
@@ -38,7 +39,7 @@ bool addLayerFromROSImage(const sensor_msgs::Image& image,
  * @param[in] gridMap the grid map object.
  * @param[out] message the grid map message to be populated.
  */
-void toMessage(const cost_map::CostMap& cost_map, grid_map_msgs::GridMap& message);
+void toMessage(const cost_map::CostMap& cost_map, cost_map_msgs::CostMap& message);
 
 grid_map::GridMap toGridMap(const cost_map::CostMap cost_map);
 

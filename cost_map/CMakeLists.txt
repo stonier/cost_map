@@ -13,6 +13,7 @@ find_package(catkin
     REQUIRED
     COMPONENTS
         cost_map_core
+        cost_map_msgs
         ecl_build
         ecl_console
         grid_map
@@ -35,6 +36,7 @@ catkin_package(
         ${PROJECT_NAME}
     CATKIN_DEPENDS
         cost_map_core
+        cost_map_msgs
         ecl_build
         ecl_console
         grid_map

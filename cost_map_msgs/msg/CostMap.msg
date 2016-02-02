@@ -10,7 +10,7 @@ string[] layers
 string[] basic_layers
 
 # Costs from a cost_map::CostMap
-std_msgs/ByteMultiArray[] costs
+std_msgs/UInt8MultiArray[] data
 
 # Row start index (default 0).
 uint16 outer_start_index
