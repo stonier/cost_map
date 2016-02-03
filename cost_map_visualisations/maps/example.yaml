@@ -1,0 +1,3 @@
+# Example costmap from image file
+resolution: 0.025
+filename: example.png

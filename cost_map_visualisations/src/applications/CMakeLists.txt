@@ -21,3 +21,4 @@ endmacro()
 
 # cost_map_visualisations_add_global_utility(gopher_planner)
 cost_map_visualisations_add_utility(node)
+cost_map_visualisations_add_utility(map_loader)
