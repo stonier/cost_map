@@ -19,7 +19,6 @@ find_package(catkin
         cost_map_msgs
         nav_msgs
         roscpp
-        roslib
     )
 
 ##############################################################################
@@ -39,7 +38,6 @@ catkin_package(
         cost_map_msgs
         nav_msgs
         roscpp
-        roslib
     )
 
 ##############################################################################

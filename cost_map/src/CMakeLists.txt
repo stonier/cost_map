@@ -3,4 +3,4 @@
 ##############################################################################
 
 add_subdirectory(lib)
-#add_subdirectory(applications)
+add_subdirectory(applications)

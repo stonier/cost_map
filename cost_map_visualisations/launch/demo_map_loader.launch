@@ -1,7 +1,7 @@
 <launch>
   <arg name="resource_name" default="cost_map_visualisations/example.yaml" doc="ros package resource name of an image/yaml pair to load (e.g. cost_map_visualisations/example.yaml)"/>
 
-  <node  pkg="cost_map_visualisations" name="map_loader" type="map_loader">
+  <node  pkg="cost_map" name="map_loader" type="map_loader">
     <param name="resource_name" value="$(arg resource_name)"/>
   </node>
 

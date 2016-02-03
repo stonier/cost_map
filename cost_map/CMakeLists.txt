@@ -19,6 +19,7 @@ find_package(catkin
         ecl_exceptions
         grid_map
         nav_msgs
+        roslib
     )
 
 find_package(Boost REQUIRED COMPONENTS filesystem)
@@ -44,6 +45,7 @@ catkin_package(
         ecl_exceptions
         grid_map
         nav_msgs
+        roslib
     DEPENDS
         Boost
         YAML_CPP

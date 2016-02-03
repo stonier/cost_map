@@ -187,7 +187,7 @@ bool addLayerFromROSImage(const sensor_msgs::Image& image,
   }
 
   for (CostMapIterator iterator(cost_map); !iterator.isPastEnd(); ++iterator) {
-    // Set transparent values.
+    // skip transparent values (they will typically be set to the default (cv_map::NO_INFORMATION/255)
     if (image.encoding == sensor_msgs::image_encodings::BGRA8) {
       const auto& cvAlpha = cvPtrAlpha->image.at<cv::Vec4b>((*iterator)(0),
                                                             (*iterator)(1));
@@ -203,7 +203,7 @@ bool addLayerFromROSImage(const sensor_msgs::Image& image,
         continue;
     }
 
-    // Compute height.
+    // Compute non-transparent values.
     unsigned int grayValue;
     if (depth == std::pow(2, 8)) {
       uchar cvGrayscale = cvPtrMono->image.at<uchar>((*iterator)(0),
@@ -215,8 +215,9 @@ bool addLayerFromROSImage(const sensor_msgs::Image& image,
                                                                (*iterator)(1));
       grayValue = (cvGrayscale[0] << 8) + cvGrayscale[1];
     }
-
-    cost_map::DataType value = static_cast<cost_map::DataType>(255.0 * (static_cast<double>(grayValue) / static_cast<double>(depth)));
+    // RULE 1 : scale only from 0-254 (remember 255 is reserved for NO_INFORMATION)
+    // RULE 2 : invert the value as black on an image (grayscale: 0) typically represents an obstacle (cost: 254)
+    cost_map::DataType value = static_cast<cost_map::DataType>(254.0 * ( 1.0 - (static_cast<double>(grayValue) / static_cast<double>(depth))));
     cost_map.at(layer, *iterator) = value;
   }
   return true;

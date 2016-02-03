@@ -1,5 +1,5 @@
 /**
- * @file /gopher_planner_maps/src/applications/map_publisher.cpp
+ * @file src/applications/map_loader.cpp
  */
 /*****************************************************************************
 ** Includes
@@ -13,7 +13,7 @@
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <string>
-#include "../../include/cost_map_visualisations/utilities.hpp"
+#include "../../include/cost_map/utilities.hpp"
 
 /*****************************************************************************
 ** Methods
