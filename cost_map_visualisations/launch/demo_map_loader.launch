@@ -9,6 +9,6 @@
     <remap from="cost_map_visualization/cost_map" to="map_loader/cost_map"/>
   </node>
 
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find gopher_planner_maps)/rviz/show_map_demo.rviz" />
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find cost_map_visualisations)/rviz/show_map_demo.rviz" />
 
 </launch>

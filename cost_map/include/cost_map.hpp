@@ -1,27 +1,25 @@
 /**
- * @file /include/cost_map_core/cost_map-core.hpp
+ * @file /include/cost_map/cost_map.hpp
  */
 /*****************************************************************************
 ** Ifdefs
 *****************************************************************************/
 
-#ifndef cost_map_core_HPP_
-#define cost_map_core_HPP_
+#ifndef cost_map_HPP_
+#define cost_map_HPP_
 
 /*****************************************************************************
 ** Includes
 *****************************************************************************/
 
-#include <grid_map_core/grid_map_core.hpp>
-
-#include "common.hpp"
-#include "iterators/iterators.hpp"
-#include "SubmapGeometry.hpp"
-#include "CostMap.hpp"
+#include <cost_map_core.hpp>
+#include "cost_map/converter.hpp"
+#include "cost_map/loader.hpp"
+#include "cost_map/utilities.hpp"
 
 /*****************************************************************************
 ** Trailers
 *****************************************************************************/
 
-#endif /* cost_map_core_HPP_ */
+#endif /* cost_map_HPP_ */
 
