@@ -28,7 +28,15 @@ namespace cost_map {
 
 class Loader {
 public:
-  Loader(ros::NodeHandle& nodehandle);
+  /**
+   * @brief Load from an image resource name (package_name/image_yaml_config).
+   *
+   * Not currently supporting any other method (e.g. loading directly from
+   * a filename). If we do, split the loader up into multiple static methods.
+   *
+   * @param image_resource_name
+   */
+  Loader(const std::string& image_resource_name="cost_map_visualisations/example.yaml");
 
   void imageResourceNameCallback(const std_msgs::String& msg);
 

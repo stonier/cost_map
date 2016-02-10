@@ -21,15 +21,16 @@ namespace cost_map {
 *****************************************************************************/
 
 
-Loader::Loader(ros::NodeHandle& nodehandle)
-: publisher(nodehandle.advertise<cost_map_msgs::CostMap>("cost_map", 1, true))
-, subscriber(nodehandle.subscribe("resource_name", 1, &Loader::imageResourceNameCallback, this))
+Loader::Loader(const std::string& image_resource_name)
 {
-  std::string default_resource_name;
-  nodehandle.param<std::string>("resource_name", default_resource_name, "cost_map_visualisations/example.yaml");
-  std::string yaml_filename = cost_map::resolveResourceName(default_resource_name);
+  ros::NodeHandle nodehandle("~");
 
+  publisher = nodehandle.advertise<cost_map_msgs::CostMap>("cost_map", 1, true);
+  subscriber = nodehandle.subscribe("resource_name", 1, &Loader::imageResourceNameCallback, this);
+
+  std::string yaml_filename = cost_map::resolveResourceName(image_resource_name);
   cost_map = cost_map::loadFromImageFile(yaml_filename);
+
   publish();
 }
 
