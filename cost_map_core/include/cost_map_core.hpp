@@ -18,6 +18,7 @@
 #include "cost_map_core/iterators/iterators.hpp"
 #include "cost_map_core/SubmapGeometry.hpp"
 #include "cost_map_core/CostMap.hpp"
+#include "cost_map_core/extras.hpp"
 
 /*****************************************************************************
 ** Trailers
