@@ -15,7 +15,6 @@
 #include <cost_map_core.hpp>
 #include "cost_map/converter.hpp"
 #include "cost_map/loader.hpp"
-#include "cost_map/conveniences.hpp"
 #include "cost_map/utilities.hpp"
 
 /*****************************************************************************
