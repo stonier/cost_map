@@ -28,7 +28,29 @@ namespace cost_map {
 ** Interfaces
 *****************************************************************************/
 
+/**
+ * @brief Loads from a cost_map image yaml representative file.
+ *
+ * The specified format for this file is a yaml, which holds some specifications
+ * for the cost_map (e.g. resolution) and points to an actual image file which
+ * contains the cost_map data.
+ *
+ * @param filename : yaml file
+ * @return shared pointer to the cost map object
+ */
 CostMapPtr loadFromImageFile(const std::string& filename);
+/**
+ * @brief Save to cost_map image yaml representative file(s).
+ *
+ * The specified format for this file is a yaml, which holds some specifications
+ * for the cost_map (e.g. resolution) and points to an actual image file which
+ * contains the cost_map data.
+ *
+ * One yaml and its associated image is saved for each layer in the cost map.
+ *
+ * @param cost_map : the cost map to save
+ */
+void saveToImageFile(const cost_map::CostMap& cost_map);
 
 bool addLayerFromROSImage(const sensor_msgs::Image& image,
                           const std::string& layer,

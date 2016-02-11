@@ -11,6 +11,7 @@
 #include <boost/filesystem.hpp>
 #include <ecl/console.hpp>
 #include <ecl/exceptions.hpp>
+#include <fstream>
 #include <limits>
 #include <iostream>
 #include <opencv2/core/core.hpp>
@@ -68,6 +69,7 @@ CostMapPtr loadFromImageFile(const std::string& filename)
   ********************/
   float resolution;
   std::string image_relative_filename;
+  std::string frame_id("map");
   try {
     YAML::Node config = YAML::LoadFile(filename);
     if (!config["resolution"]) {
@@ -75,6 +77,9 @@ CostMapPtr loadFromImageFile(const std::string& filename)
     }
     if (!config["filename"]) {
       throw ecl::StandardException(LOC, ecl::ConfigurationError, "missing required value 'filename'");
+    }
+    if (config["frame_id"]) {
+      frame_id = config["frame_id"].as<std::string>();
     }
     resolution = config["resolution"].as<float>();
     image_relative_filename = config["filename"].as<std::string>();
@@ -88,10 +93,6 @@ CostMapPtr loadFromImageFile(const std::string& filename)
   /********************
   ** Load OpenCV Image
   ********************/
-  std::cout << "Filename   : " << filename << std::endl;
-  std::cout << "Resolution : " << resolution << std::endl;
-  std::cout << "Image (Rel): " << image_relative_filename << std::endl;
-  std::cout << "Image (Abs): " << p << std::endl;
 
   cv::Mat image = cv::imread(p.string(), cv::IMREAD_UNCHANGED); // IMREAD_UNCHANGED, cv::IMREAD_COLOR, cv::IMREAD_GRAYSCALE, CV_LOAD_IMAGE_COLOR, CV_LOAD_IMAGE_GRAYSCALE
 
@@ -109,27 +110,67 @@ CostMapPtr loadFromImageFile(const std::string& filename)
   ********************/
   // TODO figure out how to skip this step and convert directly
   sensor_msgs::ImagePtr ros_image_msg = cv_bridge::CvImage(std_msgs::Header(), encoding, image).toImageMsg();
-  ros_image_msg->header.frame_id = "map";
+  // TODO optionally set a frame id from the yaml
+  ros_image_msg->header.frame_id = frame_id;
   //std::cout << "Ros Image Message: " << *ros_image_msg << std::endl;
 
   /********************
   ** To Cost Map
   ********************/
   CostMapPtr cost_map = std::make_shared<CostMap>();
+  // TODO optionally set a position from the yaml
   initializeFromROSImage(*ros_image_msg, resolution, *cost_map, cost_map::Position::Zero());
-
-  // grid_map::GridMapRosConverter::initializeFromImage(*ros_image_msg, 0.025, grid_map);
 
   // this converts to a grayscale value immediately
   addLayerFromROSImage(*ros_image_msg, "obstacle_cost", *cost_map);
   //grid_map::GridMapRosConverter::addLayerFromImage(*ros_image_msg, "obstacle_cost", grid_map, min_height, max_height); // heights were 0.0, 1.0
 
-  // debugging
+  /********************
+  ** Debugging
+  ********************/
+  //
+  //  std::cout << "Filename   : " << filename << std::endl;
+  //  std::cout << "Resolution : " << resolution << std::endl;
+  //  std::cout << "Image (Rel): " << image_relative_filename << std::endl;
+  //  std::cout << "Image (Abs): " << p << std::endl;
+  //
   // cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE);
   // cv::imshow("Display window", image);
   // cv::waitKey(0);
 
   return cost_map;
+}
+
+void saveToImageFile(const cost_map::CostMap& cost_map)
+{
+  for (const std::string& layer : cost_map.getLayers()) {
+    // can't take a const Matrix& here, since opencv will complain that it doesn't have control of
+    // the memory (i.e. const void* cannot convert to void*)
+    const cost_map::Matrix& cost_map_storage = cost_map.get(layer);
+    // cv::Mat image(cost_map_storage.rows(), cost_map_storage.cols(), CV_8U, cost_map_storage.data());
+    cv::Mat image(cost_map.getSize().x(), cost_map.getSize().y(), CV_8UC4);
+    for (int i = 0; i < cost_map_storage.rows(); ++i) {
+      for (int j = 0; j < cost_map_storage.cols(); ++j) {
+        cv::Vec4b& rgba = image.at<cv::Vec4b>(i, j);
+        cost_map::DataType value = cost_map_storage(i,j);
+        // RULE 1 : scale only from 0-254 (remember 255 is reserved for NO_INFORMATION)
+        // RULE 2 : invert the value as black on an image (grayscale: 0) typically represents an obstacle (cost: 254)
+        cost_map::DataType flipped_value = static_cast<cost_map::DataType>(std::numeric_limits<cost_map::DataType>::max() * (1.0 - static_cast<double>(value) / static_cast<double>(cost_map::NO_INFORMATION)));
+        rgba[0] = flipped_value;
+        rgba[1] = flipped_value;
+        rgba[2] = flipped_value;
+        rgba[3] = (value == cost_map::NO_INFORMATION) ? 0.0 : std::numeric_limits<cost_map::DataType>::max();
+      }
+    }
+    cv::imwrite(layer + std::string(".png"), image);
+    YAML::Node node;
+    node["resolution"] = cost_map.getResolution();
+    node["frame_id"] = cost_map.getFrameId();
+    node["filename"] = layer + std::string(".png");
+    std::ofstream ofs(layer + std::string(".yaml"), std::ofstream::out);
+    ofs << node;
+    ofs.close();
+  }
 }
 
 //

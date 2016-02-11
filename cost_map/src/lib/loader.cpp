@@ -33,6 +33,8 @@ Loader::Loader(const std::string& image_resource_name,
   cost_map = cost_map::loadFromImageFile(yaml_filename);
   cost_map->setFrameId(frame_id);
   publish();
+  // for debugging, verify this function returns what we loaded.
+  // saveToImageFile(*cost_map);
 }
 
 void Loader::imageResourceNameCallback(const std_msgs::String& msg) {
