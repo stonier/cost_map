@@ -36,13 +36,15 @@ public:
    *
    * @param image_resource_name
    */
-  Loader(const std::string& image_resource_name="cost_map_visualisations/example.yaml");
+  Loader(const std::string& image_resource_name="cost_map_visualisations/example.yaml",
+         const std::string& frame_id="map"
+         );
 
   void imageResourceNameCallback(const std_msgs::String& msg);
 
   void publish();
 
-  cost_map::CostMap cost_map;
+  cost_map::CostMapPtr cost_map;
   ros::Publisher publisher;
   ros::Subscriber subscriber;
 };

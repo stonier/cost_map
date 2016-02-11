@@ -61,7 +61,7 @@ static bool initializeFromROSImage(
 ** Implementation
 *****************************************************************************/
 
-CostMap loadFromImageFile(const std::string& filename)
+CostMapPtr loadFromImageFile(const std::string& filename)
 {
   /********************
   ** Load Yaml
@@ -115,13 +115,13 @@ CostMap loadFromImageFile(const std::string& filename)
   /********************
   ** To Cost Map
   ********************/
-  CostMap cost_map;
-  initializeFromROSImage(*ros_image_msg, resolution, cost_map, cost_map::Position::Zero());
+  CostMapPtr cost_map = std::make_shared<CostMap>();
+  initializeFromROSImage(*ros_image_msg, resolution, *cost_map, cost_map::Position::Zero());
 
   // grid_map::GridMapRosConverter::initializeFromImage(*ros_image_msg, 0.025, grid_map);
 
   // this converts to a grayscale value immediately
-  addLayerFromROSImage(*ros_image_msg, "obstacle_cost", cost_map);
+  addLayerFromROSImage(*ros_image_msg, "obstacle_cost", *cost_map);
   //grid_map::GridMapRosConverter::addLayerFromImage(*ros_image_msg, "obstacle_cost", grid_map, min_height, max_height); // heights were 0.0, 1.0
 
   // debugging

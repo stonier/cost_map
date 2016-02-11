@@ -21,7 +21,8 @@ namespace cost_map {
 *****************************************************************************/
 
 
-Loader::Loader(const std::string& image_resource_name)
+Loader::Loader(const std::string& image_resource_name,
+               const std::string& frame_id)
 {
   ros::NodeHandle nodehandle("~");
 
@@ -30,7 +31,7 @@ Loader::Loader(const std::string& image_resource_name)
 
   std::string yaml_filename = cost_map::resolveResourceName(image_resource_name);
   cost_map = cost_map::loadFromImageFile(yaml_filename);
-
+  cost_map->setFrameId(frame_id);
   publish();
 }
 
@@ -40,7 +41,7 @@ void Loader::imageResourceNameCallback(const std_msgs::String& msg) {
 
 void Loader::publish() {
   cost_map_msgs::CostMap map_message;
-  cost_map::toMessage(cost_map, map_message);
+  cost_map::toMessage(*cost_map, map_message);
   publisher.publish(map_message);
 }
 

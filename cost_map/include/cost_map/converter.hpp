@@ -28,7 +28,7 @@ namespace cost_map {
 ** Interfaces
 *****************************************************************************/
 
-CostMap loadFromImageFile(const std::string& filename);
+CostMapPtr loadFromImageFile(const std::string& filename);
 
 bool addLayerFromROSImage(const sensor_msgs::Image& image,
                           const std::string& layer,
