@@ -29,13 +29,12 @@ namespace cost_map {
 
 class OccupancyGrid {
 public:
-  OccupancyGrid(ros::NodeHandle& nodehandle);
+  OccupancyGrid();
 
 
 private:
   void _costMapCallback(const cost_map_msgs::CostMap::ConstPtr& msg);
 
-  ros::NodeHandle& nodehandle_;
   ros::Subscriber subscriber_;
   std::map<std::string, ros::Publisher> publishers_;
 };

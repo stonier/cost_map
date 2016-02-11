@@ -20,11 +20,11 @@ namespace cost_map {
 ** Implementation
 *****************************************************************************/
 
-OccupancyGrid::OccupancyGrid(ros::NodeHandle& nodehandle)
-: nodehandle_(nodehandle)
-, subscriber_(nodehandle.subscribe("cost_map", 10, &OccupancyGrid::_costMapCallback, this))
+OccupancyGrid::OccupancyGrid()
 {
+  ros::NodeHandle nodehandle("~");
 
+  subscriber_ = nodehandle.subscribe("cost_map", 10, &OccupancyGrid::_costMapCallback, this);
 //  std::string cost_map_topic_name("cost_map");
 //  nodehandle.param<std::string>("cost_map_topic_name", cost_map_topic_name, cost_map_topic_name);
 
@@ -50,7 +50,8 @@ OccupancyGrid::OccupancyGrid(ros::NodeHandle& nodehandle)
 void OccupancyGrid::_costMapCallback(const cost_map_msgs::CostMap::ConstPtr& msg) {
   for (const auto& layer : msg->layers) {
     if ( publishers_.count(layer) == 0 ) {
-      auto result = publishers_.insert(std::pair<std::string, ros::Publisher>(layer, ros::Publisher(nodehandle_.advertise<nav_msgs::OccupancyGrid>(layer, 1, true))));
+      ros::NodeHandle nodehandle("~");
+      auto result = publishers_.insert(std::pair<std::string, ros::Publisher>(layer, ros::Publisher(nodehandle.advertise<nav_msgs::OccupancyGrid>(layer, 1, true))));
     }
     // TODO check if layers disappeared and remove the publishers
     ros::Publisher& publisher = publishers_[layer];

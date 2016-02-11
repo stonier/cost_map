@@ -5,6 +5,7 @@
 ** Includes
 *****************************************************************************/
 
+#include <cost_map.hpp>
 #include <ecl/console.hpp>
 #include <ecl/exceptions.hpp>
 
@@ -25,6 +26,15 @@ int main(int argc, char **argv) {
   nodehandle.param<std::string>("resource_name", image_resource_name, "cost_map_visualisations/example.yaml");
   try {
     cost_map::Loader loader(image_resource_name);
+    if ( 0 ) {
+      cost_map::Matrix data = loader.cost_map->get("obstacle_cost");
+      for (int i = 0, number_of_rows = data.rows(), number_of_columns = data.cols(); i < number_of_rows; ++i) {
+        for (int j = 0; j < number_of_columns; ++j) {
+          std::cout << static_cast<int>(data(i,j)) << " ";
+        }
+        std::cout << std::endl;
+      }
+    }
     ros::spin();
   } catch (const ecl::StandardException& e) {
     std::cout << ecl::red << "[ERROR] " << e.what() << ecl::reset << std::endl;

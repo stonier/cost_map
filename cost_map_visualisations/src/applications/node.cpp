@@ -15,8 +15,7 @@
 
 int main(int argc, char **argv) {
   ros::init(argc, argv, "cost_map_visualisations");
-  ros::NodeHandle nodehandle("~");
-  cost_map::OccupancyGrid occupancy_grid(nodehandle);
+  cost_map::OccupancyGrid occupancy_grid;
   ros::spin();
   return EXIT_SUCCESS;
 }
