@@ -30,11 +30,11 @@ Loader::Loader(const std::string& image_resource_name,
   subscriber = nodehandle.subscribe("resource_name", 1, &Loader::imageResourceNameCallback, this);
 
   std::string yaml_filename = cost_map::resolveResourceName(image_resource_name);
-  cost_map = cost_map::loadFromImageFile(yaml_filename);
+  cost_map = cost_map::fromImageResource(yaml_filename);
   cost_map->setFrameId(frame_id);
   publish();
   // for debugging, verify this function returns what we loaded.
-  // saveToImageFile(*cost_map);
+  // toImageResource(*cost_map);
 }
 
 void Loader::imageResourceNameCallback(const std_msgs::String& msg) {

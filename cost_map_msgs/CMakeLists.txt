@@ -21,12 +21,10 @@ add_message_files(
       CostMap.msg
 )
 
-#add_service_files(
-#  FILES
-#  GetGridMap.srv
-#  GetGridMapInfo.srv
-#  ProcessFile.srv
-#)
+add_service_files(
+  FILES
+  GetCostMap.srv
+)
 
 generate_messages(
   DEPENDENCIES

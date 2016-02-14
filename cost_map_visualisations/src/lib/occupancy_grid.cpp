@@ -25,26 +25,6 @@ OccupancyGrid::OccupancyGrid()
   ros::NodeHandle nodehandle("~");
 
   subscriber_ = nodehandle.subscribe("cost_map", 10, &OccupancyGrid::_costMapCallback, this);
-//  std::string cost_map_topic_name("cost_map");
-//  nodehandle.param<std::string>("cost_map_topic_name", cost_map_topic_name, cost_map_topic_name);
-
-//  if (!getParam("layer", layer_)) {
-//    ROS_ERROR("OccupancyGridVisualization with name '%s' did not find a 'layer' parameter.", name_.c_str());
-//    return false;
-//  }
-//
-//  if (!getParam("data_min", dataMin_)) {
-//    ROS_ERROR("OccupancyGridVisualization with name '%s' did not find a 'data_min' parameter.", name_.c_str());
-//    return false;
-//  }
-//
-//  if (!getParam("data_max", dataMax_)) {
-//    ROS_ERROR("OccupancyGridVisualization with name '%s' did not find a 'data_max' parameter.", name_.c_str());
-//    return false;
-//  }
-//
-//  return true;
-
 }
 
 void OccupancyGrid::_costMapCallback(const cost_map_msgs::CostMap::ConstPtr& msg) {

@@ -14,12 +14,14 @@ find_package(catkin
     COMPONENTS
         cost_map_core
         cost_map_msgs
+        costmap_2d
         ecl_build
         ecl_console
         ecl_exceptions
         grid_map
         nav_msgs
         roslib
+        tf
     )
 
 find_package(Boost REQUIRED COMPONENTS filesystem)
@@ -40,12 +42,14 @@ catkin_package(
     CATKIN_DEPENDS
         cost_map_core
         cost_map_msgs
+        costmap_2d
         ecl_build
         ecl_console
         ecl_exceptions
         grid_map
         nav_msgs
         roslib
+        tf
     DEPENDS
         Boost
         YAML_CPP
