@@ -42,6 +42,7 @@ void Loader::imageResourceNameCallback(const std_msgs::String& msg) {
 }
 
 void Loader::publish() {
+
   cost_map_msgs::CostMap map_message;
   cost_map::toMessage(*cost_map, map_message);
   publisher.publish(map_message);

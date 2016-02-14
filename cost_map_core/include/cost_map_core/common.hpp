@@ -30,6 +30,9 @@ namespace cost_map {
   typedef Eigen::Matrix<unsigned char, Eigen::Dynamic, Eigen::Dynamic> Matrix;
   typedef unsigned char DataType;
   extern const unsigned char NO_INFORMATION;
+  extern const unsigned char LETHAL_OBSTACLE;
+  extern const unsigned char INSCRIBED_OBSTACLE;
+  extern const unsigned char FREE_SPACE;
 
   typedef grid_map::Matrix DataMatrix;
   //typedef grid_map::Matrix Matrix;

@@ -68,6 +68,7 @@ CostMapPtr fromImageResource(const std::string& filename)
   float resolution;
   std::string image_relative_filename;
   std::string frame_id("map");
+  std::string layer_name("obstacle_costs");
   try {
     YAML::Node config = YAML::LoadFile(filename);
     if (!config["resolution"]) {
@@ -78,6 +79,9 @@ CostMapPtr fromImageResource(const std::string& filename)
     }
     if (config["frame_id"]) {
       frame_id = config["frame_id"].as<std::string>();
+    }
+    if (config["layer_name"]) {
+      layer_name = config["layer_name"].as<std::string>();
     }
     resolution = config["resolution"].as<float>();
     image_relative_filename = config["filename"].as<std::string>();
@@ -120,8 +124,7 @@ CostMapPtr fromImageResource(const std::string& filename)
   initializeFromROSImage(*ros_image_msg, resolution, *cost_map, cost_map::Position::Zero());
 
   // this converts to a grayscale value immediately
-  addLayerFromROSImage(*ros_image_msg, "obstacle_cost", *cost_map);
-  //grid_map::GridMapRosConverter::addLayerFromImage(*ros_image_msg, "obstacle_cost", grid_map, min_height, max_height); // heights were 0.0, 1.0
+  addLayerFromROSImage(*ros_image_msg, layer_name, *cost_map);
 
   /********************
   ** Debugging
