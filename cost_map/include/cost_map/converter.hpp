@@ -12,10 +12,17 @@
 ** Includes
 *****************************************************************************/
 
+// grid maps
 #include <grid_map/grid_map.hpp>
-#include <cost_map_core.hpp>
+#include <cost_map_core/cost_map_core.hpp>
 #include <cost_map_msgs/CostMap.h>
+#include <cost_map_msgs/GetCostMap.h>
+
+// ros
+#include <costmap_2d/costmap_2d_ros.h>
 #include <nav_msgs/OccupancyGrid.h>
+
+// general
 #include <string>
 
 /*****************************************************************************
@@ -25,7 +32,7 @@
 namespace cost_map {
 
 /*****************************************************************************
-** Interfaces
+** Images
 *****************************************************************************/
 
 /**
@@ -38,7 +45,7 @@ namespace cost_map {
  * @param filename : yaml file
  * @return shared pointer to the cost map object
  */
-CostMapPtr loadFromImageFile(const std::string& filename);
+CostMapPtr fromImageResource(const std::string& filename);
 /**
  * @brief Save to cost_map image yaml representative file(s).
  *
@@ -50,12 +57,16 @@ CostMapPtr loadFromImageFile(const std::string& filename);
  *
  * @param cost_map : the cost map to save
  */
-void saveToImageFile(const cost_map::CostMap& cost_map);
+void toImageResource(const cost_map::CostMap& cost_map);
 
 bool addLayerFromROSImage(const sensor_msgs::Image& image,
                           const std::string& layer,
                           cost_map::CostMap& cost_map
                           );
+
+/*****************************************************************************
+** CostMap and GridMap
+*****************************************************************************/
 
 /*!
  * Converts all layers of a grid map object to a ROS grid map message.
@@ -72,16 +83,57 @@ void toMessage(const cost_map::CostMap& cost_map, cost_map_msgs::CostMap& messag
  */
 bool fromMessage(const cost_map_msgs::CostMap& message, cost_map::CostMap& cost_map);
 
+grid_map::GridMap toGridMap(const cost_map::CostMap cost_map);
+
+/*****************************************************************************
+** Ros CostMap2D & Occupancy Grids
+*****************************************************************************/
+/*
+ * There are various ways we can pull from ros costmaps. Build up a suite
+ * of functions as we need to.
+ */
+
+/**
+ * @brief Converts a ROS costmap around the robot to a costmap object.
+ *
+ * This automatically affixes the cost map grid to the location of the robot
+ * in the ros costmap. Resolution is also carried across. The only configuration
+ * necessary is to specify how large the cost map should be. Take care that this
+ * subwindow does not go off the edge of the underlying ros costmap!
+ *
+ * @param ros_costmap : a traditional ros costmap object (input).
+ * @param geometry : size of the subwindow (metres x metres).
+ * @return shared pointer to the cost map object
+ *
+ * @note We should, but cannot use a const for the ros costmap since it hasn't been very
+ * well designed. Treat it as such and do not change the internals inside.
+ */
+CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, cost_map::Length& geometry);
+
 void toOccupancyGrid(const cost_map::CostMap& cost_map, const std::string& layer, nav_msgs::OccupancyGrid& msg);
 
-grid_map::GridMap toGridMap(const cost_map::CostMap cost_map);
+/**
+ * @brief Provide cost_map::fromROSCostMap2D() as a ros service.
+ */
+class ROSCostMap2DServiceProvider {
+public:
+  ROSCostMap2DServiceProvider(costmap_2d::Costmap2DROS* ros_costmap,
+                              const std::string& service_name="get_cost_map");
+
+  bool callback(cost_map_msgs::GetCostMap::Request  &req,
+                cost_map_msgs::GetCostMap::Response &res);
+private:
+  costmap_2d::Costmap2DROS* ros_costmap;
+  ros::ServiceServer service;
+};
+
 
 /*****************************************************************************
 ** MultiArray Message Helpers
 *****************************************************************************/
 /*
  * Note: These are template version of the specific Float32MultiArray
- * version in grid_map. Could be back-ported back easily.
+ * version in grid_map. Could be back-ported to grid_map easily.
  */
 /*!
  * Checks if message data is stored in row-major format.

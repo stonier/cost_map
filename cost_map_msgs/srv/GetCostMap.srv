@@ -1,0 +1,10 @@
+# A very simple service provider for cost maps.
+
+# Requested submap length in x-direction [m].
+float64 length_x
+
+# Requested submap width in y-direction [m].
+float64 length_y
+
+---
+cost_map_msgs/CostMap map

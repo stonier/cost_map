@@ -5,7 +5,7 @@
 ** Includes
 *****************************************************************************/
 
-#include <cost_map.hpp>
+#include <cost_map/cost_map.hpp>
 #include <ecl/console.hpp>
 #include <ecl/exceptions.hpp>
 
@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
   try {
     cost_map::Loader loader(image_resource_name);
     if ( 0 ) {
-      cost_map::Matrix data = loader.cost_map->get("obstacle_cost");
+      cost_map::Matrix data = loader.cost_map->get("obstacle_costs");
       for (int i = 0, number_of_rows = data.rows(), number_of_columns = data.cols(); i < number_of_rows; ++i) {
         for (int j = 0; j < number_of_columns; ++j) {
           std::cout << static_cast<int>(data(i,j)) << " ";

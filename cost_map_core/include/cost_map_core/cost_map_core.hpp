@@ -1,5 +1,5 @@
 /**
- * @file /include/cost_map_core/cost_map-core.hpp
+ * @file /include/cost_map_core/cost_map_core.hpp
  */
 /*****************************************************************************
 ** Ifdefs
@@ -14,11 +14,12 @@
 
 #include <grid_map_core/grid_map_core.hpp>
 
-#include "cost_map_core/common.hpp"
-#include "cost_map_core/iterators/iterators.hpp"
-#include "cost_map_core/SubmapGeometry.hpp"
-#include "cost_map_core/CostMap.hpp"
-#include "cost_map_core/extras.hpp"
+#include "common.hpp"
+#include "iterators/iterators.hpp"
+#include "SubmapGeometry.hpp"
+#include "CostMap.hpp"
+#include "extras.hpp"
+#include "operations.hpp"
 
 /*****************************************************************************
 ** Trailers

@@ -27,6 +27,9 @@ namespace cost_map {
 ** Interfaces
 *****************************************************************************/
 
+/**
+ * @brief Tunes into a cost map publisher and relays it as an Occupancy Grid.
+ */
 class OccupancyGrid {
 public:
   OccupancyGrid();
