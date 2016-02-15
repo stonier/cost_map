@@ -6,7 +6,7 @@
 *****************************************************************************/
 
 #include <boost/thread/lock_guard.hpp>
-#include <cost_map_core.hpp>
+#include <cost_map_core/cost_map_core.hpp>
 #include <cost_map_msgs/CostMap.h>
 #include <cv_bridge/cv_bridge.h>
 #include <boost/filesystem.hpp>

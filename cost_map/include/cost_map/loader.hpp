@@ -12,7 +12,7 @@
 ** Includes
 *****************************************************************************/
 
-#include <cost_map_core.hpp>
+#include <cost_map_core/cost_map_core.hpp>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 
