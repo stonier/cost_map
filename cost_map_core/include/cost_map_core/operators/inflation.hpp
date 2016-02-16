@@ -125,7 +125,8 @@ private:
    * @param  src_x The x index of the obstacle point inflation started at
    * @param  src_y The y index of the obstacle point inflation started at
    */
-  void enqueue(cost_map::Matrix& data_destination,
+  void enqueue(const cost_map::Matrix& data_source,
+               cost_map::Matrix& data_destination,
                unsigned int mx, unsigned int my,
                unsigned int src_x, unsigned int src_y
                );

@@ -29,10 +29,9 @@ void Inflate::operator()(const std::string& layer_source,
   unsigned int size_x = cost_map.getSize().x();
   unsigned int size_y = cost_map.getSize().y();
   unsigned int size = size_x*size_y;
-  cost_map::Matrix data_source = cost_map.get(layer_source);
-  if ( !cost_map.exists(layer_destination) ) {
-    cost_map.add(layer_destination, data_source);
-  }
+  const cost_map::Matrix& data_source = cost_map.get(layer_source);
+  cost_map.add(layer_destination, data_source);
+
   // Rebuild internals
   seen_.resize(size_x, size_y);
   seen_.setConstant(false);
@@ -49,7 +48,7 @@ void Inflate::operator()(const std::string& layer_source,
       unsigned char cost = data_source(i, j);
       if (cost == LETHAL_OBSTACLE) {
         unsigned int index = j*number_of_rows + i;
-        enqueue(cost_map.get(layer_destination), i, j, i, j);
+        enqueue(cost_map.get(layer_source), cost_map.get(layer_destination), i, j, i, j);
       }
     }
   }
@@ -68,21 +67,22 @@ void Inflate::operator()(const std::string& layer_source,
 
     // attempt to put the neighbors of the current cell onto the queue
     if (mx > 0) {
-      enqueue(cost_map.get(layer_destination), mx - 1, my, sx, sy);
+      enqueue(cost_map.get(layer_source), cost_map.get(layer_destination), mx - 1, my, sx, sy);
     }
     if (my > 0) {
-      enqueue(cost_map.get(layer_destination), mx, my - 1, sx, sy);
+      enqueue(cost_map.get(layer_source), cost_map.get(layer_destination), mx, my - 1, sx, sy);
     }
     if (mx < size_x - 1) {
-      enqueue(cost_map.get(layer_destination), mx + 1, my, sx, sy);
+      enqueue(cost_map.get(layer_source), cost_map.get(layer_destination), mx + 1, my, sx, sy);
     }
     if (my < size_y - 1) {
-      enqueue(cost_map.get(layer_destination), mx, my + 1, sx, sy);
+      enqueue(cost_map.get(layer_source), cost_map.get(layer_destination), mx, my + 1, sx, sy);
     }
   }
 }
 
-void Inflate::enqueue(cost_map::Matrix& data_destination,
+void Inflate::enqueue(const cost_map::Matrix& data_source,
+                      cost_map::Matrix& data_destination,
                       unsigned int mx, unsigned int my,
                       unsigned int src_x, unsigned int src_y
                       )
@@ -100,7 +100,7 @@ void Inflate::enqueue(cost_map::Matrix& data_destination,
 
     // assign the cost associated with the distance from an obstacle to the cell
     unsigned char cost = costLookup(mx, my, src_x, src_y);
-    unsigned char old_cost = data_destination(mx, my);
+    unsigned char old_cost = data_source(mx, my);
 
     if (old_cost == NO_INFORMATION && cost >= INSCRIBED_OBSTACLE)
       data_destination(mx, my) = cost;
