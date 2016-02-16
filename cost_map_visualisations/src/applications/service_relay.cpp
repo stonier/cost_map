@@ -8,7 +8,7 @@
 #include <cstdlib>
 #include <ecl/command_line.hpp>
 #include <ros/ros.h>
-#include <cost_map.hpp>
+#include <cost_map/cost_map.hpp>
 #include <cost_map_msgs/GetCostMap.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <string>
