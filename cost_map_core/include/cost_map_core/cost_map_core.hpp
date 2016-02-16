@@ -19,7 +19,7 @@
 #include "SubmapGeometry.hpp"
 #include "CostMap.hpp"
 #include "extras.hpp"
-#include "operations.hpp"
+#include "operators/inflation.hpp"
 
 /*****************************************************************************
 ** Trailers

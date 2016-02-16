@@ -1,12 +1,12 @@
 /**
- * @file /cost_map_core/src/lib/operations.cpp
+ * @file /cost_map_core/src/lib/inflation.cpp
  */
 /*****************************************************************************
 ** Includes
 *****************************************************************************/
 
 #include <iostream>
-#include "../../include/cost_map_core/operations.hpp"
+#include "../../../include/cost_map_core/operators/inflation.hpp"
 
 /*****************************************************************************
 ** Namespaces
@@ -36,7 +36,7 @@ void Inflate::operator()(const std::string& layer_source,
   // Rebuild internals
   seen_.resize(size_x, size_y);
   seen_.setConstant(false);
-  CostGenerator compute_cost(inscribed_radius, cost_map.getResolution(), 5.0);
+  InflationComputer compute_cost(inscribed_radius, cost_map.getResolution(), 5.0);
   unsigned int new_cell_inflation_radius = static_cast<unsigned int>(std::max(0.0, std::ceil(inflation_radius / cost_map.getResolution())));
   if (new_cell_inflation_radius != cell_inflation_radius_ ) {
     cell_inflation_radius_ = new_cell_inflation_radius;
@@ -129,7 +129,7 @@ unsigned char Inflate::costLookup(int mx, int my, int src_x, int src_y)
   return cached_costs_(dx, dy);
 }
 
-void Inflate::computeCaches(const CostGenerator& compute_cost)
+void Inflate::computeCaches(const InflationComputer& compute_cost)
 {
   cached_costs_.resize(cell_inflation_radius_ + 2, cell_inflation_radius_ + 2);
   cached_distances_.resize(cell_inflation_radius_ + 2, cell_inflation_radius_ + 2);
@@ -147,7 +147,7 @@ void Inflate::computeCaches(const CostGenerator& compute_cost)
   }
 }
 
-Inflate::CostGenerator::CostGenerator(
+InflationComputer::InflationComputer(
     const float& inscribed_radius,
     const float& resolution,
     const float& weight)
@@ -157,7 +157,7 @@ Inflate::CostGenerator::CostGenerator(
 {
 }
 
-unsigned char Inflate::CostGenerator::operator()(float &distance) const {
+unsigned char InflationComputer::operator()(float &distance) const {
   unsigned char cost = 0;
   if (distance == 0)
     cost = LETHAL_OBSTACLE;
@@ -172,6 +172,39 @@ unsigned char Inflate::CostGenerator::operator()(float &distance) const {
   }
   return cost;
 }
+
+/*****************************************************************************
+** Deflation
+*****************************************************************************/
+
+Deflate::Deflate(const bool& do_not_strip_inscribed_region)
+: do_not_strip_inscribed_region(do_not_strip_inscribed_region)
+{
+}
+
+void Deflate::operator()(const std::string& layer_source,
+                         const std::string& layer_destination,
+                         CostMap& cost_map
+                         )
+{
+  // make a call on the data, just to check that the layer is there
+  // will throw std::out_of_range if not
+  cost_map::Matrix data_source = cost_map.get(layer_source);
+  // add a layer filled with NO_INFORMATION
+  cost_map.add(layer_destination);
+  cost_map::Matrix& data_destination = cost_map.get(layer_destination);
+
+  unsigned char cost_threshold = do_not_strip_inscribed_region ? cost_map::INSCRIBED_OBSTACLE : cost_map::LETHAL_OBSTACLE;
+
+  // eigen is by default column major - iterate with the row index changing fastest
+  for (unsigned int j = 0, number_of_rows = data_source.rows(), number_of_columns = data_source.cols(); j < number_of_columns; ++j) {
+    for (unsigned int i = 0; i < number_of_rows; ++i) {
+      unsigned char cost = data_source(i, j);
+      data_destination(i, j) = (cost >= cost_threshold ) ? cost : cost_map::FREE_SPACE;
+    }
+  }
+}
+
 
 /*****************************************************************************
  ** Trailers

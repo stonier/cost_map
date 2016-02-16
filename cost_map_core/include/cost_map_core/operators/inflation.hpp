@@ -1,18 +1,18 @@
 /**
- * @file /cost_map_core/include/cost_map_core/operations.hpp
+ * @file /cost_map_core/include/cost_map_core/operators/inflation.hpp
  */
 /*****************************************************************************
 ** Ifdefs
 *****************************************************************************/
 
-#ifndef cost_map_core_OPERATIONS_HPP_
-#define cost_map_core_OPERATIONS_HPP_
+#ifndef cost_map_core_INFLATION_HPP_
+#define cost_map_core_INFLATION_HPP_
 
 /*****************************************************************************
 ** Includes
 *****************************************************************************/
 
-#include "CostMap.hpp"
+#include "../CostMap.hpp"
 #include <queue>
 
 /*****************************************************************************
@@ -22,40 +22,31 @@
 namespace cost_map {
 
 /*****************************************************************************
-** Helpers
-*****************************************************************************/
-
-struct CellData {
-  /**
-   * @brief  Constructor for CellData objects
-   * @param  d The distance to the nearest obstacle, used for ordering in the priority queue
-   * @param  x The x coordinate of the cell in the cost map
-   * @param  y The y coordinate of the cell in the cost map
-   * @param  sx The x coordinate of the closest obstacle cell in the costmap
-   * @param  sy The y coordinate of the closest obstacle cell in the costmap
-   * @return
-   */
-  CellData(double d, unsigned int x, unsigned int y, unsigned int sx, unsigned int sy) :
-      distance_(d), x_(x), y_(y), src_x_(sx), src_y_(sy)
-  {
-  }
-  double distance_;
-  unsigned int x_, y_;
-  unsigned int src_x_, src_y_;
-};
-/**
- * @brief Provide an ordering between CellData objects in the priority queue
- * @return We want the lowest distance to have the highest priority... so this returns true if a has higher priority than b
- */
-inline bool operator<(const CellData &a, const CellData &b)
-{
-  return a.distance_ > b.distance_;
-}
-
-/*****************************************************************************
 ** Inflation Function
 *****************************************************************************/
 
+/**
+ * @brief Function which can compute costs for the inflation layer.
+ *
+ * This class provides a default inflation function which works like the
+ * ROS inflation layer. Inherit from this to generate your own inflation
+ * functions.
+ */
+class InflationComputer {
+public:
+  InflationComputer(const float& inscribed_radius,
+                const float& resolution,
+                const float& weight);
+
+  /** @brief  Given a distance, compute a cost.
+   *
+   * @param  distance The distance from an obstacle in cells
+   * @return A cost value for the distance
+   **/
+  unsigned char operator()(float &distance) const;
+private:
+  float inscribed_radius_, resolution_, weight_;
+};
 
 /*****************************************************************************
 ** Inflation
@@ -63,6 +54,16 @@ inline bool operator<(const CellData &a, const CellData &b)
 
 class Inflate {
 public:
+  /**
+   * @brief Inflate...
+   *
+   * @param layer_source
+   * @param layer_destination
+   * @param inflation_radius
+   * @param inscribed_radius
+   * @param cost_map
+   * @throw std::out_of_range if no map layer with name `layer` is present.
+   */
   void operator()(const std::string& layer_source,
                const std::string& layer_destination,
                const float& inflation_radius,
@@ -70,28 +71,32 @@ public:
                CostMap& cost_map
                );
 
-  /**
-   * @brief Function which can compute costs for the inflation layer.
-   */
-  class CostGenerator {
-  public:
-    CostGenerator(const float& inscribed_radius,
-                  const float& resolution,
-                  const float& weight);
-
-    /** @brief  Given a distance, compute a cost.
-     *
-     * @param  distance The distance from an obstacle in cells
-     * @return A cost value for the distance
-     **/
-    unsigned char operator()(float &distance) const;
-  private:
-    float inscribed_radius_, resolution_, weight_;
-  };
-
-protected:
-
 private:
+  struct CellData {
+    /**
+     * @brief  Constructor for CellData objects
+     * @param  d The distance to the nearest obstacle, used for ordering in the priority queue
+     * @param  x The x coordinate of the cell in the cost map
+     * @param  y The y coordinate of the cell in the cost map
+     * @param  sx The x coordinate of the closest obstacle cell in the costmap
+     * @param  sy The y coordinate of the closest obstacle cell in the costmap
+     * @return
+     */
+    CellData(double d, unsigned int x, unsigned int y, unsigned int sx, unsigned int sy) :
+        distance_(d), x_(x), y_(y), src_x_(sx), src_y_(sy)
+    {
+    }
+    /**
+     * @brief Provide an ordering between CellData objects in the priority queue
+     * @return We want the lowest distance to have the highest priority... so this returns true if a has higher priority than b
+     */
+    friend bool operator<(const CellData &a, const CellData &b) {
+      return a.distance_ > b.distance_;
+    }
+    double distance_;
+    unsigned int x_, y_;
+    unsigned int src_x_, src_y_;
+  };
 
   /**
    * @brief  Given an index of a cell in the costmap, place it into a priority queue for obstacle inflation
@@ -125,7 +130,7 @@ private:
    * @return
    */
   unsigned char costLookup(int mx, int my, int src_x, int src_y);
-  void computeCaches(const CostGenerator& compute_cost);
+  void computeCaches(const InflationComputer& compute_cost);
 
   Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> seen_;
   Eigen::MatrixXf cached_distances_;
@@ -135,9 +140,37 @@ private:
 };
 
 /*****************************************************************************
+** Deflation
+*****************************************************************************/
+
+/**
+ * Use to strip the inflation layer from a cost map.
+ */
+class Deflate {
+public:
+  Deflate(const bool& do_not_strip_inscribed_region=false);
+
+  /**
+   * @brief Deflate...
+   *
+   * @param layer_source
+   * @param layer_destination
+   * @param cost_map
+   * @throw std::out_of_range if no map layer with name `layer` is present.
+   */
+  void operator()(const std::string& layer_source,
+                  const std::string& layer_destination,
+                  CostMap& cost_map
+                 );
+
+private:
+  bool do_not_strip_inscribed_region;
+};
+
+/*****************************************************************************
 ** Trailers
 *****************************************************************************/
 
 } // namespace cost_map_core
 
-#endif /* cost_map_core_OPERATIONS_HPP_ */
+#endif /* cost_map_core_INFLATION_HPP_ */
