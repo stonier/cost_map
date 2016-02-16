@@ -28,24 +28,43 @@ namespace cost_map {
 /**
  * @brief Function which can compute costs for the inflation layer.
  *
- * This class provides a default inflation function which works like the
- * ROS inflation layer. Inherit from this to generate your own inflation
+ * Inherit from this to generate your own inflation
  * functions.
  */
 class InflationComputer {
 public:
-  InflationComputer(const float& inscribed_radius,
-                const float& resolution,
-                const float& weight);
+  InflationComputer() {};
+  virtual ~InflationComputer() {};
 
   /** @brief  Given a distance, compute a cost.
    *
    * @param  distance The distance from an obstacle in cells
    * @return A cost value for the distance
    **/
-  unsigned char operator()(float &distance) const;
+  virtual unsigned char operator()(const float &distance) const = 0;
+};
+
+/**
+ * @brief Function which can compute costs for the inflation layer.
+ *
+ * This class provides a default inflation function which works like the
+ * ROS inflation layer. Inherit from this to generate your own inflation
+ * functions.
+ */
+class ROSInflationComputer : public InflationComputer {
+public:
+  ROSInflationComputer(const float& inscribed_radius, const float& weight);
+
+  virtual ~ROSInflationComputer() {};
+
+  /** @brief  Given a distance, compute a cost.
+   *
+   * @param  distance The metric distance from an obstacle (distance = cell_distance*resolution)
+   * @return A cost value for the distance
+   **/
+  virtual unsigned char operator()(const float &distance) const;
 private:
-  float inscribed_radius_, resolution_, weight_;
+  float inscribed_radius_, weight_;
 };
 
 /*****************************************************************************
@@ -67,7 +86,7 @@ public:
   void operator()(const std::string& layer_source,
                const std::string& layer_destination,
                const float& inflation_radius,
-               const float& inscribed_radius,
+               const InflationComputer& inflation_computer,
                CostMap& cost_map
                );
 
@@ -130,7 +149,7 @@ private:
    * @return
    */
   unsigned char costLookup(int mx, int my, int src_x, int src_y);
-  void computeCaches(const InflationComputer& compute_cost);
+  void computeCaches(const float& resolution, const InflationComputer& compute_cost);
 
   Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> seen_;
   Eigen::MatrixXf cached_distances_;

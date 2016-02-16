@@ -21,7 +21,7 @@ namespace cost_map {
 void Inflate::operator()(const std::string& layer_source,
                          const std::string& layer_destination,
                          const float& inflation_radius,
-                         const float& inscribed_radius,
+                         const InflationComputer& inflation_computer,
                          CostMap& cost_map
                         ) {
   //unsigned char* master_array = cost_map...
@@ -36,11 +36,10 @@ void Inflate::operator()(const std::string& layer_source,
   // Rebuild internals
   seen_.resize(size_x, size_y);
   seen_.setConstant(false);
-  InflationComputer compute_cost(inscribed_radius, cost_map.getResolution(), 5.0);
   unsigned int new_cell_inflation_radius = static_cast<unsigned int>(std::max(0.0, std::ceil(inflation_radius / cost_map.getResolution())));
   if (new_cell_inflation_radius != cell_inflation_radius_ ) {
     cell_inflation_radius_ = new_cell_inflation_radius;
-    computeCaches(compute_cost);
+    computeCaches(cost_map.getResolution(), inflation_computer);
   }
 
   // eigen is default column storage, so iterate over the rows most quickly
@@ -129,7 +128,7 @@ unsigned char Inflate::costLookup(int mx, int my, int src_x, int src_y)
   return cached_costs_(dx, dy);
 }
 
-void Inflate::computeCaches(const InflationComputer& compute_cost)
+void Inflate::computeCaches(const float& resolution, const InflationComputer& compute_cost)
 {
   cached_costs_.resize(cell_inflation_radius_ + 2, cell_inflation_radius_ + 2);
   cached_distances_.resize(cell_inflation_radius_ + 2, cell_inflation_radius_ + 2);
@@ -142,32 +141,33 @@ void Inflate::computeCaches(const InflationComputer& compute_cost)
 
   for (unsigned int i = 0; i <= cell_inflation_radius_ + 1; ++i) {
     for (unsigned int j = 0; j <= cell_inflation_radius_ + 1; ++j) {
-      cached_costs_(i, j) = compute_cost(cached_distances_(i, j));
+      cached_costs_(i, j) = compute_cost(resolution*cached_distances_(i, j));
     }
   }
 }
 
-InflationComputer::InflationComputer(
+/*****************************************************************************
+** Inflation Computers
+*****************************************************************************/
+
+ROSInflationComputer::ROSInflationComputer(
     const float& inscribed_radius,
-    const float& resolution,
     const float& weight)
 : inscribed_radius_(inscribed_radius)
-, resolution_(resolution)
 , weight_(weight)
 {
 }
 
-unsigned char InflationComputer::operator()(float &distance) const {
+unsigned char ROSInflationComputer::operator()(const float &distance) const {
   unsigned char cost = 0;
-  if (distance == 0)
+  if (distance == 0.0)
     cost = LETHAL_OBSTACLE;
-  else if (distance * resolution_ <= inscribed_radius_)
+  else if (distance <= inscribed_radius_)
     cost = INSCRIBED_OBSTACLE;
   else
   {
     // make sure cost falls off by Euclidean distance
-    double euclidean_distance = distance * resolution_;
-    double factor = std::exp(-1.0 * weight_ * (euclidean_distance - inscribed_radius_));
+    double factor = std::exp(-1.0 * weight_ * (distance - inscribed_radius_));
     cost = (unsigned char)((INSCRIBED_OBSTACLE - 1) * factor);
   }
   return cost;
