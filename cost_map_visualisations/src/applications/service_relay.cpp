@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
   bool persistent = true, latched = true;
   std::cout << "Looking up service: " << serviceNameArg.getValue() << std::endl;
   ros::ServiceClient get_cost_map = nodehandle.serviceClient<cost_map_msgs::GetCostMap>(serviceNameArg.getValue(), persistent);
-  if ( !get_cost_map.waitForExistence(ros::Duration(3.0)) ) {
+  if ( !get_cost_map.waitForExistence(ros::Duration(10.0)) ) {
     ROS_ERROR_STREAM("Cost Map Service Relay : failed to find the GetCostMap service on " << nodehandle.resolveName(serviceNameArg.getValue(), true));
     return EXIT_FAILURE;
   }
@@ -59,8 +59,9 @@ int main(int argc, char **argv) {
   while ( ros::ok() ) {
     if (!get_cost_map.call(srv))
     {
-      ROS_ERROR_STREAM("Cost Map Service Relay : service call failed.");
-      return EXIT_FAILURE;
+      // could be just that someone closed down the navigation source and will restart
+      // so quietly ignore, but do check proceed to check again for ros::ok()
+      continue;
     }
     nav_msgs::OccupancyGrid occupancy_grid_msg;
     cost_map::CostMap cost_map;
