@@ -1,12 +1,12 @@
 /**
- * @file /cost_map_core/src/lib/operations.cpp
+ * @file /cost_map_core/src/lib/inflation.cpp
  */
 /*****************************************************************************
 ** Includes
 *****************************************************************************/
 
 #include <iostream>
-#include "../../include/cost_map_core/operations.hpp"
+#include "../../../include/cost_map_core/operators/inflation.hpp"
 
 /*****************************************************************************
 ** Namespaces
@@ -21,7 +21,7 @@ namespace cost_map {
 void Inflate::operator()(const std::string& layer_source,
                          const std::string& layer_destination,
                          const float& inflation_radius,
-                         const float& inscribed_radius,
+                         const InflationComputer& inflation_computer,
                          CostMap& cost_map
                         ) {
   //unsigned char* master_array = cost_map...
@@ -29,18 +29,16 @@ void Inflate::operator()(const std::string& layer_source,
   unsigned int size_x = cost_map.getSize().x();
   unsigned int size_y = cost_map.getSize().y();
   unsigned int size = size_x*size_y;
-  cost_map::Matrix data_source = cost_map.get(layer_source);
-  if ( !cost_map.exists(layer_destination) ) {
-    cost_map.add(layer_destination, data_source);
-  }
+  const cost_map::Matrix& data_source = cost_map.get(layer_source);
+  cost_map.add(layer_destination, data_source);
+
   // Rebuild internals
   seen_.resize(size_x, size_y);
   seen_.setConstant(false);
-  CostGenerator compute_cost(inscribed_radius, cost_map.getResolution(), 5.0);
   unsigned int new_cell_inflation_radius = static_cast<unsigned int>(std::max(0.0, std::ceil(inflation_radius / cost_map.getResolution())));
   if (new_cell_inflation_radius != cell_inflation_radius_ ) {
     cell_inflation_radius_ = new_cell_inflation_radius;
-    computeCaches(compute_cost);
+    computeCaches(cost_map.getResolution(), inflation_computer);
   }
 
   // eigen is default column storage, so iterate over the rows most quickly
@@ -50,7 +48,7 @@ void Inflate::operator()(const std::string& layer_source,
       unsigned char cost = data_source(i, j);
       if (cost == LETHAL_OBSTACLE) {
         unsigned int index = j*number_of_rows + i;
-        enqueue(cost_map.get(layer_destination), i, j, i, j);
+        enqueue(cost_map.get(layer_source), cost_map.get(layer_destination), i, j, i, j);
       }
     }
   }
@@ -69,21 +67,22 @@ void Inflate::operator()(const std::string& layer_source,
 
     // attempt to put the neighbors of the current cell onto the queue
     if (mx > 0) {
-      enqueue(cost_map.get(layer_destination), mx - 1, my, sx, sy);
+      enqueue(cost_map.get(layer_source), cost_map.get(layer_destination), mx - 1, my, sx, sy);
     }
     if (my > 0) {
-      enqueue(cost_map.get(layer_destination), mx, my - 1, sx, sy);
+      enqueue(cost_map.get(layer_source), cost_map.get(layer_destination), mx, my - 1, sx, sy);
     }
     if (mx < size_x - 1) {
-      enqueue(cost_map.get(layer_destination), mx + 1, my, sx, sy);
+      enqueue(cost_map.get(layer_source), cost_map.get(layer_destination), mx + 1, my, sx, sy);
     }
     if (my < size_y - 1) {
-      enqueue(cost_map.get(layer_destination), mx, my + 1, sx, sy);
+      enqueue(cost_map.get(layer_source), cost_map.get(layer_destination), mx, my + 1, sx, sy);
     }
   }
 }
 
-void Inflate::enqueue(cost_map::Matrix& data_destination,
+void Inflate::enqueue(const cost_map::Matrix& data_source,
+                      cost_map::Matrix& data_destination,
                       unsigned int mx, unsigned int my,
                       unsigned int src_x, unsigned int src_y
                       )
@@ -101,7 +100,7 @@ void Inflate::enqueue(cost_map::Matrix& data_destination,
 
     // assign the cost associated with the distance from an obstacle to the cell
     unsigned char cost = costLookup(mx, my, src_x, src_y);
-    unsigned char old_cost = data_destination(mx, my);
+    unsigned char old_cost = data_source(mx, my);
 
     if (old_cost == NO_INFORMATION && cost >= INSCRIBED_OBSTACLE)
       data_destination(mx, my) = cost;
@@ -129,7 +128,7 @@ unsigned char Inflate::costLookup(int mx, int my, int src_x, int src_y)
   return cached_costs_(dx, dy);
 }
 
-void Inflate::computeCaches(const CostGenerator& compute_cost)
+void Inflate::computeCaches(const float& resolution, const InflationComputer& compute_cost)
 {
   cached_costs_.resize(cell_inflation_radius_ + 2, cell_inflation_radius_ + 2);
   cached_distances_.resize(cell_inflation_radius_ + 2, cell_inflation_radius_ + 2);
@@ -142,36 +141,70 @@ void Inflate::computeCaches(const CostGenerator& compute_cost)
 
   for (unsigned int i = 0; i <= cell_inflation_radius_ + 1; ++i) {
     for (unsigned int j = 0; j <= cell_inflation_radius_ + 1; ++j) {
-      cached_costs_(i, j) = compute_cost(cached_distances_(i, j));
+      cached_costs_(i, j) = compute_cost(resolution*cached_distances_(i, j));
     }
   }
 }
 
-Inflate::CostGenerator::CostGenerator(
+/*****************************************************************************
+** Inflation Computers
+*****************************************************************************/
+
+ROSInflationComputer::ROSInflationComputer(
     const float& inscribed_radius,
-    const float& resolution,
     const float& weight)
 : inscribed_radius_(inscribed_radius)
-, resolution_(resolution)
 , weight_(weight)
 {
 }
 
-unsigned char Inflate::CostGenerator::operator()(float &distance) const {
+unsigned char ROSInflationComputer::operator()(const float &distance) const {
   unsigned char cost = 0;
-  if (distance == 0)
+  if (distance == 0.0)
     cost = LETHAL_OBSTACLE;
-  else if (distance * resolution_ <= inscribed_radius_)
+  else if (distance <= inscribed_radius_)
     cost = INSCRIBED_OBSTACLE;
   else
   {
     // make sure cost falls off by Euclidean distance
-    double euclidean_distance = distance * resolution_;
-    double factor = std::exp(-1.0 * weight_ * (euclidean_distance - inscribed_radius_));
+    double factor = std::exp(-1.0 * weight_ * (distance - inscribed_radius_));
     cost = (unsigned char)((INSCRIBED_OBSTACLE - 1) * factor);
   }
   return cost;
 }
+
+/*****************************************************************************
+** Deflation
+*****************************************************************************/
+
+Deflate::Deflate(const bool& do_not_strip_inscribed_region)
+: do_not_strip_inscribed_region(do_not_strip_inscribed_region)
+{
+}
+
+void Deflate::operator()(const std::string& layer_source,
+                         const std::string& layer_destination,
+                         CostMap& cost_map
+                         )
+{
+  // make a call on the data, just to check that the layer is there
+  // will throw std::out_of_range if not
+  cost_map::Matrix data_source = cost_map.get(layer_source);
+  // add a layer filled with NO_INFORMATION
+  cost_map.add(layer_destination);
+  cost_map::Matrix& data_destination = cost_map.get(layer_destination);
+
+  unsigned char cost_threshold = do_not_strip_inscribed_region ? cost_map::INSCRIBED_OBSTACLE : cost_map::LETHAL_OBSTACLE;
+
+  // eigen is by default column major - iterate with the row index changing fastest
+  for (unsigned int j = 0, number_of_rows = data_source.rows(), number_of_columns = data_source.cols(); j < number_of_columns; ++j) {
+    for (unsigned int i = 0; i < number_of_rows; ++i) {
+      unsigned char cost = data_source(i, j);
+      data_destination(i, j) = (cost >= cost_threshold ) ? cost : cost_map::FREE_SPACE;
+    }
+  }
+}
+
 
 /*****************************************************************************
  ** Trailers
