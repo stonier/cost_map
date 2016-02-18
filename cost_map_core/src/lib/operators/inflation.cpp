@@ -18,8 +18,8 @@ namespace cost_map {
 ** Implementation
 *****************************************************************************/
 
-void Inflate::operator()(const std::string& layer_source,
-                         const std::string& layer_destination,
+void Inflate::operator()(const std::string layer_source,
+                         const std::string layer_destination,
                          const float& inflation_radius,
                          const InflationComputer& inflation_computer,
                          CostMap& cost_map

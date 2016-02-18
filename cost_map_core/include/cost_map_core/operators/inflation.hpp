@@ -83,8 +83,8 @@ public:
    * @param cost_map
    * @throw std::out_of_range if no map layer with name `layer` is present.
    */
-  void operator()(const std::string& layer_source,
-               const std::string& layer_destination,
+  void operator()(const std::string layer_source,
+               const std::string layer_destination,
                const float& inflation_radius,
                const InflationComputer& inflation_computer,
                CostMap& cost_map
