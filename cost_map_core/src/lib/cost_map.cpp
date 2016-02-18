@@ -256,14 +256,14 @@ bool CostMap::getVector(const std::string& layerPrefix, const cost_map::Index& i
 }
 
 CostMap CostMap::getSubmap(const cost_map::Position& position, const cost_map::Length& length,
-                           bool& isSuccess)
+                           bool& isSuccess) const
 {
   Index index;
   return getSubmap(position, length, index, isSuccess);
 }
 
 CostMap CostMap::getSubmap(const cost_map::Position& position, const cost_map::Length& length,
-                           cost_map::Index& indexInSubmap, bool& isSuccess)
+                           cost_map::Index& indexInSubmap, bool& isSuccess) const
 {
   // Submap the generate.
   CostMap submap(layers_);
