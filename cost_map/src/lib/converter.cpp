@@ -425,16 +425,28 @@ void toOccupancyGrid(const cost_map::CostMap& cost_map, const std::string& layer
 
   // Occupancy probabilities are in the range [0,100].  Unknown is -1.
   const float cellMin = 0;
-  const float cellMax = 100;
+  const float cellMax = 98;
   const float cellRange = cellMax - cellMin;
 
   const float data_minimum = 0;
-  const float data_maximum = 254;
-  for (CostMapIterator iterator(cost_map); !iterator.isPastEnd(); ++iterator) {
+  const float data_maximum = 252;
+  for (CostMapIterator iterator(cost_map); !iterator.isPastEnd(); ++iterator)
+  {
     float value;
-    if (cost_map.at(layer, *iterator) == cost_map::NO_INFORMATION) {
+    if (cost_map.at(layer, *iterator) == cost_map::NO_INFORMATION) // 255
+    {
       value = -1;
-    } else {
+    }
+    else if (cost_map.at(layer, *iterator) == cost_map::LETHAL_OBSTACLE) // 254
+    {
+      value = 100;
+    }
+    else if (cost_map.at(layer, *iterator) == cost_map::INSCRIBED_OBSTACLE) // 253
+    {
+      value = 99;
+    }
+    else
+    {
       value = (cost_map.at(layer, *iterator) - data_minimum) / (data_maximum - data_minimum);
       value = cellMin + std::min(std::max(0.0f, value), 1.0f) * cellRange;
     }
