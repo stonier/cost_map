@@ -285,7 +285,7 @@ public:
    * @return submap (is empty if success is false).
    */
   CostMap getSubmap(const Position& position, const Length& length,
-                    bool& isSuccess);
+                    bool& isSuccess) const;
 
   /*!
    * Gets a submap from the map. The requested submap is specified with the requested
@@ -297,7 +297,7 @@ public:
    * @return submap (is empty if success is false).
    */
   CostMap getSubmap(const Position& position, const Length& length,
-                    Index& indexInSubmap, bool& isSuccess);
+                    Index& indexInSubmap, bool& isSuccess) const;
 
   /*!
    * Move the grid map w.r.t. to the grid map frame. Use this to move the grid map
