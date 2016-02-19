@@ -182,8 +182,8 @@ Deflate::Deflate(const bool& do_not_strip_inscribed_region)
 {
 }
 
-void Deflate::operator()(const std::string& layer_source,
-                         const std::string& layer_destination,
+void Deflate::operator()(const std::string layer_source,
+                         const std::string layer_destination,
                          CostMap& cost_map
                          )
 {
