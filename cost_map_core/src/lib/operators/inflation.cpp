@@ -18,8 +18,8 @@ namespace cost_map {
 ** Implementation
 *****************************************************************************/
 
-void Inflate::operator()(const std::string& layer_source,
-                         const std::string& layer_destination,
+void Inflate::operator()(const std::string layer_source,
+                         const std::string layer_destination,
                          const float& inflation_radius,
                          const InflationComputer& inflation_computer,
                          CostMap& cost_map
@@ -182,8 +182,8 @@ Deflate::Deflate(const bool& do_not_strip_inscribed_region)
 {
 }
 
-void Deflate::operator()(const std::string& layer_source,
-                         const std::string& layer_destination,
+void Deflate::operator()(const std::string layer_source,
+                         const std::string layer_destination,
                          CostMap& cost_map
                          )
 {
