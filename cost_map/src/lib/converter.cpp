@@ -452,7 +452,7 @@ void toOccupancyGrid(const cost_map::CostMap& cost_map, const std::string& layer
     }
     // Occupancy grid claims to be row-major order, but it does not seem that way.
     // http://docs.ros.org/api/nav_msgs/html/msg/OccupancyGrid.html.
-    unsigned int index = grid_map::get1dIndexFrom2dIndex(*iterator, cost_map.getSize(), false);
+    unsigned int index = grid_map::getLinearIndexFromIndex(*iterator, cost_map.getSize(), false);
     msg.data[index] = value;
   }
 }
