@@ -330,7 +330,7 @@ bool fromMessage(const cost_map_msgs::CostMap& message, cost_map::CostMap& cost_
     Matrix data;
     // this is not a template function
     // grid_map::multiArrayMessageCopyToMatrixEigen(message.data[i], data); // TODO Could we use the data mapping (instead of copying) method here?
-    multiArrayMessageCopyToMatrixEigen(message.data[i], data);
+    grid_map::multiArrayMessageCopyToMatrixEigen(message.data[i], data);
     // TODO Check if size is good.   size_ << getRows(message.data[0]), getCols(message.data[0]);
     cost_map.add(message.layers[i], data);
   }
