@@ -28,7 +28,6 @@ find_package(Boost REQUIRED COMPONENTS filesystem)
 
 find_package(PkgConfig)
 pkg_check_modules(YAML_CPP yaml-cpp>=0.5)
-find_package(OpenCV REQUIRED)
 
 ##############################################################################
 # Catkin
@@ -66,6 +65,7 @@ add_definitions(
     ${Boost_DEFINITIONS}
     ${OpenCV_DEFINITIONS}
 )
+
 include_directories(
     include
     ${catkin_INCLUDE_DIRS}
@@ -73,7 +73,19 @@ include_directories(
     ${YAML_CPP_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
 )
+
 link_directories(${YAML_CPP_LIBRARY_DIRS})
+
+# *spank* opencv calls include_directories internally, which means if you
+# don't call it after the other include_directories, it will automagically
+# stuff its directories at the front of your include path and this can
+# cause headaches.
+find_package(OpenCV REQUIRED)
+
+# not necessary to re-include, but should be here for when eventually opencv3
+# fixes this for us
+include_directories(${OpenCV_INCLUDE_DIRS})
+add_definitions(${OpenCV_DEFINITIONS})
 
 ##############################################################################
 # Project Sources
