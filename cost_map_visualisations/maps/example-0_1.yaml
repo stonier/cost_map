@@ -1,6 +1,6 @@
 # Example costmap from image file
-resolution: 0.5
-filename: tiny.png
+resolution: 0.10
+filename: example-0_1.png
 
 # optionals
 frame_id: map

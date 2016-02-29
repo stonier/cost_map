@@ -33,6 +33,7 @@
   <export>
     <rosdoc config="rosdoc.yaml" />
     <cost_map yaml="${prefix}/maps/example.yaml"/>
+    <cost_map yaml="${prefix}/maps/example-0_1.yaml"/>
     <cost_map yaml="${prefix}/maps/tiny.yaml"/>
   </export>
 </package>
