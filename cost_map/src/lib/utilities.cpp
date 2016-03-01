@@ -37,8 +37,8 @@ std::string resolveResourceName(const std::string& resource_name) {
   /********************
   ** Lookup
   ********************/
-  std::string plugin_package = "cost_map"; // nav_core, cost_map
-  std::string attribute = "yaml";          // plugin, yaml
+  std::string plugin_package = "cost_map";  // nav_core, cost_map
+  std::string attribute = "image_resource"; // plugin, yaml
 
   // pending release of https://github.com/ros/ros/pull/103
   // std::vector<std::string> packages, costmaps;
