@@ -13,6 +13,7 @@
 *****************************************************************************/
 
 #include "../CostMap.hpp"
+#include <limits>
 #include <queue>
 
 /*****************************************************************************
@@ -73,6 +74,10 @@ private:
 
 class Inflate {
 public:
+  Inflate() : cell_inflation_radius_(std::numeric_limits<unsigned int>::max())
+  {
+  };
+
   /**
    * @brief Inflate...
    *
