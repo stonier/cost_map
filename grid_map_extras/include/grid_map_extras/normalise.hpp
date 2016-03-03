@@ -29,7 +29,8 @@ namespace grid_map_extras {
 /**
  * @brief Normalise and handle infinity for a grid map.
  *
- * This is useful for publishing to a point cloud.
+ * This is useful for publishing text representations of the cloud where we'd
+ * like to limit the digits used.
  *
  * @param boundary_value : maximum bound of the normalisation (typically 1.0)
  * @param infinity_value
@@ -37,10 +38,9 @@ namespace grid_map_extras {
 void normalise(grid_map::GridMap& grid_map,
                const std::string& from_layer,
                const std::string& to_layer,
-               const double& boundary_value = 1.0,
-               const double& infinity_value = std::numeric_limits<double>::infinity());
-
+               const double& boundary_value = 1.0);
 }
+
 /*****************************************************************************
 ** Trailers
 *****************************************************************************/

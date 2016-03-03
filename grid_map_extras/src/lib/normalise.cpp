@@ -5,6 +5,7 @@
 ** Includes
 *****************************************************************************/
 
+#include <limits>
 #include "../../include/grid_map_extras/normalise.hpp"
 
 /*****************************************************************************
@@ -20,8 +21,7 @@ namespace grid_map_extras {
 void normalise(grid_map::GridMap& grid_map,
                const std::string& from_layer,
                const std::string& to_layer,
-               const double& boundary_value,
-               const double& infinity_value)
+               const double& boundary_value)
 {
   grid_map::Index costmap_index;
   grid_map.add(to_layer, 0.0);
@@ -32,7 +32,7 @@ void normalise(grid_map::GridMap& grid_map,
     int i = (*iterator)(0);
     int j = (*iterator)(1);
     double value = data_original(i, j);
-    if ( ( std::abs(value) > max_magnitude ) && (value != infinity_value) ) {
+    if ( ( std::abs(value) > max_magnitude ) && (value != std::numeric_limits<double>::infinity()) ) {
       max_magnitude = value;
     }
   }
@@ -40,8 +40,8 @@ void normalise(grid_map::GridMap& grid_map,
     int i = (*iterator)(0);
     int j = (*iterator)(1);
     double value = data_original(i, j);
-    if (value == infinity_value) {
-      data_normalised(i, j) = std::numeric_limits<double>::infinity();
+    if (value == std::numeric_limits<double>::infinity()) {
+      data_normalised(i, j) = value;
     } else {
       data_normalised(i, j) = boundary_value*data_original(i,j)/max_magnitude;
     }

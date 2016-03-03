@@ -37,7 +37,6 @@ public:
    * format. Note this only formats a single layer.
    *
    * @param layer_name : look for this layer in any passed grid to format.
-   * @param infinity_value : convert this value to /info and ignore when scaling
    * @param scaled : scale values on the range -99.0 -> 99.0 (for formatting ease).
    * @param w : width (default - no width constraints)
    * @param p : the number of decimal places of precision (default - 4)
@@ -45,8 +44,7 @@ public:
   Formatter(const std::string& layer_name,
             const int &w = -1,
             const unsigned int &p = 2,
-            const bool& scaled = true,
-            const double& infinity_value = std::numeric_limits<double>::infinity()
+            const bool& scaled = true
             )
   : format(w, p, ecl::RightAlign)
   , tmp_width(w)
@@ -56,7 +54,6 @@ public:
   , grid_(nullptr)
   , layer_name_(layer_name)
   , scaled_(scaled)
-  , infinity_value_(infinity_value)
 {}
   virtual ~Formatter() {}
   /**
@@ -158,7 +155,6 @@ private:
   const grid_map::GridMap *grid_;
   const std::string layer_name_;
   bool scaled_;
-  double infinity_value_;
 };
 
 template <typename OutputStream>
@@ -194,7 +190,7 @@ OutputStream& operator << (OutputStream& ostream, Formatter & formatter ) ecl_as
         int i = (*iterator)(0);
         int j = (*iterator)(1);
         double value = data(i, j);
-        if ( ( std::abs(value) > max_magnitude ) && (value != formatter.infinity_value_) ) {
+        if ( ( std::abs(value) > max_magnitude ) && (value != std::numeric_limits<double>::infinity()) ) {
           max_magnitude = value;
         }
       }
@@ -220,7 +216,7 @@ OutputStream& operator << (OutputStream& ostream, Formatter & formatter ) ecl_as
       }
     }
     for ( const double& value : storage ) {
-      if ( value == formatter.infinity_value_) {
+      if ( value == std::numeric_limits<double>::infinity() ) {
         for ( unsigned int i = 0; i < formatter.format.width() - 3; ++i ) {
           ostream << " ";
         }
@@ -262,10 +258,9 @@ public:
   Format(const std::string& layer_name,
          const int &w,
          const unsigned int &p,
-         const bool& scaled,
-         const double& infinity_value = std::numeric_limits<double>::infinity()
+         const bool& scaled
          )
-  : grid_map_extras::Formatter(layer_name, w, p, scaled, infinity_value)
+  : grid_map_extras::Formatter(layer_name, w, p, scaled)
   {}
 };
 
