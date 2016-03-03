@@ -18,7 +18,9 @@ find_package(catkin
         ecl_build
         ecl_console
         ecl_exceptions
-        grid_map
+        grid_map_core
+        grid_map_ros
+        grid_map_visualization
         nav_msgs
         roslib
         tf
@@ -45,7 +47,9 @@ catkin_package(
         ecl_build
         ecl_console
         ecl_exceptions
-        grid_map
+        grid_map_core
+        grid_map_ros
+        grid_map_visualization
         nav_msgs
         roslib
         tf

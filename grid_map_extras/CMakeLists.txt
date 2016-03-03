@@ -16,7 +16,7 @@ find_package(catkin
         ecl_console
         ecl_exceptions
         ecl_formatters
-        grid_map
+        grid_map_core
         grid_map_visualization
     )
 
@@ -34,7 +34,7 @@ catkin_package(
         ecl_console
         ecl_exceptions
         ecl_formatters
-        grid_map
+        grid_map_core
         grid_map_visualization
     )
 

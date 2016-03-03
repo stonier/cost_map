@@ -12,7 +12,7 @@
 ** Includes
 *****************************************************************************/
 
-#include <grid_map/grid_map.hpp>
+#include <grid_map_core/grid_map_core.hpp>
 #include <limits>
 #include <string>
 

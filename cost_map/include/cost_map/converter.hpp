@@ -13,7 +13,8 @@
 *****************************************************************************/
 
 // grid maps
-#include <grid_map/grid_map.hpp>
+#include <grid_map_core/grid_map_core.hpp>
+#include <grid_map_ros/grid_map_ros.hpp>
 #include <cost_map_core/cost_map_core.hpp>
 #include <cost_map_msgs/CostMap.h>
 #include <cost_map_msgs/GetCostMap.h>
