@@ -1,12 +1,12 @@
 /**
- * @file /cost_map_visualisations/include/cost_map_visualisations/formatters.hpp
+ * @file /grid_map_visualisations/include/grid_map_visualisations/formatters.hpp
  */
 /*****************************************************************************
 ** Ifdefs
 *****************************************************************************/
 
-#ifndef cost_map_visualisations_FORMATTERS_HPP_
-#define cost_map_visualisations_FORMATTERS_HPP_
+#ifndef grid_map_visualisations_FORMATTERS_HPP_
+#define grid_map_visualisations_FORMATTERS_HPP_
 
 /*****************************************************************************
 ** Includes
@@ -14,12 +14,14 @@
 
 #include <ecl/formatters.hpp>
 #include <grid_map/grid_map.hpp>
+#include <limits>
+#include <string>
 
 /*****************************************************************************
 ** Namespaces
 *****************************************************************************/
 
-namespace grid_map {
+namespace grid_map_extras {
 
 /*****************************************************************************
 ** Interfaces
@@ -35,10 +37,17 @@ public:
    * format. Note this only formats a single layer.
    *
    * @param layer_name : look for this layer in any passed grid to format.
+   * @param infinity_value : convert this value to /info and ignore when scaling
+   * @param scaled : scale values on the range -99.0 -> 99.0 (for formatting ease).
    * @param w : width (default - no width constraints)
    * @param p : the number of decimal places of precision (default - 4)
    **/
-  Formatter(const std::string& layer_name, const int &w = -1, const unsigned int &p = 2)
+  Formatter(const std::string& layer_name,
+            const int &w = -1,
+            const unsigned int &p = 2,
+            const bool& scaled = true,
+            const double& infinity_value = std::numeric_limits<double>::infinity()
+            )
   : format(w, p, ecl::RightAlign)
   , tmp_width(w)
   , tmp_precision(p)
@@ -46,6 +55,8 @@ public:
   , ready_to_format(false)
   , grid_(nullptr)
   , layer_name_(layer_name)
+  , scaled_(scaled)
+  , infinity_value_(infinity_value)
 {}
   virtual ~Formatter() {}
   /**
@@ -93,7 +104,7 @@ public:
    * @param matrix : the matrix to be formatted (gets temporarily stored as a pointer).
    * @return FloatMatrixFormatter& : this formatter readied for use with a stream.
    **/
-  Formatter& operator() (const nav_msgs::OccupancyGrid & grid ) {
+  Formatter& operator() (const grid_map::GridMap& grid ) {
     grid_ = &grid;
     ready_to_format = true;
     return (*this);
@@ -114,7 +125,7 @@ public:
    * @param p : the number of decimal places of precision.
    * @return FloatMatrixFormatter& : this formatter readied for use with a stream.
    **/
-  Formatter& operator() (const nav_msgs::OccupancyGrid & grid, const int &w, const unsigned int &p) {
+  Formatter& operator() (const grid_map::GridMap& grid, const int &w, const unsigned int &p) {
           grid_ = &grid;
           tmp_precision = p;
           tmp_width = w;
@@ -144,8 +155,10 @@ private:
   unsigned int tmp_precision;
   bool tmp_formatting;
   bool ready_to_format;
-  const nav_msgs::OccupancyGrid *grid_;
+  const grid_map::GridMap *grid_;
   const std::string layer_name_;
+  bool scaled_;
+  double infinity_value_;
 };
 
 template <typename OutputStream>
@@ -169,18 +182,54 @@ OutputStream& operator << (OutputStream& ostream, Formatter & formatter ) ecl_as
       formatter.format.width(formatter.tmp_width);
     }
 
-    /*********************
-    ** Stream Grid Map
-    **********************/
     grid_map::Index costmap_index;
-    grid_map::Matrix& data = formatter.grid->get("totals");
+    const grid_map::Matrix& data = formatter.grid_->get(std::string(formatter.layer_name_));
+
+    /********************
+    ** Scaling
+    ********************/
+    double max_magnitude = 99.0;
+    if ( formatter.scaled_ ) {
+      for (grid_map::GridMapIterator iterator(*(formatter.grid_)); !iterator.isPastEnd(); ++iterator) {
+        int i = (*iterator)(0);
+        int j = (*iterator)(1);
+        double value = data(i, j);
+        if ( ( std::abs(value) > max_magnitude ) && (value != formatter.infinity_value_) ) {
+          max_magnitude = value;
+        }
+      }
+    }
+
+    /*********************
+    ** Stream
+    **********************/
     int count = 0;
-    for (grid_map::GridMapIterator iterator(*(formatter.grid)); !iterator.isPastEnd(); ++iterator) {
+    // Eigen Matrix is row-major, so this grid map iterator usually iterates down before across
+    // so have to rearrange the grid into a form that is convenient for streaming to the screen
+    // reminder : do not iterate over the matrix directly - the starting index might not be at
+    //            the start of the matrix!
+    std::vector<double> storage(formatter.grid_->getSize().x() * formatter.grid_->getSize().y(), 0.0);
+    for (grid_map::GridMapIterator iterator(*(formatter.grid_)); !iterator.isPastEnd(); ++iterator) {
       int i = (*iterator)(0);
       int j = (*iterator)(1);
-      ostream << formatter.format(data(i,j));
+      double value = data(i, j);
+      if ( formatter.scaled_ ) {
+        storage[j + i*formatter.grid_->getSize().x()] = 99.0*value/max_magnitude;
+      } else {
+        storage[j + i*formatter.grid_->getSize().x()] = value;
+      }
+    }
+    for ( const double& value : storage ) {
+      if ( value == formatter.infinity_value_) {
+        for ( unsigned int i = 0; i < formatter.format.width() - 3; ++i ) {
+          ostream << " ";
+        }
+        ostream << "inf";
+      } else {
+        ostream << formatter.format(value);
+      }
       ++count;
-      if ( count == formatter.grid->getSize().x() ) {
+      if ( count == formatter.grid_->getSize().x() ) {
         count = 0;
         ostream << "\n";
       }
@@ -199,7 +248,7 @@ OutputStream& operator << (OutputStream& ostream, Formatter & formatter ) ecl_as
   return ostream;
 }
 
-} // namespace grid_map
+} // namespace grid_map_extras
 
 /*****************************************************************************
  ** ECL Format Type
@@ -207,12 +256,18 @@ OutputStream& operator << (OutputStream& ostream, Formatter & formatter ) ecl_as
 
 namespace ecl {
 
-  template <>
-  class Format<nav_msgs::OccupancyGrid> : public grid_map::Formatter {
-  public:
-    Format() : grid_map::Formatter() {}
-    Format(const int &w, const unsigned int &p) : grid_map::Formatter(w, p) {}
-  };
+template <>
+class Format<grid_map::GridMap> : public grid_map_extras::Formatter {
+public:
+  Format(const std::string& layer_name,
+         const int &w,
+         const unsigned int &p,
+         const bool& scaled,
+         const double& infinity_value = std::numeric_limits<double>::infinity()
+         )
+  : grid_map_extras::Formatter(layer_name, w, p, scaled, infinity_value)
+  {}
+};
 
 } // namespace ecl
 
@@ -220,4 +275,4 @@ namespace ecl {
 ** Trailers
 *****************************************************************************/
 
-#endif /* cost_map_visualisations_FORMATTERS_HPP_ */
+#endif /* grid_map_visualisations_FORMATTERS_HPP_ */
