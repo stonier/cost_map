@@ -191,7 +191,7 @@ OutputStream& operator << (OutputStream& ostream, Formatter & formatter ) ecl_as
         int j = (*iterator)(1);
         double value = data(i, j);
         if ( ( std::abs(value) > max_magnitude ) && (value != std::numeric_limits<double>::infinity()) ) {
-          max_magnitude = value;
+          max_magnitude = std::abs(value);
         }
       }
     }
