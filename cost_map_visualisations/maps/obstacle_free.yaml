@@ -1,0 +1,6 @@
+# Example costmap from image file
+resolution: 0.20
+filename: obstacle_free.png
+
+# optionals
+frame_id: map
