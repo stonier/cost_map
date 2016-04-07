@@ -76,7 +76,7 @@ bool EllipseIterator::isPastEnd() const
   return internalIterator_->isPastEnd();
 }
 
-bool EllipseIterator::isInside()
+bool EllipseIterator::isInside() const
 {
   Position position;
   grid_map::getPositionFromIndex(position, *(*internalIterator_), mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);

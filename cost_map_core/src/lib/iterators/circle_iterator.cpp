@@ -72,7 +72,7 @@ bool CircleIterator::isPastEnd() const
   return internalIterator_->isPastEnd();
 }
 
-bool CircleIterator::isInside()
+bool CircleIterator::isInside() const
 {
   Position position;
   grid_map::getPositionFromIndex(position, *(*internalIterator_), mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
