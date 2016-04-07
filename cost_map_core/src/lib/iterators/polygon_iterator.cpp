@@ -68,7 +68,7 @@ bool PolygonIterator::isPastEnd() const
   return internalIterator_->isPastEnd();
 }
 
-bool PolygonIterator::isInside()
+bool PolygonIterator::isInside() const
 {
   Eigen::Vector2d position;
   grid_map::getPositionFromIndex(position, *(*internalIterator_), mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
