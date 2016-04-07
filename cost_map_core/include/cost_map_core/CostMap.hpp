@@ -429,6 +429,13 @@ public:
    */
   const Index& getStartIndex() const;
 
+  /**
+   * Adjust the cost map to a new resolution.
+   *
+   * @param resolution the new resolution
+   */
+  void setResolution(const double& resolution);
+
  private:
 
   /*!

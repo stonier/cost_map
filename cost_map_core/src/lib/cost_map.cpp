@@ -592,5 +592,43 @@ void CostMap::resize(const Eigen::Array2i& size)
   }
 }
 
+void CostMap::setResolution(const double& new_resolution)
+{
+  // skip adjustment, if new and original resolution are the same
+  if (resolution_ == new_resolution)
+  {
+    return;
+  }
+
+  cost_map::CostMap adjusted_cost_map(layers_);
+  adjusted_cost_map.setGeometry(length_, new_resolution, position_);
+  adjusted_cost_map.setTimestamp(timestamp_);
+  adjusted_cost_map.setFrameId(frameId_);
+  adjusted_cost_map.setBasicLayers(basicLayers_);
+
+  // assign cell values of the original map cells
+  cost_map::Position pos_new_map;
+  cost_map::DataType org_cell_value;
+
+  for (unsigned int layer = 0; layer < layers_.size(); ++layer)
+  {
+    for (cost_map::CostMapIterator it(adjusted_cost_map); !it.isPastEnd(); ++it)
+    {
+      if (adjusted_cost_map.getPosition(*it, pos_new_map))
+      {
+        // get the cell value of this position in the original map
+        org_cell_value = this->atPosition(layers_[layer], pos_new_map);
+        // and assign it to cell of the adjusted map
+        adjusted_cost_map.atPosition(layers_[layer], pos_new_map) = org_cell_value;
+      }
+    }
+  }
+
+  // swap the maps
+  *this = adjusted_cost_map;
+
+  return;
+}
+
 } /* namespace */
 
