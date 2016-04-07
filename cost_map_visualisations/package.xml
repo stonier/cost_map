@@ -32,6 +32,7 @@
 
   <export>
     <rosdoc config="rosdoc.yaml" />
+    <cost_map image_resource="${prefix}/maps/elevator.yaml"/>
     <cost_map image_resource="${prefix}/maps/obstacle_free-8x8.yaml"/>
     <cost_map image_resource="${prefix}/maps/obstacle_free.yaml"/>
     <cost_map image_resource="${prefix}/maps/example.yaml"/>

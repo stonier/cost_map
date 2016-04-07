@@ -1,0 +1,6 @@
+# Example costmap from image file
+resolution: 0.02
+filename: elevator.png
+
+# optionals
+frame_id: map
