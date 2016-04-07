@@ -56,7 +56,7 @@ std::string resolveResourceName(const std::string& resource_name) {
     }
   }
   // not found
-  throw ecl::StandardException(LOC, ecl::NotFoundError, std::string("resource name '") + resource_name + std::string("' is not available (try 'rospack --attrib=yaml cost_map')."));
+  throw ecl::StandardException(LOC, ecl::NotFoundError, std::string("resource name '") + resource_name + std::string("' is not available (try 'rospack plugins --attrib=yaml cost_map')."));
 }
 
 /*****************************************************************************
