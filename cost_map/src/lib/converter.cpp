@@ -357,33 +357,46 @@ CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, cost_map::Len
   // TODO check the result
   cost_map::Position position;
   position << tf_pose.getOrigin().x() , tf_pose.getOrigin().y();
-  float resolution = ros_costmap.getCostmap()->getResolution();
+  double resolution = ros_costmap.getCostmap()->getResolution();
   cost_map->setFrameId(ros_costmap.getGlobalFrameID());
   cost_map->setGeometry(geometry, resolution, position);
   cost_map->setTimestamp(tf_pose.stamp_.toNSec());
 
-  float subwindow_bottom_left_x = position.x() - geometry.x() / 2.0;
-  float subwindow_bottom_left_y = position.y() - geometry.y() / 2.0;
+  double subwindow_bottom_left_x = (position.x() - geometry.x()) * 0.5;
+  double subwindow_bottom_left_y = (position.y() - geometry.y()) * 0.5;
+
+  double original_size_x = ros_costmap.getCostmap()->getSizeInMetersX();
+  double original_size_y = ros_costmap.getCostmap()->getSizeInMetersX();
 
 //  std::cout << "From ROS Costmap2D" << std::endl;
 //  std::cout << "  Robot Pose        : " << position.x() << "," << position.y() << std::endl;
 //  std::cout << "  Bottom Left Corner: " << subwindow_bottom_left_x << "," << subwindow_bottom_left_y << std::endl;
 //  std::cout << "  Resolution        : " << resolution << std::endl;
 //  std::cout << "  Size              : " << geometry.x() << "x" << geometry.y() << std::endl;
+//  std::cout << "  Original Size     : " << original_size_x << "x" << original_size_y << std::endl;
+
   bool is_subwindow = false;
   // why do we need to lock - why don't they lock for us?
   {
     boost::lock_guard<costmap_2d::Costmap2D::mutex_t> lock(*(ros_costmap.getCostmap()->getMutex()));
-    is_subwindow = costmap_subwindow.copyCostmapWindow(
+
+    if((geometry.x() == original_size_x && geometry.y() == original_size_y)
+        || geometry.x() == 0.0 || geometry.y() == 0.0) {
+      is_subwindow = true;
+      costmap_subwindow = costmap_2d::Costmap2D(*(ros_costmap.getCostmap())); //be aware of some black magic in here
+    }
+    else {
+      is_subwindow = costmap_subwindow.copyCostmapWindow(
       *(ros_costmap.getCostmap()),
       subwindow_bottom_left_x, subwindow_bottom_left_y,
       geometry.x(),
       geometry.y());
+    }
   }
   if ( !is_subwindow ) {
     // handle differently - e.g. copy the internal part only and lethal elsewhere, but other parts would have to handle being outside too
     std::ostringstream error_message;
-    error_message << " subwindow landed outside the global costmap, aborting (you should ensure the robot travels inside the global costmap bounds).";
+    error_message << " subwindow landed outside the costmap (max size: " << original_size_x << "x" << original_size_y << "), aborting (you should ensure the robot travels inside the costmap bounds).";
     std::cout << error_message.str() << std::endl;
     throw ecl::StandardException(LOC, ecl::OutOfRangeError, error_message.str());
   }
