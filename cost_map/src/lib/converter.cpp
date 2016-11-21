@@ -357,52 +357,87 @@ CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, cost_map::Len
   // TODO check the result
   cost_map::Position position;
   position << tf_pose.getOrigin().x() , tf_pose.getOrigin().y();
-  float resolution = ros_costmap.getCostmap()->getResolution();
+  double resolution = ros_costmap.getCostmap()->getResolution();
   cost_map->setFrameId(ros_costmap.getGlobalFrameID());
-  cost_map->setGeometry(geometry, resolution, position);
   cost_map->setTimestamp(tf_pose.stamp_.toNSec());
 
-  float subwindow_bottom_left_x = position.x() - geometry.x() / 2.0;
-  float subwindow_bottom_left_y = position.y() - geometry.y() / 2.0;
+  double subwindow_bottom_left_x = position.x() - geometry.x() / 2.0;
+  double subwindow_bottom_left_y = position.y() - geometry.y() / 2.0;
+
+  double original_size_x = ros_costmap.getCostmap()->getSizeInMetersX();
+  double original_size_y = ros_costmap.getCostmap()->getSizeInMetersY();
 
 //  std::cout << "From ROS Costmap2D" << std::endl;
 //  std::cout << "  Robot Pose        : " << position.x() << "," << position.y() << std::endl;
 //  std::cout << "  Bottom Left Corner: " << subwindow_bottom_left_x << "," << subwindow_bottom_left_y << std::endl;
 //  std::cout << "  Resolution        : " << resolution << std::endl;
 //  std::cout << "  Size              : " << geometry.x() << "x" << geometry.y() << std::endl;
-  bool is_subwindow = false;
+//  std::cout << "  Original Size     : " << original_size_x << "x" << original_size_y << std::endl;
+
+  bool is_valid_window = false;
   // why do we need to lock - why don't they lock for us?
   {
     boost::lock_guard<costmap_2d::Costmap2D::mutex_t> lock(*(ros_costmap.getCostmap()->getMutex()));
-    is_subwindow = costmap_subwindow.copyCostmapWindow(
-      *(ros_costmap.getCostmap()),
-      subwindow_bottom_left_x, subwindow_bottom_left_y,
-      geometry.x(),
-      geometry.y());
+
+    bool full_size_requested = (geometry.x() == original_size_x && geometry.y() == original_size_y)
+                             || geometry.x() == 0.0 || geometry.y() == 0.0;
+    if(full_size_requested) {
+      geometry(0) = original_size_x;
+      geometry(1) = original_size_y;
+
+      cost_map->setGeometry(geometry, resolution, position);
+      copyCostmap2DData(*(ros_costmap.getCostmap()), cost_map);
+      return cost_map;
+    }
+
+    cost_map->setGeometry(geometry, resolution, position);
+    is_valid_window = costmap_subwindow.copyCostmapWindow(
+                            *(ros_costmap.getCostmap()),
+                            subwindow_bottom_left_x, subwindow_bottom_left_y,
+                            geometry.x(),
+                            geometry.y());
   }
-  if ( !is_subwindow ) {
+
+  if ( !is_valid_window ) {
     // handle differently - e.g. copy the internal part only and lethal elsewhere, but other parts would have to handle being outside too
     std::ostringstream error_message;
-    error_message << " subwindow landed outside the global costmap, aborting (you should ensure the robot travels inside the global costmap bounds).";
+    error_message << "Subwindow landed outside the costmap (max size: " << original_size_x << "x" << original_size_y
+                  << "), aborting (you should ensure the robot travels inside the costmap bounds).";
     std::cout << error_message.str() << std::endl;
     throw ecl::StandardException(LOC, ecl::OutOfRangeError, error_message.str());
   }
 
 //  // std::cout << "  CellsX            : " << global_costmap_subwindow.getSizeInCellsX() << std::endl;
 //  // std::cout << "  CellsY            : " << global_costmap_subwindow.getSizeInCellsY() << std::endl;
-  unsigned char* subwindow_costs = costmap_subwindow.getCharMap();
+
+  copyCostmap2DData(costmap_subwindow, cost_map);
+  return cost_map;
+}
+
+void copyCostmap2DData(costmap_2d::Costmap2D& copied_cost_map, const CostMapPtr& target_cost_map)
+{
+  if (copied_cost_map.getSizeInCellsX() != target_cost_map->getSize().x()
+      || copied_cost_map.getSizeInCellsY() != target_cost_map->getSize().y()) {
+
+    std::ostringstream error_message;
+    error_message << "Tried to copy Costmap2D data (" << copied_cost_map.getSizeInCellsX() << "x" << copied_cost_map.getSizeInCellsY()
+                  << ") from a differently sized cost_map (" << target_cost_map->getSize().x() << "x" << target_cost_map->getSize().y() << ")";
+    std::cout << error_message.str() << std::endl;
+    throw ecl::StandardException(LOC, ecl::OutOfRangeError, error_message.str());
+  }
+
+  unsigned char* subwindow_costs = copied_cost_map.getCharMap();
 
   // remember there is a different convention for indexing.
   //  - costmap_2d::CostMap starts from the bottom left
   //  - cost_map::CostMap   starts from the top left
-  cost_map::Matrix data(cost_map->getSize().x(), cost_map->getSize().y());
-  // should I check cost_map->getSize().x() == costmap_subwindow.getSizeInCellsX()??
-  unsigned int size = costmap_subwindow.getSizeInCellsX()*costmap_subwindow.getSizeInCellsY();
+  cost_map::Matrix data(target_cost_map->getSize().x(), target_cost_map->getSize().y());
+
+  unsigned int size = target_cost_map->getSize().x() * target_cost_map->getSize().y();
   for ( int i=0, index = size-1; index >= 0; --index, ++i) {
     data(i) = subwindow_costs[index];
   }
-  cost_map->add("obstacle_costs", data);
-  return cost_map;
+  target_cost_map->add("obstacle_costs", data);
 }
 
 void toOccupancyGrid(const cost_map::CostMap& cost_map, const std::string& layer, nav_msgs::OccupancyGrid& msg) {
