@@ -352,14 +352,15 @@ CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, cost_map::Len
   /****************************************
   ** Initialise the CostMap
   ****************************************/
-  tf::Stamped<tf::Pose> tf_pose;
-  bool unused_result = ros_costmap.getRobotPose(tf_pose);
-  // TODO check the result
-  cost_map::Position position;
-  position << tf_pose.getOrigin().x() , tf_pose.getOrigin().y();
+
   double resolution = ros_costmap.getCostmap()->getResolution();
+  Position position(ros_costmap.getCostmap()->getOriginX(), ros_costmap.getCostmap()->getOriginY());
+    // Different conventions of center of map.
+  Position offset(0.5 * ros_costmap.getCostmap()->getSizeInCellsX(), 0.5 * ros_costmap.getCostmap()->getSizeInCellsY());
+  position += offset * resolution;
+
   cost_map->setFrameId(ros_costmap.getGlobalFrameID());
-  cost_map->setTimestamp(tf_pose.stamp_.toNSec());
+  cost_map->setTimestamp(ros::Time::now().toNSec());
 
   double subwindow_bottom_left_x = position.x() - geometry.x() / 2.0;
   double subwindow_bottom_left_y = position.y() - geometry.y() / 2.0;
@@ -447,16 +448,18 @@ void toOccupancyGrid(const cost_map::CostMap& cost_map, const std::string& layer
   msg.info.resolution = cost_map.getResolution();
   msg.info.width = cost_map.getSize()(0);
   msg.info.height = cost_map.getSize()(1);
-  Position positionOfOrigin;
-  grid_map::getPositionOfDataStructureOrigin(cost_map.getPosition(), cost_map.getLength(), positionOfOrigin);
-  msg.info.origin.position.x = positionOfOrigin.x();
-  msg.info.origin.position.y = positionOfOrigin.y();
+  Position position = cost_map.getPosition() - 0.5 * cost_map.getLength().matrix();
+  msg.info.origin.position.x = position.x();
+  msg.info.origin.position.y = position.y();
   msg.info.origin.position.z = 0.0;
   msg.info.origin.orientation.x = 0.0;
   msg.info.origin.orientation.y = 0.0;
-  msg.info.origin.orientation.z = 1.0;  // yes, this is correct.
-  msg.info.origin.orientation.w = 0.0;
+  msg.info.origin.orientation.z = 0.0;
+  msg.info.origin.orientation.w = 1.0;
   msg.data.resize(msg.info.width * msg.info.height);
+
+  size_t nCells = cost_map.getSize().prod();
+  msg.data.resize(nCells);
 
   // Occupancy probabilities are in the range [0,100].  Unknown is -1.
   const float cellMin = 0;
@@ -485,10 +488,8 @@ void toOccupancyGrid(const cost_map::CostMap& cost_map, const std::string& layer
       value = (cost_map.at(layer, *iterator) - data_minimum) / (data_maximum - data_minimum);
       value = cellMin + std::min(std::max(0.0f, value), 1.0f) * cellRange;
     }
-    // Occupancy grid claims to be row-major order, but it does not seem that way.
-    // http://docs.ros.org/api/nav_msgs/html/msg/OccupancyGrid.html.
     unsigned int index = grid_map::getLinearIndexFromIndex(*iterator, cost_map.getSize(), false);
-    msg.data[index] = value;
+    msg.data[nCells - index - 1] = value;
   }
 }
 

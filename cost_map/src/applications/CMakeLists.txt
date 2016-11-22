@@ -13,3 +13,4 @@ endmacro()
 ###############################################################################
 
 cost_map_add_utility(map_loader)
+cost_map_add_utility(alignment_test)
