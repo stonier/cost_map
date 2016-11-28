@@ -103,13 +103,26 @@ grid_map::GridMap toGridMap(const cost_map::CostMap cost_map);
  * subwindow does not go off the edge of the underlying ros costmap!
  *
  * @param ros_costmap : a traditional ros costmap object (input).
- * @param geometry : size of the subwindow (metres x metres).
+ * @param geometry : size of the subwindow (metres x metres, 0x0 to get the whole costmap).
  * @return shared pointer to the cost map object
  *
  * @note We should, but cannot use a const for the ros costmap since it hasn't been very
  * well designed. Treat it as such and do not change the internals inside.
  */
 CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, cost_map::Length& geometry);
+
+/**
+ * @brief Copies all data from copied_cost_map to target_cost_map (have to be same size)
+ *
+ * The data will be put in a new layer called "obstacle_costs"
+ *
+ * @param copied_cost_map : a traditional ros Costmap2D object.
+ * @param target_cost_map : Ptr to target cost_map.
+ *
+ * @note We should, but cannot use a const for the ros Costmap2D since it hasn't been very
+ * well designed. Treat it as such and do not change the internals inside.
+ */
+void copyCostmap2DData(costmap_2d::Costmap2D& copied_cost_map, const CostMapPtr& target_cost_map);
 
 void toOccupancyGrid(const cost_map::CostMap& cost_map, const std::string& layer, nav_msgs::OccupancyGrid& msg);
 
