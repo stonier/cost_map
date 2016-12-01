@@ -345,53 +345,112 @@ bool fromMessage(const cost_map_msgs::CostMap& message, cost_map::CostMap& cost_
 *****************************************************************************/
 
 CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, cost_map::Length& geometry) {
-
   CostMapPtr cost_map = std::make_shared<CostMap>();
   costmap_2d::Costmap2D costmap_subwindow;
+
+  double resolution = ros_costmap.getCostmap()->getResolution();
+  double original_size_x = ros_costmap.getCostmap()->getSizeInCellsX() * resolution;
+  double original_size_y = ros_costmap.getCostmap()->getSizeInCellsY() * resolution;
+
+  tf::Stamped<tf::Pose> tf_pose;
+  if(!ros_costmap.getRobotPose(tf_pose))
+  {
+    std::ostringstream error_message;
+    error_message << "Could not get robot pose, not published?";
+    std::cout << error_message.str() << std::endl;
+    throw ecl::StandardException(LOC, ecl::OutOfRangeError, error_message.str());
+  }
+
+  cost_map::Position robot_position(tf_pose.getOrigin().x() , tf_pose.getOrigin().y());
+  cost_map::Position ros_map_origin(ros_costmap.getCostmap()->getOriginX(), ros_costmap.getCostmap()->getOriginY());
+
+  bool full_size_requested = (geometry.x() == original_size_x && geometry.y() == original_size_y)
+                           || geometry.x() == 0.0 || geometry.y() == 0.0;
+  if(full_size_requested)
+  {
+    geometry(0) = original_size_x;
+    geometry(1) = original_size_y;
+  }
+
+  /****************************************
+  ** Align the robot position to costmap grid layout
+  ****************************************/
+
+  // Have to do the exact same as the ros costmap updateOrigin to end up with same position
+  // Don't use original_size_x here. getSizeInMeters is actually broken but the
+  // ros costmap uses it to set the origin. So we also have to do it to get the
+  // same behaviour. (See also updateOrigin call in LayeredCostmap)
+  double fake_origin_x = robot_position.x() - ros_costmap.getCostmap()->getSizeInMetersX() / 2;
+  double fake_origin_y = robot_position.y() - ros_costmap.getCostmap()->getSizeInMetersY() / 2;
+
+  int fake_origin_cell_x, fake_origin_cell_y;
+  fake_origin_cell_x = int((fake_origin_x - ros_map_origin.x()) / resolution);
+  fake_origin_cell_y = int((fake_origin_y - ros_map_origin.y()) / resolution);
+
+  // compute the associated world coordinates for the origin cell
+  // because we want to keep things grid-aligned
+  double fake_origin_aligned_x, fake_origin_aligned_y;
+  fake_origin_aligned_x = ros_map_origin.x() + fake_origin_cell_x * resolution;
+  fake_origin_aligned_y = ros_map_origin.y() + fake_origin_cell_y * resolution;
+
+  double origin_aligned_x = fake_origin_aligned_x + original_size_x / 2;
+  double origin_aligned_y = fake_origin_aligned_y + original_size_y / 2;
+
+  cost_map::Position aligned_cost_map_origin(origin_aligned_x, origin_aligned_y);
 
   /****************************************
   ** Initialise the CostMap
   ****************************************/
 
-  double resolution = ros_costmap.getCostmap()->getResolution();
-  Position position(ros_costmap.getCostmap()->getOriginX(), ros_costmap.getCostmap()->getOriginY());
-    // Different conventions of center of map.
-  Position offset(0.5 * ros_costmap.getCostmap()->getSizeInCellsX(), 0.5 * ros_costmap.getCostmap()->getSizeInCellsY());
-  position += offset * resolution;
-
   cost_map->setFrameId(ros_costmap.getGlobalFrameID());
   cost_map->setTimestamp(ros::Time::now().toNSec());
 
-  double subwindow_bottom_left_x = position.x() - geometry.x() / 2.0;
-  double subwindow_bottom_left_y = position.y() - geometry.y() / 2.0;
+  double subwindow_bottom_left_x = aligned_cost_map_origin.x() - geometry.x() / 2.0;
+  double subwindow_bottom_left_y = aligned_cost_map_origin.y() - geometry.y() / 2.0;
 
-  double original_size_x = ros_costmap.getCostmap()->getSizeInMetersX();
-  double original_size_y = ros_costmap.getCostmap()->getSizeInMetersY();
+  double resolution_offset_x = std::abs(std::fmod(subwindow_bottom_left_x, resolution));
+  double resolution_offset_y = std::abs(std::fmod(subwindow_bottom_left_y, resolution));
 
-//  std::cout << "From ROS Costmap2D" << std::endl;
-//  std::cout << "  Robot Pose        : " << position.x() << "," << position.y() << std::endl;
-//  std::cout << "  Bottom Left Corner: " << subwindow_bottom_left_x << "," << subwindow_bottom_left_y << std::endl;
-//  std::cout << "  Resolution        : " << resolution << std::endl;
-//  std::cout << "  Size              : " << geometry.x() << "x" << geometry.y() << std::endl;
-//  std::cout << "  Original Size     : " << original_size_x << "x" << original_size_y << std::endl;
+  // The way the conversion of world to map coordinate is done in costmap_2d is:
+  //    mx = (int)((wx - origin_x_) / resolution_);
+  // Because of numeric inaccuracy with the division we can end up with something too low
+  // So we add a buffer. The buffer has have the same sign because of the used int cast
+  // which is not rounding, but just cutting off
+  double numeric_inaccuracy_fix = 0.5 * resolution;
+  subwindow_bottom_left_x += std::copysign(numeric_inaccuracy_fix - resolution_offset_x, subwindow_bottom_left_x);
+  subwindow_bottom_left_y += std::copysign(numeric_inaccuracy_fix - resolution_offset_y, subwindow_bottom_left_y);
+
+  //debug
+//  if ((robot_aligned - robot_position).norm() > 3 * resolution)
+//  {
+//    //something funny happened
+//    std::cout << "[cost_map]: Got an apparently wrong position out of the cost_map conversion" << std::endl;
+//    std::cout << "  Resolution        : " << resolution << std::endl;
+//    std::cout << "  original size     : " << original_size_x << "x" << original_size_y << std::endl;
+//    std::cout << "  Size              : " << geometry.x() << "x" << geometry.y() << std::endl;
+//    std::cout << "  Robot Pose        : " << robot_position.x() << "," << robot_position.y() << std::endl;
+//    std::cout << "  fake_origin       : " << fake_origin_x << "x" << fake_origin_y << std::endl;
+//    std::cout << "  fake_origin_cell  : " << fake_origin_cell_x << "x" << fake_origin_cell_y << std::endl;
+//    std::cout << "  fake_ aligned     : " << fake_origin_aligned_x << "x" << fake_origin_aligned_y << std::endl;
+//    std::cout << "  robot_aligned     : " << robot_aligned_x << "x" << robot_aligned_y << std::endl;
+//    std::cout << "  resolution_offset : " << resolution_offset_x << "x" << resolution_offset_y << std::endl;
+//    std::cout << "  subwindow before  : " << aligned_cost_map_origin.x() - geometry.x() / 2.0 << "x" << aligned_cost_map_origin.y() - geometry.y() / 2.0 << std::endl;
+//    std::cout << "  subwindow after   : " << subwindow_bottom_left_x << "x" << subwindow_bottom_left_y << std::endl;
+//    std::cout << "  ros_map_origin    : " << ros_map_origin.x() << "x" << ros_map_origin.y() << std::endl;
+//  }
 
   bool is_valid_window = false;
   // why do we need to lock - why don't they lock for us?
   {
     boost::lock_guard<costmap_2d::Costmap2D::mutex_t> lock(*(ros_costmap.getCostmap()->getMutex()));
 
-    bool full_size_requested = (geometry.x() == original_size_x && geometry.y() == original_size_y)
-                             || geometry.x() == 0.0 || geometry.y() == 0.0;
     if(full_size_requested) {
-      geometry(0) = original_size_x;
-      geometry(1) = original_size_y;
-
-      cost_map->setGeometry(geometry, resolution, position);
+      cost_map->setGeometry(geometry, resolution, aligned_cost_map_origin);
       copyCostmap2DData(*(ros_costmap.getCostmap()), cost_map);
       return cost_map;
     }
 
-    cost_map->setGeometry(geometry, resolution, position);
+    cost_map->setGeometry(geometry, resolution, aligned_cost_map_origin);
     is_valid_window = costmap_subwindow.copyCostmapWindow(
                             *(ros_costmap.getCostmap()),
                             subwindow_bottom_left_x, subwindow_bottom_left_y,
@@ -408,9 +467,6 @@ CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, cost_map::Len
     throw ecl::StandardException(LOC, ecl::OutOfRangeError, error_message.str());
   }
 
-//  // std::cout << "  CellsX            : " << global_costmap_subwindow.getSizeInCellsX() << std::endl;
-//  // std::cout << "  CellsY            : " << global_costmap_subwindow.getSizeInCellsY() << std::endl;
-
   copyCostmap2DData(costmap_subwindow, cost_map);
   return cost_map;
 }
@@ -422,7 +478,7 @@ void copyCostmap2DData(costmap_2d::Costmap2D& copied_cost_map, const CostMapPtr&
 
     std::ostringstream error_message;
     error_message << "Tried to copy Costmap2D data (" << copied_cost_map.getSizeInCellsX() << "x" << copied_cost_map.getSizeInCellsY()
-                  << ") from a differently sized cost_map (" << target_cost_map->getSize().x() << "x" << target_cost_map->getSize().y() << ")";
+                  << ") to a differently sized cost_map (" << target_cost_map->getSize().x() << "x" << target_cost_map->getSize().y() << ")";
     std::cout << error_message.str() << std::endl;
     throw ecl::StandardException(LOC, ecl::OutOfRangeError, error_message.str());
   }
@@ -448,9 +504,11 @@ void toOccupancyGrid(const cost_map::CostMap& cost_map, const std::string& layer
   msg.info.resolution = cost_map.getResolution();
   msg.info.width = cost_map.getSize()(0);
   msg.info.height = cost_map.getSize()(1);
-  Position position = cost_map.getPosition() - 0.5 * cost_map.getLength().matrix();
-  msg.info.origin.position.x = position.x();
-  msg.info.origin.position.y = position.y();
+
+  // adjust for difference in center
+  Position positionOfOrigin = cost_map.getPosition() - 0.5 * cost_map.getLength().matrix();
+  msg.info.origin.position.x = positionOfOrigin.x();
+  msg.info.origin.position.y = positionOfOrigin.y();
   msg.info.origin.position.z = 0.0;
   msg.info.origin.orientation.x = 0.0;
   msg.info.origin.orientation.y = 0.0;
