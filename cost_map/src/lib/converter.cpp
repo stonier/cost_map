@@ -87,6 +87,7 @@ CostMapPtr fromImageResource(const std::string& filename)
     image_relative_filename = config["filename"].as<std::string>();
   } catch(const YAML::ParserException& e ) {
     std::cout << "Error parsing the yaml: " << e.what() << std::endl;
+    // TODO throw an exception
   }
   // until c++11 filesystem stuff is more convenient.
   boost::filesystem::path p = boost::filesystem::path(filename).parent_path();
@@ -358,7 +359,6 @@ CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, const cost_ma
   {
     std::ostringstream error_message;
     error_message << "Could not get robot pose, not published?";
-    std::cout << error_message.str() << std::endl;
     throw ecl::StandardException(LOC, ecl::OutOfRangeError, error_message.str());
   }
 
@@ -481,7 +481,6 @@ void copyCostmap2DData(costmap_2d::Costmap2D& copied_cost_map, const CostMapPtr&
     std::ostringstream error_message;
     error_message << "Tried to copy Costmap2D data (" << copied_cost_map.getSizeInCellsX() << "x" << copied_cost_map.getSizeInCellsY()
                   << ") to a differently sized cost_map (" << target_cost_map->getSize().x() << "x" << target_cost_map->getSize().y() << ")";
-    std::cout << error_message.str() << std::endl;
     throw ecl::StandardException(LOC, ecl::OutOfRangeError, error_message.str());
   }
 
