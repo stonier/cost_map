@@ -103,13 +103,14 @@ grid_map::GridMap toGridMap(const cost_map::CostMap cost_map);
  * subwindow does not go off the edge of the underlying ros costmap!
  *
  * @param ros_costmap : a traditional ros costmap object (input).
- * @param geometry : size of the subwindow (metres x metres, 0x0 to get the whole costmap).
+ * @param geometry : size of the subwindow (mxm), use 0x0 to get the whole costmap.
  * @return shared pointer to the cost map object
  *
  * @note We should, but cannot use a const for the ros costmap since it hasn't been very
  * well designed. Treat it as such and do not change the internals inside.
  */
-CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, cost_map::Length& geometry);
+CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap,
+                            const cost_map::Length& geometry=cost_map::Length::Zero());
 
 /**
  * @brief Copies all data from copied_cost_map to target_cost_map (have to be same size)
