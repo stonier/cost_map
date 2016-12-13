@@ -373,43 +373,61 @@ CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, const cost_ma
   /****************************************
   ** Where is the New Costmap Origin?
   ****************************************/
-  // Note:
-  //   You cannot directly use the robot pose as the new 'costmap centre'
-  //   since the underlying grid is not necessarily exactly aligned with
-  //   that (two cases to consider, rolling window and globally fixed).
-  //
-  // Relevant diagrams:
-  //  - https://github.com/ethz-asl/grid_map
+  cost_map::Position new_cost_map_origin;
 
-  // Have to do the exact same as the ros costmap updateOrigin to end up with same position
-  // Don't use original_size_x here. getSizeInMeters is actually broken but the
-  // ros costmap uses it to set the origin. So we also have to do it to get the
-  // same behaviour. (See also updateOrigin call in LayeredCostmap)
-  double fake_origin_x = robot_position.x() - ros_costmap.getCostmap()->getSizeInMetersX() / 2;
-  double fake_origin_y = robot_position.y() - ros_costmap.getCostmap()->getSizeInMetersY() / 2;
+  if ( full_size_requested ) {
+    new_cost_map_origin <<
+        ros_map_origin.x() + original_size_x/2,
+        ros_map_origin.y() + original_size_y/2;
+  } else {
+    // Note:
+    //   You cannot directly use the robot pose as the new 'costmap centre'
+    //   since the underlying grid is not necessarily exactly aligned with
+    //   that (two cases to consider, rolling window and globally fixed).
+    //
+    // Relevant diagrams:
+    //  - https://github.com/ethz-asl/grid_map
 
-  int fake_origin_cell_x, fake_origin_cell_y;
-  fake_origin_cell_x = int((fake_origin_x - ros_map_origin.x()) / resolution);
-  fake_origin_cell_y = int((fake_origin_y - ros_map_origin.y()) / resolution);
+    // Have to do the exact same as the ros costmap updateOrigin to end up with same position
+    // Don't use original_size_x here. getSizeInMeters is actually broken but the
+    // ros costmap uses it to set the origin. So we also have to do it to get the
+    // same behaviour. (See also updateOrigin call in LayeredCostmap)
+    double fake_origin_x = robot_position.x() - ros_costmap.getCostmap()->getSizeInMetersX() / 2;
+    double fake_origin_y = robot_position.y() - ros_costmap.getCostmap()->getSizeInMetersY() / 2;
 
-  // compute the associated world coordinates for the origin cell
-  // because we want to keep things grid-aligned
-  double fake_origin_aligned_x, fake_origin_aligned_y;
-  fake_origin_aligned_x = ros_map_origin.x() + fake_origin_cell_x * resolution;
-  fake_origin_aligned_y = ros_map_origin.y() + fake_origin_cell_y * resolution;
+    int fake_origin_cell_x, fake_origin_cell_y;
+    fake_origin_cell_x = int((fake_origin_x - ros_map_origin.x()) / resolution);
+    fake_origin_cell_y = int((fake_origin_y - ros_map_origin.y()) / resolution);
 
-  cost_map::Position aligned_cost_map_origin(fake_origin_aligned_x + original_size_x / 2,
-                                             fake_origin_aligned_y + original_size_y / 2);
+    // compute the associated world coordinates for the origin cell
+    // because we want to keep things grid-aligned
+    double fake_origin_aligned_x, fake_origin_aligned_y;
+    fake_origin_aligned_x = ros_map_origin.x() + fake_origin_cell_x * resolution;
+    fake_origin_aligned_y = ros_map_origin.y() + fake_origin_cell_y * resolution;
+
+    new_cost_map_origin <<
+        fake_origin_aligned_x + original_size_x / 2,
+        fake_origin_aligned_y + original_size_y / 2;
+  }
 
   /****************************************
   ** Initialise the CostMap
   ****************************************/
-
   cost_map->setFrameId(ros_costmap.getGlobalFrameID());
   cost_map->setTimestamp(ros::Time::now().toNSec());
+  cost_map->setGeometry(geometry_, resolution, new_cost_map_origin);
 
-  double subwindow_bottom_left_x = aligned_cost_map_origin.x() - geometry_.x() / 2.0;
-  double subwindow_bottom_left_y = aligned_cost_map_origin.y() - geometry_.y() / 2.0;
+  /****************************************
+  ** Copy Data
+  ****************************************/
+  if( full_size_requested ) {
+    boost::lock_guard<costmap_2d::Costmap2D::mutex_t> lock(*(ros_costmap.getCostmap()->getMutex()));
+    copyCostmap2DData(*(ros_costmap.getCostmap()), cost_map);
+    return cost_map;
+  }
+
+  double subwindow_bottom_left_x = new_cost_map_origin.x() - geometry_.x() / 2.0;
+  double subwindow_bottom_left_y = new_cost_map_origin.y() - geometry_.y() / 2.0;
 
   double resolution_offset_x = std::abs(std::fmod(subwindow_bottom_left_x, resolution));
   double resolution_offset_y = std::abs(std::fmod(subwindow_bottom_left_y, resolution));
@@ -437,7 +455,7 @@ CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, const cost_ma
 //    std::cout << "  fake_ aligned     : " << fake_origin_aligned_x << "x" << fake_origin_aligned_y << std::endl;
 //    std::cout << "  robot_aligned     : " << robot_aligned_x << "x" << robot_aligned_y << std::endl;
 //    std::cout << "  resolution_offset : " << resolution_offset_x << "x" << resolution_offset_y << std::endl;
-//    std::cout << "  subwindow before  : " << aligned_cost_map_origin.x() - geometry.x() / 2.0 << "x" << aligned_cost_map_origin.y() - geometry.y() / 2.0 << std::endl;
+//    std::cout << "  subwindow before  : " << new_cost_map_origin.x() - geometry.x() / 2.0 << "x" << new_cost_map_origin.y() - geometry.y() / 2.0 << std::endl;
 //    std::cout << "  subwindow after   : " << subwindow_bottom_left_x << "x" << subwindow_bottom_left_y << std::endl;
 //    std::cout << "  ros_map_origin    : " << ros_map_origin.x() << "x" << ros_map_origin.y() << std::endl;
 //  }
@@ -447,13 +465,6 @@ CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, const cost_ma
   {
     boost::lock_guard<costmap_2d::Costmap2D::mutex_t> lock(*(ros_costmap.getCostmap()->getMutex()));
 
-    if(full_size_requested) {
-      cost_map->setGeometry(geometry_, resolution, aligned_cost_map_origin);
-      copyCostmap2DData(*(ros_costmap.getCostmap()), cost_map);
-      return cost_map;
-    }
-
-    cost_map->setGeometry(geometry_, resolution, aligned_cost_map_origin);
     is_valid_window = costmap_subwindow.copyCostmapWindow(
                             *(ros_costmap.getCostmap()),
                             subwindow_bottom_left_x, subwindow_bottom_left_y,
