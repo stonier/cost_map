@@ -344,6 +344,10 @@ bool fromMessage(const cost_map_msgs::CostMap& message, cost_map::CostMap& cost_
 ** CostMap2DROS and Occupancy Grids
 *****************************************************************************/
 
+/*
+ * This is pulling a subwindow/full window around the saved robot pose of the ros costmap
+ * with the specified geometry.
+ */
 CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, cost_map::Length& geometry) {
   CostMapPtr cost_map = std::make_shared<CostMap>();
   costmap_2d::Costmap2D costmap_subwindow;
@@ -364,17 +368,26 @@ CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, cost_map::Len
   cost_map::Position robot_position(tf_pose.getOrigin().x() , tf_pose.getOrigin().y());
   cost_map::Position ros_map_origin(ros_costmap.getCostmap()->getOriginX(), ros_costmap.getCostmap()->getOriginY());
 
-  bool full_size_requested = (geometry.x() == original_size_x && geometry.y() == original_size_y)
-                           || geometry.x() == 0.0 || geometry.y() == 0.0;
-  if(full_size_requested)
-  {
-    geometry(0) = original_size_x;
-    geometry(1) = original_size_y;
+  // Update geometry if requesting the full size
+  //   Note: correct the case if someone requested the size according to the wierd
+  //   getSizeInMetersX/Y() call which returns the #cells*resolution - half a cell
+  bool wierd_full_size_requested = geometry.x() == ros_costmap.getCostmap()->getSizeInMetersX() &&
+                                   geometry.y() == ros_costmap.getCostmap()->getSizeInMetersY();
+  if (wierd_full_size_requested || geometry.x() == 0.0 || geometry.y() == 0.0 ) {
+    geometry << original_size_x, original_size_y;
   }
+  bool full_size_requested = geometry.x() == original_size_x && geometry.y() == original_size_y;
 
   /****************************************
-  ** Align the robot position to costmap grid layout
+  ** Where is the New Costmap Origin?
   ****************************************/
+  // Note:
+  //   You cannot directly use the robot pose as the new 'costmap centre'
+  //   since the underlying grid is not necessarily exactly aligned with
+  //   that (two cases to consider, rolling window and globally fixed).
+  //
+  // Relevant diagrams:
+  //  - https://github.com/ethz-asl/grid_map
 
   // Have to do the exact same as the ros costmap updateOrigin to end up with same position
   // Don't use original_size_x here. getSizeInMeters is actually broken but the
@@ -393,10 +406,8 @@ CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, cost_map::Len
   fake_origin_aligned_x = ros_map_origin.x() + fake_origin_cell_x * resolution;
   fake_origin_aligned_y = ros_map_origin.y() + fake_origin_cell_y * resolution;
 
-  double origin_aligned_x = fake_origin_aligned_x + original_size_x / 2;
-  double origin_aligned_y = fake_origin_aligned_y + original_size_y / 2;
-
-  cost_map::Position aligned_cost_map_origin(origin_aligned_x, origin_aligned_y);
+  cost_map::Position aligned_cost_map_origin(fake_origin_aligned_x + original_size_x / 2,
+                                             fake_origin_aligned_y + original_size_y / 2);
 
   /****************************************
   ** Initialise the CostMap
@@ -463,7 +474,6 @@ CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, cost_map::Len
     std::ostringstream error_message;
     error_message << "Subwindow landed outside the costmap (max size: " << original_size_x << "x" << original_size_y
                   << "), aborting (you should ensure the robot travels inside the costmap bounds).";
-    std::cout << error_message.str() << std::endl;
     throw ecl::StandardException(LOC, ecl::OutOfRangeError, error_message.str());
   }
 
