@@ -344,13 +344,10 @@ bool fromMessage(const cost_map_msgs::CostMap& message, cost_map::CostMap& cost_
 ** CostMap2DROS and Occupancy Grids
 *****************************************************************************/
 
-/*
- * This is pulling a subwindow/full window around the saved robot pose of the ros costmap
- * with the specified geometry.
- */
-CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, cost_map::Length& geometry) {
+CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, const cost_map::Length& geometry) {
   CostMapPtr cost_map = std::make_shared<CostMap>();
   costmap_2d::Costmap2D costmap_subwindow;
+  cost_map::Length geometry_ = geometry;
 
   double resolution = ros_costmap.getCostmap()->getResolution();
   double original_size_x = ros_costmap.getCostmap()->getSizeInCellsX() * resolution;
@@ -368,15 +365,10 @@ CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, cost_map::Len
   cost_map::Position robot_position(tf_pose.getOrigin().x() , tf_pose.getOrigin().y());
   cost_map::Position ros_map_origin(ros_costmap.getCostmap()->getOriginX(), ros_costmap.getCostmap()->getOriginY());
 
-  // Update geometry if requesting the full size
-  //   Note: correct the case if someone requested the size according to the wierd
-  //   getSizeInMetersX/Y() call which returns the #cells*resolution - half a cell
-  bool wierd_full_size_requested = geometry.x() == ros_costmap.getCostmap()->getSizeInMetersX() &&
-                                   geometry.y() == ros_costmap.getCostmap()->getSizeInMetersY();
-  if (wierd_full_size_requested || geometry.x() == 0.0 || geometry.y() == 0.0 ) {
-    geometry << original_size_x, original_size_y;
+  if (geometry_.x() == 0.0 || geometry_.y() == 0.0 ) {
+    geometry_ << original_size_x, original_size_y;
   }
-  bool full_size_requested = geometry.x() == original_size_x && geometry.y() == original_size_y;
+  bool full_size_requested = geometry_.x() == original_size_x && geometry_.y() == original_size_y;
 
   /****************************************
   ** Where is the New Costmap Origin?
@@ -416,8 +408,8 @@ CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, cost_map::Len
   cost_map->setFrameId(ros_costmap.getGlobalFrameID());
   cost_map->setTimestamp(ros::Time::now().toNSec());
 
-  double subwindow_bottom_left_x = aligned_cost_map_origin.x() - geometry.x() / 2.0;
-  double subwindow_bottom_left_y = aligned_cost_map_origin.y() - geometry.y() / 2.0;
+  double subwindow_bottom_left_x = aligned_cost_map_origin.x() - geometry_.x() / 2.0;
+  double subwindow_bottom_left_y = aligned_cost_map_origin.y() - geometry_.y() / 2.0;
 
   double resolution_offset_x = std::abs(std::fmod(subwindow_bottom_left_x, resolution));
   double resolution_offset_y = std::abs(std::fmod(subwindow_bottom_left_y, resolution));
@@ -456,17 +448,17 @@ CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, cost_map::Len
     boost::lock_guard<costmap_2d::Costmap2D::mutex_t> lock(*(ros_costmap.getCostmap()->getMutex()));
 
     if(full_size_requested) {
-      cost_map->setGeometry(geometry, resolution, aligned_cost_map_origin);
+      cost_map->setGeometry(geometry_, resolution, aligned_cost_map_origin);
       copyCostmap2DData(*(ros_costmap.getCostmap()), cost_map);
       return cost_map;
     }
 
-    cost_map->setGeometry(geometry, resolution, aligned_cost_map_origin);
+    cost_map->setGeometry(geometry_, resolution, aligned_cost_map_origin);
     is_valid_window = costmap_subwindow.copyCostmapWindow(
                             *(ros_costmap.getCostmap()),
                             subwindow_bottom_left_x, subwindow_bottom_left_y,
-                            geometry.x(),
-                            geometry.y());
+                            geometry_.x(),
+                            geometry_.y());
   }
 
   if ( !is_valid_window ) {

@@ -53,12 +53,9 @@ void test(ros::NodeHandle& node_handle)
 
   Costmap2D* ros_cost_map = layers->getCostmap();
 
-  // this is the wierd one - it only covers size in cells * resolution - half a cell
-  cost_map::Length geometry(ros_cost_map->getSizeInMetersX(), ros_cost_map->getSizeInMetersY());
-//  double resolution = ros_cost_map->getResolution()
-//  cost_map::Length geometry(ros_cost_map->getSizeInCellsX()*resolution,
-//                            ros_cost_map->getSizeInCellsY()*resolution);
-  cost_map::CostMapPtr cost_map = cost_map::fromROSCostMap2D(map_ros, geometry);
+  cost_map::CostMapPtr cost_map = cost_map::fromROSCostMap2D(map_ros);
+//  cost_map::Length geometry(0,0);
+//  cost_map::CostMapPtr cost_map = cost_map::fromROSCostMap2D(map_ros, geometry);
 
   ros::Publisher pub = node_handle.advertise<nav_msgs::OccupancyGrid>("converted_back", 1, true);
   nav_msgs::OccupancyGrid occupancy_msg;
