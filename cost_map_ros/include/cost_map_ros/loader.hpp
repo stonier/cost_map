@@ -1,12 +1,12 @@
 /**
- * @file /cost_map/include/cost_map/loader.hpp
+ * @file /cost_map_ros/include/cost_map_ros/loader.hpp
  */
 /*****************************************************************************
 ** Ifdefs
 *****************************************************************************/
 
-#ifndef cost_map_LOADER_HPP_
-#define cost_map_LOADER_HPP_
+#ifndef cost_map_ros_LOADER_HPP_
+#define cost_map_ros_LOADER_HPP_
 
 /*****************************************************************************
 ** Includes
@@ -53,4 +53,4 @@ public:
 
 } // namespace cost_map
 
-#endif /* cost_map_LOADER_HPP_ */
+#endif /* cost_map_ros_LOADER_HPP_ */

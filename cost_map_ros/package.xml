@@ -1,5 +1,5 @@
 <package>
-  <name>cost_map</name>
+  <name>cost_map_ros</name>
   <version>0.2.0</version>
   <description>
    Cost maps, following the style of ethz-asl's grid_map library.

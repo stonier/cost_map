@@ -1,12 +1,12 @@
 /**
- * @file /include/cost_map/cost_map.hpp
+ * @file /include/cost_map_ros/cost_map_ros.hpp
  */
 /*****************************************************************************
 ** Ifdefs
 *****************************************************************************/
 
-#ifndef cost_map_HPP_
-#define cost_map_HPP_
+#ifndef cost_map_ros_HPP_
+#define cost_map_ros_HPP_
 
 /*****************************************************************************
 ** Includes
@@ -21,5 +21,5 @@
 ** Trailers
 *****************************************************************************/
 
-#endif /* cost_map_HPP_ */
+#endif /* cost_map_ros_HPP_ */
 

@@ -1,5 +1,5 @@
 /**
- * @file /cost_map/src/lib/converter.cpp
+ * @file /cost_map_ros/src/lib/converter.cpp
  */
 /*****************************************************************************
 ** Includes
@@ -25,7 +25,7 @@
 #include <string>
 #include <yaml-cpp/yaml.h>
 #include <tf/tf.h>
-#include "../../include/cost_map/converter.hpp"
+#include "../../include/cost_map_ros/converter.hpp"
 
 /*****************************************************************************
 ** Namespaces

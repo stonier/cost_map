@@ -1,3 +1,10 @@
+/**
+ * @file src/applications/alignment_test.cpp
+ */
+/*****************************************************************************
+** Includes
+*****************************************************************************/
+
 #include <atomic>
 #include <thread>
 #include <ros/common.h>
@@ -7,15 +14,12 @@
 
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
-/*****************************************************************************
-** Includes
-*****************************************************************************/
 
 #include <costmap_2d/costmap_2d.h>
 #include <costmap_2d/cost_values.h>
 #include <nav_msgs/OccupancyGrid.h>
 
-#include "cost_map/converter.hpp"
+#include "../../include/cost_map_ros/converter.hpp"
 
 /*****************************************************************************
 ** Interfaces
