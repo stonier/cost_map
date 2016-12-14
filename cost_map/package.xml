@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>cost_map</name>
+  <version>0.2.0</version>
+  <description>
+   Meta-package for the universal cost map library.
+  </description>
+  <url type="repository">https://github.com/stonier/cost_map</url>
+  <url type="bugtracker">https://github.com/stonier/cost_map/issues</url>
+  <license>BSD</license>
+  <author>Daniel Stonier</author>
+  <maintainer email="d.stonier@gmail.com">Daniel Stonier</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>cost_map_core</exec_depend>
+  <exec_depend>cost_map_msgs</exec_depend>
+  <exec_depend>cost_map_ros</exec_depend>
+  <exec_depend>cost_map_visualisations</exec_depend>
+
+  <export>
+    <metapackage />
+  </export>
+
+</package>
