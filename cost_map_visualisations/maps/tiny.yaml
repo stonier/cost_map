@@ -4,3 +4,4 @@ filename: tiny.png
 
 # optionals
 frame_id: map
+layer_name: obstacle_costs

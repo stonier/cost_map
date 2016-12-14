@@ -1,5 +1,15 @@
 /**
  * @file /cost_map/include/cost_map/converter.hpp
+ *
+ * Methods in this file should in general, adopt the following signatures:
+ *
+ * - initialiseFromXYZ(const auto& in, cost_map::CostMap& cost_map) : delete all layers, set the geeomtry, frame id
+ * - addLayerFromXYZ(const auto& in, cost_map::CostMap& cost_map)   : assert cost map properties, then add data layer
+ * - toXYZ(const auto& in, cost_map::CostMap& cost_map)             : convert cost_map to the specified object
+ * - fromXYZ(const auto& in, cost_map::CostMap& cost_map)           : convert specified object to cost_map (i.e. completely instantiate)
+ *
+ * Note : important to pass in cost_map objects as a reference. This provides
+ * the flexibility to use this api with either objects or smart pointers.
  */
 /*****************************************************************************
 ** Ifdefs
@@ -33,40 +43,48 @@
 namespace cost_map {
 
 /*****************************************************************************
-** Images
+** Image Bundles
 *****************************************************************************/
 
 /**
- * @brief Loads from a cost_map image yaml representative file.
+ * @brief Initialises a adds a single layer from a yaml/image resource pair.
  *
- * The specified format for this file is a yaml, which holds some specifications
- * for the cost_map (e.g. resolution) and points to an actual image file which
- * contains the cost_map data.
+ * The image resource pair
+ * @warning this will change the geometry of the provided costmap and delete all layers!
+ * @todo extend this so it can load multiple layers
  *
- * @param filename : yaml file
- * @return shared pointer to the cost map object
+ * @param[in] filename : yaml file
+ * @param[out] cost_map :
  */
-CostMapPtr fromImageResource(const std::string& filename);
+void fromImageBundle(const std::string& filename, cost_map::CostMap& cost_map);
 /**
- * @brief Save to cost_map image yaml representative file(s).
+ * @brief Dump a cost map to an image bundle set of files.
  *
- * The specified format for this file is a yaml, which holds some specifications
- * for the cost_map (e.g. resolution) and points to an actual image file which
- * contains the cost_map data.
+ * This creates the specified yaml file with image bundle meta information
+ * and a set of png images alongside, one for each layer in the cost map.
  *
- * One yaml and its associated image is saved for each layer in the cost map.
- *
- * @param cost_map : the cost map to save
+ * @param[in] filename : name of the yaml file to write
+ * @param[in] cost_map : cost map to dump
  */
-void toImageResource(const cost_map::CostMap& cost_map);
+void toImageBundle(const std::string& filename, cost_map::CostMap& cost_map);
 
-bool addLayerFromROSImage(const sensor_msgs::Image& image,
-                          const std::string& layer,
-                          cost_map::CostMap& cost_map
-                          );
+// this might be an interesting api to have too
+// void addLayerFromImageFile()
 
 /*****************************************************************************
 ** CostMap and GridMap
+*****************************************************************************/
+
+/**
+ * @todo should be a void function with ref argument so people
+ * can use smart pointers or objects with this function
+ * @param cost_map
+ * @return
+ */
+grid_map::GridMap toGridMap(const cost_map::CostMap cost_map);
+
+/*****************************************************************************
+** ROS Messages
 *****************************************************************************/
 
 /*!
@@ -84,7 +102,14 @@ void toMessage(const cost_map::CostMap& cost_map, cost_map_msgs::CostMap& messag
  */
 bool fromMessage(const cost_map_msgs::CostMap& message, cost_map::CostMap& cost_map);
 
-grid_map::GridMap toGridMap(const cost_map::CostMap cost_map);
+/*****************************************************************************
+** ROS Images
+*****************************************************************************/
+
+bool addLayerFromROSImage(const sensor_msgs::Image& image,
+                          const std::string& layer,
+                          cost_map::CostMap& cost_map
+                          );
 
 /*****************************************************************************
 ** Ros CostMap2D & Occupancy Grids

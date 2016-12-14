@@ -1,6 +1,13 @@
-# Example costmap from image file
-resolution: 0.025
-filename: example.png
-
-# optionals
+# frame in the world that this map is attached to
 frame_id: map
+# co-ordinates of the centre of the map relative to the frame_id
+centre_x: 0
+centre_y: 0
+# dimensional properties of the map
+resolution: 0.025
+number_of_cells_x: 200
+number_of_cells_y: 200
+# data layers
+layers:
+  - layer_name: obstacle_costs
+    layer_data: example.png

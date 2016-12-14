@@ -15,6 +15,7 @@
 #include <fstream>
 #include <limits>
 #include <iostream>
+#include <map>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -36,115 +37,132 @@ namespace cost_map {
 ** Images
 *****************************************************************************/
 
-/*!
- * Initializes a cost map from a ros image message. This changes the geometry
- * of the map and deletes all contents of the layers!
- * @param[in] image the image.
- * @param[in] resolution the desired resolution of the grid map [m/cell].
- * @param[out] gridMap the grid map to be initialized.
- * @return true if successful, false otherwise.
- */
-static bool initializeFromROSImage(
-    const sensor_msgs::Image& image,
-    const double resolution,
-    cost_map::CostMap& cost_map,
-    const cost_map::Position& position
-)
+void fromImageBundle(const std::string& filename, cost_map::CostMap& cost_map)
 {
-  const double lengthX = resolution * image.height;
-  const double lengthY = resolution * image.width;
-  Length length(lengthX, lengthY);
-  cost_map.setGeometry(length, resolution, position);
-  cost_map.setFrameId(image.header.frame_id);
-  cost_map.setTimestamp(image.header.stamp.toNSec());
-  return true;
-}
-
-CostMapPtr fromImageResource(const std::string& filename)
-{
-  /********************
-  ** Load Yaml
-  ********************/
+  /****************************************
+  ** Load Meta Information from Yaml
+  ****************************************/
+  std::string frame_id;
+  cost_map::Position centre;
   float resolution;
-  std::string image_relative_filename;
-  std::string frame_id("map");
-  std::string layer_name("obstacle_costs");
+  unsigned int number_of_cells_x, number_of_cells_y;
+  std::map<std::string, std::string> layers;
   try {
     YAML::Node config = YAML::LoadFile(filename);
-    if (!config["resolution"]) {
-      throw ecl::StandardException(LOC, ecl::ConfigurationError, "missing required value 'resolution'");
+    for (const std::string& property : {
+        "frame_id", "centre_x", "centre_y",
+        "resolution", "number_of_cells_x", "number_of_cells_y"} ) {
+      if (!config[property]) {
+        throw ecl::StandardException(LOC, ecl::ConfigurationError, "missing required value '" + property + "'");
+      }
     }
-    if (!config["filename"]) {
-      throw ecl::StandardException(LOC, ecl::ConfigurationError, "missing required value 'filename'");
-    }
-    if (config["frame_id"]) {
-      frame_id = config["frame_id"].as<std::string>();
-    }
-    if (config["layer_name"]) {
-      layer_name = config["layer_name"].as<std::string>();
-    }
+    frame_id = config["frame_id"].as<std::string>();
     resolution = config["resolution"].as<float>();
-    image_relative_filename = config["filename"].as<std::string>();
+    number_of_cells_x = config["number_of_cells_x"].as<unsigned int>();
+    number_of_cells_y = config["number_of_cells_y"].as<unsigned int>();
+    centre << config["centre_x"].as<double>(), config["centre_y"].as<double>();
+    if (config["layers"]) {
+      for ( unsigned int index = 0; index < config["layers"].size(); ++index ) {
+        const YAML::Node& layer = config["layers"][index];
+        if (!layer["layer_name"]) {
+          throw ecl::StandardException(LOC, ecl::ConfigurationError, "missing required value 'layer_name'");
+        }
+        if (!layer["layer_data"]) {
+          throw ecl::StandardException(LOC, ecl::ConfigurationError, "missing required value 'layer_data'");
+        }
+        layers.insert(std::pair<std::string, std::string>(
+            layer["layer_name"].as<std::string>(),
+            layer["layer_data"].as<std::string>()
+            ));
+      }
+    }
   } catch(const YAML::ParserException& e ) {
-    std::cout << "Error parsing the yaml: " << e.what() << std::endl;
-    // TODO throw an exception
+    throw ecl::StandardException(LOC, ecl::InvalidObjectError, "failed to parse (bad) yaml '" + filename + "'");
   }
-  // until c++11 filesystem stuff is more convenient.
-  boost::filesystem::path p = boost::filesystem::path(filename).parent_path();
-  p /= image_relative_filename;
+  /****************************************
+  ** Initialise the Cost Map
+  ****************************************/
+  Length length(resolution*number_of_cells_x, resolution*number_of_cells_y);
+  cost_map.setGeometry(length, resolution, centre);
+  cost_map.setFrameId(frame_id);
+  cost_map.resetTimestamp();
+  /****************************************
+  ** Add Layers from Image Data
+  ****************************************/
+  for ( const auto& p : layers ) {
+    // until c++11 filesystem stuff is more convenient.
+    boost::filesystem::path parent_path = boost::filesystem::path(filename).parent_path();
+    const std::string& layer_name = p.first;
+    const std::string& image_relative_filename = p.second;
+    boost::filesystem::path image_absolute_filename = parent_path / image_relative_filename;
+    /********************
+    ** Load OpenCV Image
+    ********************/
+    cv::Mat image = cv::imread(image_absolute_filename.string(), cv::IMREAD_UNCHANGED); // IMREAD_UNCHANGED, cv::IMREAD_COLOR, cv::IMREAD_GRAYSCALE, CV_LOAD_IMAGE_COLOR, CV_LOAD_IMAGE_GRAYSCALE
+    // TODO check image.depth() for number of bits
+    std::string encoding;
+    switch( image.channels() ) {
+      case 3  : encoding = "bgr8"; break;
+      case 4  : encoding = "bgra8"; break;
+      default : encoding = "mono8"; break;
+    }
 
-  /********************
-  ** Load OpenCV Image
-  ********************/
+    /********************
+    ** To Ros Image
+    ********************/
+    // TODO figure out how to skip this step and convert directly
+    sensor_msgs::ImagePtr ros_image_msg = cv_bridge::CvImage(std_msgs::Header(), encoding, image).toImageMsg();
+    // TODO optionally set a frame id from the yaml
+    ros_image_msg->header.frame_id = frame_id;
+    //std::cout << "Ros Image Message: " << *ros_image_msg << std::endl;
 
-  cv::Mat image = cv::imread(p.string(), cv::IMREAD_UNCHANGED); // IMREAD_UNCHANGED, cv::IMREAD_COLOR, cv::IMREAD_GRAYSCALE, CV_LOAD_IMAGE_COLOR, CV_LOAD_IMAGE_GRAYSCALE
+    /********************
+    ** To Cost Map
+    ********************/
+    // this converts to a grayscale value immediately
+    addLayerFromROSImage(*ros_image_msg, layer_name, cost_map);
 
-  // TODO check image.depth() for number of bits
-  std::string encoding;
+    /********************
+    ** Debugging
+    ********************/
+    //
+    //  std::cout << "Filename   : " << filename << std::endl;
+    //  std::cout << "Resolution : " << resolution << std::endl;
+    //  std::cout << "Image (Rel): " << image_relative_filename << std::endl;
+    //  std::cout << "Image (Abs): " << image_absolute_filename.string() << std::endl;
+    //
+    // cv::namedWindow(image_relative_filename, cv::WINDOW_AUTOSIZE);
+    // cv::imshow(image_relative_filename, image);
+    // cv::waitKey(0);
 
-  switch( image.channels() ) {
-    case 3  : encoding = "bgr8"; break;
-    case 4  : encoding = "bgra8"; break;
-    default : encoding = "mono8"; break;
   }
-
-  /********************
-  ** To Ros Image
-  ********************/
-  // TODO figure out how to skip this step and convert directly
-  sensor_msgs::ImagePtr ros_image_msg = cv_bridge::CvImage(std_msgs::Header(), encoding, image).toImageMsg();
-  // TODO optionally set a frame id from the yaml
-  ros_image_msg->header.frame_id = frame_id;
-  //std::cout << "Ros Image Message: " << *ros_image_msg << std::endl;
-
-  /********************
-  ** To Cost Map
-  ********************/
-  CostMapPtr cost_map = std::make_shared<CostMap>();
-  // TODO optionally set a position from the yaml
-  initializeFromROSImage(*ros_image_msg, resolution, *cost_map, cost_map::Position::Zero());
-
-  // this converts to a grayscale value immediately
-  addLayerFromROSImage(*ros_image_msg, layer_name, *cost_map);
-
-  /********************
-  ** Debugging
-  ********************/
-  //
-  //  std::cout << "Filename   : " << filename << std::endl;
-  //  std::cout << "Resolution : " << resolution << std::endl;
-  //  std::cout << "Image (Rel): " << image_relative_filename << std::endl;
-  //  std::cout << "Image (Abs): " << p << std::endl;
-  //
-  // cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE);
-  // cv::imshow("Display window", image);
-  // cv::waitKey(0);
-
-  return cost_map;
 }
 
-void toImageResource(const cost_map::CostMap& cost_map)
-{
+void toImageBundle(const std::string& filename, const cost_map::CostMap& cost_map) {
+  /********************
+  ** Yaml
+  ********************/
+  YAML::Node node;
+  node["frame_id"] = cost_map.getFrameId();
+  node["centre_x"] = cost_map.getPosition().x();
+  node["centre_y"] = cost_map.getPosition().x();
+  node["resolution"] = cost_map.getResolution();
+  node["number_of_cells_x"] = cost_map.getSize()(0);
+  node["number_of_cells_y"] = cost_map.getSize()(1);
+  YAML::Node layers;
+  for (const std::string& layer_name : cost_map.getLayers()) {
+    YAML::Node layer;
+    layer["layer_name"] = layer_name;
+    layer["layer_data"] = layer_name + ".png";
+    layers.push_back(layer);
+  }
+  node["layers"] = layers;
+  std::ofstream ofs(filename, std::ofstream::out);
+  ofs << node;
+  ofs.close();
+  /********************
+  ** Layers
+  ********************/
   for (const std::string& layer : cost_map.getLayers()) {
     // can't take a const Matrix& here, since opencv will complain that it doesn't have control of
     // the memory (i.e. const void* cannot convert to void*)
@@ -164,14 +182,9 @@ void toImageResource(const cost_map::CostMap& cost_map)
         rgba[3] = (value == cost_map::NO_INFORMATION) ? 0.0 : std::numeric_limits<cost_map::DataType>::max();
       }
     }
-    cv::imwrite(layer + std::string(".png"), image);
-    YAML::Node node;
-    node["resolution"] = cost_map.getResolution();
-    node["frame_id"] = cost_map.getFrameId();
-    node["filename"] = layer + std::string(".png");
-    std::ofstream ofs(layer + std::string(".yaml"), std::ofstream::out);
-    ofs << node;
-    ofs.close();
+    boost::filesystem::path parent_path = boost::filesystem::path(filename).parent_path();
+    boost::filesystem::path image_absolute_filename = parent_path / (layer + std::string(".png"));
+    cv::imwrite(image_absolute_filename.string(), image);
   }
 }
 
