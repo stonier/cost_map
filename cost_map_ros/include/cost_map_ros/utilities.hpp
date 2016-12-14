@@ -1,12 +1,12 @@
 /**
- * @file include/cost_map/utilities.hpp
+ * @file include/cost_map_ros/utilities.hpp
  */
 /*****************************************************************************
 ** Ifdefs
 *****************************************************************************/
 
-#ifndef cost_map_UTILS_HPP_
-#define cost_map_UTILS_HPP__UTILS_HPP_
+#ifndef cost_map_ros_UTILS_HPP_
+#define cost_map_ros_UTILS_HPP__UTILS_HPP_
 
 /*****************************************************************************
 ** Includes
@@ -47,4 +47,4 @@ std::string resolveResourceName(const std::string& resource_name);
 
 } // namespace cost_map
 
-#endif /* cost_map_UTILS_HPP_ */
+#endif /* cost_map_ros_UTILS_HPP_ */

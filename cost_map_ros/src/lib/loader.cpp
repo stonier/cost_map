@@ -1,14 +1,14 @@
 /**
- * @file /cost_map/src/lib/loader.cpp
+ * @file /cost_map_ros/src/lib/loader.cpp
  */
 /*****************************************************************************
 ** Includes
 *****************************************************************************/
 
 #include <cost_map_msgs/CostMap.h>
-#include "../../include/cost_map/converter.hpp"
-#include "../../include/cost_map/loader.hpp"
-#include "../../include/cost_map/utilities.hpp"
+#include "../../include/cost_map_ros/converter.hpp"
+#include "../../include/cost_map_ros/loader.hpp"
+#include "../../include/cost_map_ros/utilities.hpp"
 
 /*****************************************************************************
 ** Namespaces

@@ -5,15 +5,14 @@
 ** Includes
 *****************************************************************************/
 
-#include <cost_map/cost_map.hpp>
 #include <ecl/console.hpp>
 #include <ecl/exceptions.hpp>
 
 #include <ros/ros.h>
 #include <string>
 
-#include "../../include/cost_map/loader.hpp"
-#include "../../include/cost_map/utilities.hpp"
+#include "../../include/cost_map_ros/loader.hpp"
+#include "../../include/cost_map_ros/utilities.hpp"
 
 /*****************************************************************************
 ** Main

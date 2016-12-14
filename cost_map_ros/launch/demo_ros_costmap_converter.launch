@@ -1,5 +1,5 @@
 <launch>
-    <node name="converter" type="alignment_test" pkg="cost_map">
+    <node name="converter" type="alignment_test" pkg="cost_map_ros">
     </node>
     <node pkg="rviz" type="rviz" name="rviz" args="-d $(find cost_map)/rviz/demo_ros_costmap_converter.rviz"/>
 </launch>

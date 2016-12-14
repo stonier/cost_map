@@ -5,7 +5,7 @@
 ** Includes
 *****************************************************************************/
 
-#include <cost_map/cost_map.hpp>
+#include <cost_map_ros/cost_map_ros.hpp>
 #include <ecl/console.hpp>
 #include <ecl/exceptions.hpp>
 #include <memory>

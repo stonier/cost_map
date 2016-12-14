@@ -9,7 +9,7 @@
 #include <iostream>
 #include <ros/package.h>
 #include <string>
-#include "../../include/cost_map/utilities.hpp"
+#include "../../include/cost_map_ros/utilities.hpp"
 
 /*****************************************************************************
 ** Namespaces

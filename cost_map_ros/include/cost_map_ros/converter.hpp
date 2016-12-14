@@ -1,5 +1,5 @@
 /**
- * @file /cost_map/include/cost_map/converter.hpp
+ * @file /cost_map_ros/include/cost_map/converter.hpp
  *
  * Methods in this file should in general, adopt the following signatures:
  *
@@ -15,8 +15,8 @@
 ** Ifdefs
 *****************************************************************************/
 
-#ifndef cost_map_CONVERTER_HPP_
-#define cost_map_CONVERTER_HPP_
+#ifndef cost_map_ros_CONVERTER_HPP_
+#define cost_map_ros_CONVERTER_HPP_
 
 /*****************************************************************************
 ** Includes
@@ -173,4 +173,4 @@ private:
 
 } // namespace cost_map
 
-#endif /* cost_map_CONVERTER_HPP_ */
+#endif /* cost_map_ros_CONVERTER_HPP_ */

@@ -6,7 +6,7 @@
 *****************************************************************************/
 
 #include <cost_map_core/CostMap.hpp>
-#include <cost_map/converter.hpp>
+#include <cost_map_ros/converter.hpp>
 #include <nav_msgs/OccupancyGrid.h>
 #include "../../include/cost_map_visualisations/occupancy_grid.hpp"
 

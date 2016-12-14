@@ -15,7 +15,7 @@ find_package(catkin
         ecl_build
         ecl_command_line
         ecl_console
-        cost_map
+        cost_map_ros
         cost_map_core
         cost_map_msgs
         nav_msgs
@@ -35,7 +35,7 @@ catkin_package(
         ecl_build
         ecl_command_line
         ecl_console
-        cost_map
+        cost_map_ros
         cost_map_core
         cost_map_msgs
         nav_msgs
