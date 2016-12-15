@@ -16,6 +16,7 @@ find_package(catkin
         cost_map_msgs
         costmap_2d
         ecl_build
+        ecl_command_line
         ecl_console
         ecl_exceptions
         grid_map_core
@@ -45,6 +46,7 @@ catkin_package(
         cost_map_msgs
         costmap_2d
         ecl_build
+        ecl_command_line
         ecl_console
         ecl_exceptions
         grid_map_core
