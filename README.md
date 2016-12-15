@@ -5,6 +5,8 @@
 This is a C++ library directly analogous to ETHZ ASL's [GridMap] library,
 but designed for use with costs where the data element is a byte (as opposed to grid_map's doubles).
 
+## Table of Contents
+
 1. [Packages Overview](#packages-overview)
 2. [Image Bundles](#image-bundles)
 3. [Inflation Computers](#inflation-computers)
