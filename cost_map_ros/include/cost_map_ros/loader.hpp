@@ -15,6 +15,7 @@
 #include <cost_map_core/cost_map_core.hpp>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <string>
 
 /*****************************************************************************
 ** Namespaces
@@ -29,22 +30,18 @@ namespace cost_map {
 class Loader {
 public:
   /**
-   * @brief Load from an image bundle resource name.
+   * @brief Load and publish from an image bundle.
    *
-   * Not currently supporting any other method (e.g. loading directly from
-   * a filename). If we do, split the loader up into multiple static methods.
-   *
-   * @param image_bundle_resource_name : package_name/yaml_filename (e.g. cost_map_visualisations/example.yaml)
+   * @param[in] image_bundle_location : package_name/yaml resource pair  (e.g. cost_map_visualisations/example.yaml), or simply yaml filename
+   * @param[in] topic_name : where to publish the costmap (default: 'cost_map')
    */
-  Loader(const std::string& image_bundle_resource_name);
-
-  void imageResourceNameCallback(const std_msgs::String& msg);
+  Loader(const std::string& image_bundle_location,
+         const std::string& topic_name="cost_map");
 
   void publish();
 
   cost_map::CostMapPtr cost_map;
   ros::Publisher publisher;
-  ros::Subscriber subscriber;
 };
 
 /*****************************************************************************

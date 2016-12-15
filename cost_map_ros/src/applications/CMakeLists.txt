@@ -12,5 +12,5 @@ endmacro()
 # Setup
 ###############################################################################
 
-cost_map_add_utility(map_loader)
 cost_map_add_utility(alignment_test)
+cost_map_add_utility(publish_image_bundle)

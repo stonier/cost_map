@@ -4,10 +4,10 @@ frame_id: map
 centre_x: 0
 centre_y: 0
 # dimensional properties of the map
-resolution: 0.50
-number_of_cells_x: 4
-number_of_cells_y: 4
+resolution: 0.10
+number_of_cells_x: 50
+number_of_cells_y: 50
 # data layers
 layers:
   - layer_name: obstacle_costs
-    layer_data: tiny.png
+    layer_data: example-50x50.png

@@ -20,15 +20,13 @@ namespace cost_map {
 ** Implementation
 *****************************************************************************/
 
-
-Loader::Loader(const std::string& image_bundle_resource_name)
+Loader::Loader(const std::string& image_bundle_location,
+               const std::string& topic_name)
 {
   ros::NodeHandle nodehandle("~");
+  publisher = nodehandle.advertise<cost_map_msgs::CostMap>(topic_name, 1, true);
 
-  publisher = nodehandle.advertise<cost_map_msgs::CostMap>("cost_map", 1, true);
-  subscriber = nodehandle.subscribe("resource_name", 1, &Loader::imageResourceNameCallback, this);
-
-  std::string yaml_filename = cost_map::resolveResourceName(image_bundle_resource_name);
+  std::string yaml_filename = cost_map::resolveResourceName(image_bundle_location);
   cost_map = std::make_shared<CostMap>();
   cost_map::fromImageBundle(yaml_filename, *cost_map);
   publish();
@@ -36,12 +34,7 @@ Loader::Loader(const std::string& image_bundle_resource_name)
   // toImageBundle("debug.yaml", *cost_map);
 }
 
-void Loader::imageResourceNameCallback(const std_msgs::String& msg) {
-  //std::string filename = resolveResourceName(msg.data);
-}
-
 void Loader::publish() {
-
   cost_map_msgs::CostMap map_message;
   cost_map::toMessage(*cost_map, map_message);
   publisher.publish(map_message);
