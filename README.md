@@ -5,18 +5,18 @@
 This is a C++ library directly analogous to ETHZ ASL's [GridMap] library,
 but designed for use with costs where the data element is a byte (as opposed to grid_map's doubles).
 
-**Author: Daniel Stonier**
-**Maintainer: Daniel Stonier**
+1. [Packages Overview](#packages-overview)
+2. [Image Bundles](#image-bundles)
+3. [Inflation Computers](#inflation-computers)
 
 ## Packages Overview
 
-* ***cost_map*** is the meta-package for the grid map library.
-* ***cost_map_core*** implements the algorithms of the cost map library. It provides the `CostMap` class and several helper classes such as the iterators. This package is implemented without [ROS] dependencies.
-* ***cost_map_ros*** is the main package for [ROS] dependent projects using the cost map library. It provides the interfaces to convert cost maps from and to messages and files.
-* ***cost_map_msgs*** holds the [ROS] message and service definitions around the [grid_map_msg/GridMap] message type.
-* ***cost_map_visualisations*** contains a node written to convert CostMap messages to other [ROS] message types for example for  visualization in [RViz].
-* ***cost_map_demos*** contains several nodes for demonstration purposes.
-
+* ***cost_map*** : meta-package for the grid map library.
+* ***cost_map_core*** : implements algorithms of the cost map library. This package is implemented without [ROS] dependencies.
+* ***cost_map_ros*** : main package for [ROS] dependent projects using the cost map library. It provides converters to and from messages and files.
+* ***cost_map_msgs*** : [ROS] message and service definitions related to the [cost_map_msgs/CostMap] message type.
+* ***cost_map_visualisations*** : helper nodes that convert [cost_map_msgs/CostMap] messages to visualisation types for [RViz].
+* ***cost_map_demos*** : several nodes for demonstration purposes.
 
 ## Image Bundles
 
@@ -26,7 +26,7 @@ An image bundle is comprised of two parts - 1) meta-information about the costma
 2) layer data that is stored alongside in grayscale images. These enable a convenient means of
 saving/loading cost maps to and from files on disk.
 
-A typical yaml file for an image bundle looks something like:
+A typical meta yaml for an image bundle:
 
 ```yaml
 # frame in the world that this map is attached to
@@ -45,6 +45,8 @@ layers:
   - layer_name: static_costs
     layer_data: can_be_some_other_name.png
 ```
+
+See [cost_map_ros/image_bundles/example.yaml](https://github.com/stonier/cost_map/blob/devel/cost_map_ros/image_bundles/example.yaml) for a real example.
 
 ### Demo
 
@@ -85,7 +87,7 @@ roslaunch cost_map_demos inflations.launch --screen
 
 Obstacle Layer | Inflated Layer | Deflated Layer
 :---: | :---: | :---:
-[![Obstacle Layer](cost_map_demos/doc/images/inflation/obstacle_layer_preview.png)](cost_map_demos/doc/images/inflation/obstacle_layer.gif) | [![Inflated Layer](cost_map_demos/doc/images/inflation/inflation_layer_preview.png)](cost_map_demos/doc/images/inflation/inflation_layer.png) | [![Deflated Layer](cost_map_demos/doc/images/inflation/deflation_layer_preview.png)](cost_map_demos/doc/images/inflation/obstacle_layer.png)
+[![Obstacle Layer](cost_map_demos/doc/images/inflation/obstacle_layer_preview.png)](cost_map_demos/doc/images/inflation/obstacle_layer.gif) | [![Inflated Layer](cost_map_demos/doc/images/inflation/inflation_layer_preview.png)](cost_map_demos/doc/images/inflation/inflation_layer.png) | [![Deflated Layer](cost_map_demos/doc/images/inflation/deflated_layer_preview.png)](cost_map_demos/doc/images/inflation/deflated_layer.png)
 
 ### Classes
 
@@ -99,4 +101,5 @@ which illustrates how to use these classes.
 [GridMap]: https://github.com/ethz-asl/grid_map
 [ROS]: http://www.ros.org
 [RViz]: http://wiki.ros.org/rviz
+[cost_map_msgs/CostMap]: http://docs.ros.org/api/cost_map_msgs/html/msg/CostMap.html
 
