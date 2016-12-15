@@ -13,6 +13,8 @@
 *****************************************************************************/
 
 #include <cost_map_core/cost_map_core.hpp>
+#include <cost_map_msgs/CostMap.h>
+#include <mutex>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <string>
@@ -24,10 +26,21 @@
 namespace cost_map {
 
 /*****************************************************************************
+** Methods
+*****************************************************************************/
+
+// to/from converters are in converters.hpp/converters.cpp
+
+/*****************************************************************************
 ** Interfaces
 *****************************************************************************/
 
-class Loader {
+/**
+ * @brief Helper for loading and publishing image bundles.
+ *
+ * Used by the save_image_bundle command line utility.
+ */
+class LoadImageBundle {
 public:
   /**
    * @brief Load and publish from an image bundle.
@@ -35,13 +48,37 @@ public:
    * @param[in] image_bundle_location : package_name/yaml resource pair  (e.g. cost_map_visualisations/example.yaml), or simply yaml filename
    * @param[in] topic_name : where to publish the costmap (default: 'cost_map')
    */
-  Loader(const std::string& image_bundle_location,
-         const std::string& topic_name="cost_map");
+  LoadImageBundle(const std::string& image_bundle_location,
+                  const std::string& topic_name="cost_map");
 
   void publish();
 
   cost_map::CostMapPtr cost_map;
   ros::Publisher publisher;
+};
+
+/**
+ * @brief Helper for saving an image bundle from a cost map topic.
+ *
+ * Used by the save_image_bundle command line utility.
+ */
+class SaveImageBundle {
+public:
+  /**
+   * @brief Load and publish from an image bundle.
+   *
+   * @param[in] topic_name : topic to listen to for incoming cost maps
+   * @param[in] yaml_filename : name of the image bundle meta yaml file (abs or relative path).
+   */
+  SaveImageBundle(const std::string& topic_name, const std::string& yaml_filename="foo.yaml");
+  void costmapCallback(const cost_map_msgs::CostMap& msg);
+
+  std::string yaml_filename;
+  bool finished;
+
+private:
+  ros::Subscriber subscriber_;
+  std::mutex mutex_;
 };
 
 /*****************************************************************************

@@ -1,7 +1,7 @@
 <launch>
   <arg name="image_bundle" default="cost_map_ros/example.yaml" doc="ros package resource name of an image/yaml pair to load (e.g. cost_map_visualisations/example.yaml)"/>
 
-  <node pkg="cost_map_ros" name="image_bundle" type="publish_image_bundle" args="$(arg image_bundle)"/>
+  <node pkg="cost_map_ros" name="image_bundle" type="load_image_bundle" args="$(arg image_bundle)"/>
 
   <node pkg="cost_map_visualisations" type="node" name="cost_map_visualisation">
     <remap from="cost_map_visualisation/cost_map" to="image_bundle/cost_map"/>

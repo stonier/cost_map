@@ -1,5 +1,5 @@
 /**
- * @file src/applications/publish_image_bundle.cpp
+ * @file src/applications/load_image_bundle.cpp
  *
  * Grabs an image bundle, loads it into a costmap and publishes it.
  */
@@ -7,6 +7,7 @@
 ** Includes
 *****************************************************************************/
 
+#include <cost_map_ros/image_bundles.hpp>
 #include <ecl/command_line.hpp>
 #include <ecl/console.hpp>
 #include <ecl/exceptions.hpp>
@@ -15,7 +16,6 @@
 #include <ros/ros.h>
 #include <string>
 
-#include "../../include/cost_map_ros/loader.hpp"
 #include "../../include/cost_map_ros/utilities.hpp"
 
 /*****************************************************************************
@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
       "A yaml file with meta-data about the costmap to be built",
       true,
       "cost_map_ros/example",
-      "string (package/name OR filename)");
+      "string (package/name OR yaml filename)");
   cmd.add(topicNameArg);
   cmd.add(imageBundleArg);
   std::vector<std::string> myargs;
@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
 
   ros::init(argc, argv, "image_bundle");
   try {
-    cost_map::Loader loader(imageBundleArg.getValue(), topicNameArg.getValue());
+    cost_map::LoadImageBundle loader(imageBundleArg.getValue(), topicNameArg.getValue());
 //    if ( broken_layer_probably_isnt_obstacle_costs ) {
 //      cost_map::Matrix data = loader.cost_map->get("obstacle_costs");
 //      for (int i = 0, number_of_rows = data.rows(), number_of_columns = data.cols(); i < number_of_rows; ++i) {

@@ -13,4 +13,5 @@ endmacro()
 ###############################################################################
 
 cost_map_add_utility(alignment_test)
-cost_map_add_utility(publish_image_bundle)
+cost_map_add_utility(load_image_bundle)
+cost_map_add_utility(save_image_bundle)
