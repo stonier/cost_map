@@ -37,7 +37,7 @@ std::string resolveResourceName(const std::string& resource_name) {
   /********************
   ** Lookup
   ********************/
-  std::string plugin_package = "cost_map";  // nav_core, cost_map
+  std::string plugin_package = "cost_map_ros";  // nav_core, cost_map
   std::string attribute = "image_resource"; // plugin, yaml
 
   // pending release of https://github.com/ros/ros/pull/103
@@ -56,7 +56,7 @@ std::string resolveResourceName(const std::string& resource_name) {
     }
   }
   // not found
-  throw ecl::StandardException(LOC, ecl::NotFoundError, std::string("resource name '") + resource_name + std::string("' is not available (try 'rospack plugins --attrib=yaml cost_map')."));
+  throw ecl::StandardException(LOC, ecl::NotFoundError, std::string("resource name '") + resource_name + std::string("' is not available (try 'rospack plugins --attrib=image_resource cost_map_ros')."));
 }
 
 /*****************************************************************************
