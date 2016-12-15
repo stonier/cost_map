@@ -169,7 +169,7 @@ private:
 *****************************************************************************/
 
 /**
- * Use to strip the inflation layer from a cost map.
+ * @brief Functor to strip the inflation layer from a cost map.
  */
 class Deflate {
 public:

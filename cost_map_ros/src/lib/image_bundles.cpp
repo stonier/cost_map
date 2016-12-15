@@ -55,10 +55,10 @@ SaveImageBundle::SaveImageBundle(
 {
   ros::NodeHandle nodehandle("~");
   // TODO : check that a publisher exists and warn if not available?
-  subscriber_ = nodehandle.subscribe(topic_name, 1, &SaveImageBundle::costmapCallback, this);
+  subscriber_ = nodehandle.subscribe(topic_name, 1, &SaveImageBundle::_costmapCallback, this);
 }
 
-void SaveImageBundle::costmapCallback(const cost_map_msgs::CostMap& msg) {
+void SaveImageBundle::_costmapCallback(const cost_map_msgs::CostMap& msg) {
   std::lock_guard<std::mutex> guard(mutex_);
   if ( !finished ) {
     cost_map::CostMap cost_map;

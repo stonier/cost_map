@@ -1,0 +1,6 @@
+<launch>
+  <node pkg="cost_map_demos" type="inflations" name="inflations"/>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find cost_map_demos)/rviz/inflations.rviz" />
+
+</launch>

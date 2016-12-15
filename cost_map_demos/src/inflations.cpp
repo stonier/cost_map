@@ -10,6 +10,7 @@
 #include <ecl/exceptions.hpp>
 #include <memory>
 #include <nav_msgs/OccupancyGrid.h>
+#include <ros/ros.h>
 #include <cstdlib>
 
 /*****************************************************************************
@@ -20,25 +21,16 @@ int main(int argc, char **argv) {
   /****************************************
   ** Ros
   ****************************************/
-  ros::init(argc, argv, "demo_inflations");
+  ros::init(argc, argv, "inflations");
   ros::NodeHandle nodehandle("~");
 
   /****************************************
   ** Load
   ****************************************/
-  std::string image_resource_name = "cost_map_visualisations/example.yaml";
-  std::shared_ptr<cost_map::Loader> loader;
+  std::string image_resource_name = "cost_map_ros/example.yaml";
+  std::shared_ptr<cost_map::LoadImageBundle> loader;
   try {
-    loader = std::make_shared<cost_map::Loader>(image_resource_name);
-    if ( 0 ) {
-      cost_map::Matrix data = loader->cost_map->get("obstacle_costs");
-      for (int i = 0, number_of_rows = data.rows(), number_of_columns = data.cols(); i < number_of_rows; ++i) {
-        for (int j = 0; j < number_of_columns; ++j) {
-          std::cout << static_cast<int>(data(i,j)) << " ";
-        }
-        std::cout << std::endl;
-      }
-    }
+    loader = std::make_shared<cost_map::LoadImageBundle>(image_resource_name);
     /****************************************
     ** Inflate & Deflate
     ****************************************/

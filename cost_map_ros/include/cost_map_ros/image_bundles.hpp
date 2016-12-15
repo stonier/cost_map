@@ -50,6 +50,7 @@ public:
    */
   LoadImageBundle(const std::string& image_bundle_location,
                   const std::string& topic_name="cost_map");
+  virtual ~LoadImageBundle() {}
 
   void publish();
 
@@ -71,12 +72,15 @@ public:
    * @param[in] yaml_filename : name of the image bundle meta yaml file (abs or relative path).
    */
   SaveImageBundle(const std::string& topic_name, const std::string& yaml_filename="foo.yaml");
-  void costmapCallback(const cost_map_msgs::CostMap& msg);
+  virtual ~SaveImageBundle() {}
+
 
   std::string yaml_filename;
   bool finished;
 
 private:
+  void _costmapCallback(const cost_map_msgs::CostMap& msg);
+
   ros::Subscriber subscriber_;
   std::mutex mutex_;
 };
