@@ -14,7 +14,7 @@
 
 #include <cost_map_core/cost_map_core.hpp>
 #include "converter.hpp"
-#include "loader.hpp"
+#include "image_bundles.hpp"
 #include "utilities.hpp"
 
 /*****************************************************************************

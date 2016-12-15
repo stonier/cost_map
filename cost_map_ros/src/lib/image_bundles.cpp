@@ -27,7 +27,13 @@ LoadImageBundle::LoadImageBundle(
   ros::NodeHandle nodehandle("~");
   publisher = nodehandle.advertise<cost_map_msgs::CostMap>(topic_name, 1, true);
 
-  std::string yaml_filename = cost_map::resolveResourceName(image_bundle_location);
+  std::string yaml_filename;
+  if ( boost::filesystem::exists(image_bundle_location)) {
+    yaml_filename = image_bundle_location;
+  } else {
+    // fallback to check if it's a ros resource
+    yaml_filename = cost_map::resolveResourceName(image_bundle_location);
+  }
   cost_map = std::make_shared<CostMap>();
   cost_map::fromImageBundle(yaml_filename, *cost_map);
   publish();
