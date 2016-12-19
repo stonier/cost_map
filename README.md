@@ -7,7 +7,8 @@ but designed for use with costs where the data element is a byte (as opposed to 
 
 1. [Packages Overview](#packages-overview)
 2. [Image Bundles](#image-bundles)
-3. [Inflation Computers](#inflation-computers)
+3. [Costmap2DROS Conversions](#costmap2dros-conversions)
+4. [Inflation Computers](#inflation-computers)
 
 ## Packages Overview
 
@@ -48,14 +49,14 @@ layers:
 
 See [cost_map_ros/image_bundles/example.yaml](https://github.com/stonier/cost_map/blob/devel/cost_map_ros/image_bundles/example.yaml) for a real example.
 
-### Demo
+### ImageBundle Demo
 
 ```bash
 # load an image bundle and visualise the cost map
 roslaunch cost_map_demos load_image_bundle.launch --screen
 ```
 
-### Command Line Utilities
+### ImageBundle Command Line Utilities
 
 There exist two command line utilities for loading and saving to and from a cost map topic:
 
@@ -68,7 +69,7 @@ cd foo
 rosrun cost_map_ros save_image_bundle /foo/cost_map foo.yaml
 ```
 
-### Library Usage
+### ImageBundle Methods
 
 * `cost_map::toImageBundle()` : convert a `cost_map::CostMap` object to an image bundle
 * `cost_map::fromImageBundle()` : load an image bundle into a `cost_map::CostMap` object
@@ -81,7 +82,7 @@ classes which illustrate how the command line utilities use these api.
 The ROS Navistack uses `costmap_2d::Costmap2DROS` objects and it is sometimes necessary
 to make conversions from these to provide new style cost maps to other libraries.
 
-### Demo
+### Costmap2DROS Demo
 
 ![From Ros Costmaps](cost_map_demos/doc/images/from_ros_costmaps/from_ros_costmaps.png)
 
@@ -90,7 +91,7 @@ to make conversions from these to provide new style cost maps to other libraries
 roslaunch cost_map_demos from_ros_costmaps.launch --screen
 ```
 
-### Library Usage
+### Costmap2DROS Methods
 
 * `cost_map::fromCostMap2DROS()` : convert a full window or a subwindow centred on the robot pose to a cost_map::CostMap object
 * `cost_map::addLayerFromCostMap2D()` : just copy the data from a Costmap2DROS object into a single layer
@@ -100,7 +101,7 @@ which illustrates how to use these api.
 
 ## Inflation Computers
 
-### Demo
+### Inflation Demo
 
 ```bash
 # load an image bundle and visualise the cost map
@@ -111,7 +112,7 @@ Obstacle Layer | Inflated Layer | Deflated Layer
 :---: | :---: | :---:
 [![Obstacle Layer](cost_map_demos/doc/images/inflation/obstacle_layer_preview.png)](cost_map_demos/doc/images/inflation/obstacle_layer.gif) | [![Inflated Layer](cost_map_demos/doc/images/inflation/inflation_layer_preview.png)](cost_map_demos/doc/images/inflation/inflation_layer.png) | [![Deflated Layer](cost_map_demos/doc/images/inflation/deflated_layer_preview.png)](cost_map_demos/doc/images/inflation/deflated_layer.png)
 
-### Classes
+### Inflation Classes
 
 * `cost_map::Inflate` : functor that executes (with the assistance of an inflation computer) the inflation process
 * `cost_map::ROSInflationComputer` : emulates the ROS inflation algorithm
