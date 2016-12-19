@@ -15,10 +15,12 @@ find_package(catkin
         ecl_build
         ecl_console
         ecl_exceptions
+        costmap_2d
         cost_map_ros
         cost_map_visualisations
         nav_msgs
         roscpp
+        tf
     )
 
 ##############################################################################
@@ -34,10 +36,12 @@ catkin_package(
         ecl_build
         ecl_console
         ecl_exceptions
+        costmap_2d
         cost_map_ros
         cost_map_visualisations
         nav_msgs
         roscpp
+        tf
     )
 
 ##############################################################################

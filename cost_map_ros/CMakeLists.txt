@@ -24,7 +24,6 @@ find_package(catkin
         grid_map_visualization
         nav_msgs
         roslib
-        tf
     )
 
 find_package(Boost REQUIRED COMPONENTS filesystem)
@@ -54,7 +53,6 @@ catkin_package(
         grid_map_visualization
         nav_msgs
         roslib
-        tf
     DEPENDS
         Boost
         YAML_CPP

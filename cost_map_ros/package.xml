@@ -27,7 +27,6 @@
   <build_depend>nav_msgs</build_depend>
   <build_depend>roslib</build_depend>
   <build_depend>yaml-cpp</build_depend>
-  <build_depend>tf</build_depend>
 
   <run_depend>boost</run_depend>
   <run_depend>cost_map_core</run_depend>
@@ -44,7 +43,6 @@
   <run_depend>nav_msgs</run_depend>
   <run_depend>roslib</run_depend>
   <run_depend>yaml-cpp</run_depend>
-  <run_depend>tf</run_depend>
 
   <export>
     <rosdoc config="rosdoc.yaml" />

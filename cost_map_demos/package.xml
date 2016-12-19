@@ -13,6 +13,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <depend>costmap_2d</depend>
   <depend>ecl_build</depend>
   <depend>ecl_console</depend>
   <depend>ecl_exceptions</depend>
@@ -20,6 +21,8 @@
   <depend>cost_map_visualisations</depend>
   <depend>nav_msgs</depend>
   <depend>roscpp</depend>
+  <depend>tf</depend>
+
   <exec_depend>rviz</exec_depend>
 
 </package>

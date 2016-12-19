@@ -1,0 +1,88 @@
+/**
+ * @file src/applications/alignment_test.cpp
+ */
+/*****************************************************************************
+** Includes
+*****************************************************************************/
+
+#include <atomic>
+#include <ros/common.h>
+#include <ros/node_handle.h>
+#include <ros/subscriber.h>
+#include <ros/publisher.h>
+
+#include <costmap_2d/costmap_2d.h>
+#include <costmap_2d/cost_values.h>
+#include <nav_msgs/OccupancyGrid.h>
+
+#include <cost_map_ros/converter.hpp>
+
+#include "../../include/cost_map_demos/from_ros_costmaps.hpp"
+
+/*****************************************************************************
+** Interfaces
+*****************************************************************************/
+
+
+
+int main(int argc, char** argv)
+{
+  ros::init(argc, argv, "converter"); // , ros::init_options::AnonymousName);
+
+  /********************
+  ** Transforms
+  ********************/
+  cost_map_demos::TransformBroadcaster broadcaster;
+  broadcaster.add("base_link_5x5", tf::Vector3(1.0,  1.0, 0.0), tf::Quaternion(0, 0, 0, 1));
+  broadcaster.add("base_link_4x4", tf::Vector3(1.0, -3.0, 0.0), tf::Quaternion(0, 0, 0, 1));
+  broadcaster.add("base_link_5x5_3x3_offset", tf::Vector3(-3.7, 2.4, 0.0), tf::Quaternion(0, 0, 0, 1));
+  broadcaster.add("base_link_5x5_3x3_centre", tf::Vector3(-3.5, -3.5, 0.0), tf::Quaternion(0, 0, 0, 1));
+  broadcaster.startBroadCastingThread();
+
+  /********************
+  ** ROS Costmaps
+  ********************/
+  // The following should result in costmaps with strips of increasing cost in the x-direction,
+  // but also 1-4 cells cleared by the footprint (see rviz)
+  cost_map_demos::ROSCostmapServer ros_costmap_5x5("five_by_five", "base_link_5x5", cost_map::Position(0.0, 0.0), 5.0, 5.0);
+  cost_map_demos::ROSCostmapServer ros_costmap_4x4("four_by_four", "base_link_4x4", cost_map::Position(0.0, -5.0), 4.0, 4.0);
+  cost_map_demos::ROSCostmapServer ros_costmap_5x5_3x3_offset("five_by_five_three_by_three_offset", "base_link_5x5_3x3_offset", cost_map::Position(-6.0, 0.0), 5.0, 5.0);
+  cost_map_demos::ROSCostmapServer ros_costmap_5x5_3x3_centre("five_by_five_three_by_three_centre", "base_link_5x5_3x3_centre", cost_map::Position(-6.0, -6.0), 5.0, 5.0);
+
+  /********************
+  ** New Costmaps
+  ********************/
+  // full windows
+  cost_map::CostMapPtr cost_map_5x5 = cost_map::fromROSCostMap2D(*(ros_costmap_5x5.getROSCostmap()));
+  cost_map::CostMapPtr cost_map_4x4 = cost_map::fromROSCostMap2D(*(ros_costmap_4x4.getROSCostmap()));
+  cost_map::Length geometry_3x3(3.0, 3.0);
+  cost_map::CostMapPtr cost_map_5x5_3x3_offset = cost_map::fromROSCostMap2D(*(ros_costmap_5x5_3x3_offset.getROSCostmap()), geometry_3x3);
+  cost_map::CostMapPtr cost_map_5x5_3x3_centre = cost_map::fromROSCostMap2D(*(ros_costmap_5x5_3x3_centre.getROSCostmap()), geometry_3x3);
+  // subwindows
+
+//  cost_map::Length geometry(0,0);
+//  cost_map::CostMapPtr cost_map = cost_map::fromROSCostMap2D(map_ros, geometry);
+
+  ros::NodeHandle node_handle;
+  ros::Publisher pub_5x5 = node_handle.advertise<nav_msgs::OccupancyGrid>("converted_5x5", 1, true);
+  ros::Publisher pub_4x4 = node_handle.advertise<nav_msgs::OccupancyGrid>("converted_4x4", 1, true);
+  ros::Publisher pub_5x5_3x3_offset = node_handle.advertise<nav_msgs::OccupancyGrid>("converted_5x5_3x3_offset", 1, true);
+  ros::Publisher pub_5x5_3x3_centre = node_handle.advertise<nav_msgs::OccupancyGrid>("converted_5x5_3x3_centre", 1, true);
+
+  nav_msgs::OccupancyGrid occupancy_msg;
+  cost_map::toOccupancyGrid(*cost_map_5x5, cost_map_5x5->getLayers()[0], occupancy_msg);
+  pub_5x5.publish(occupancy_msg);
+  cost_map::toOccupancyGrid(*cost_map_4x4, cost_map_4x4->getLayers()[0], occupancy_msg);
+  pub_4x4.publish(occupancy_msg);
+  cost_map::toOccupancyGrid(*cost_map_5x5_3x3_offset, cost_map_5x5_3x3_offset->getLayers()[0], occupancy_msg);
+  pub_5x5_3x3_offset.publish(occupancy_msg);
+  cost_map::toOccupancyGrid(*cost_map_5x5_3x3_centre, cost_map_5x5_3x3_centre->getLayers()[0], occupancy_msg);
+  pub_5x5_3x3_centre.publish(occupancy_msg);
+
+  /********************
+  ** Spin & Shutdown
+  ********************/
+  ros::spin();
+
+  return 0;
+}

@@ -18,12 +18,34 @@
 					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.365430363.1204020403" name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.base.69920263" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.1219755000" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
-							<builder arguments="-f ${YUJIN_WORKSPACE}/build/cost_map/${ProjName}/Makefile -j8" command="make" id="cdt.managedbuild.target.gnu.builder.base.1045080748" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+							<builder arguments="-f ${YUJIN_WORKSPACE}/build/cost_map/${ProjName}/Makefile -j8" command="make" id="cdt.managedbuild.target.gnu.builder.base.1045080748" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.base">
+								<outputEntries>
+									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name=""/>
+								</outputEntries>
+							</builder>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.459899318" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.1090319233" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
+								<option id="gnu.cpp.compiler.option.include.paths.1881783009" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/opt/groot/navi_ws/devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/groot/dslam_ws/devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/groot/messages_ws/devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/groot/ecl_ws/devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/groot/ecto_ws/devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/yujin/amd64/indigo-devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/ros/indigo/include"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2128721693" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.472156942" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
+								<option id="gnu.c.compiler.option.include.paths.1229625611" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/opt/groot/navi_ws/devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/groot/dslam_ws/devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/groot/messages_ws/devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/groot/ecl_ws/devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/groot/ecto_ws/devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/yujin/amd64/indigo-devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/ros/indigo/include"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.582068073" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.1413392956" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
@@ -34,10 +56,24 @@
 								</inputType>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.base.798382321" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
+								<option id="gnu.both.asm.option.include.paths.2027510439" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/opt/groot/navi_ws/devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/groot/dslam_ws/devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/groot/messages_ws/devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/groot/ecl_ws/devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/groot/ecto_ws/devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/yujin/amd64/indigo-devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/ros/indigo/include"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1058621255" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include/cost_map_demos"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src/applications"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src/lib"/>
+					</sourceEntries>
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
@@ -46,13 +82,19 @@
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="cost_map_demos.null.1204361745" name="cost_map_demos"/>
 	</storageModule>
-	<storageModule moduleId="scannerConfiguration">
-		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="Default">
 			<resource resourceType="PROJECT" workspacePath="/cost_map_demos"/>
 		</configuration>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.365430363;cdt.managedbuild.toolchain.gnu.base.365430363.1204020403;cdt.managedbuild.tool.gnu.c.compiler.base.472156942;cdt.managedbuild.tool.gnu.c.compiler.input.582068073">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.365430363;cdt.managedbuild.toolchain.gnu.base.365430363.1204020403;cdt.managedbuild.tool.gnu.cpp.compiler.base.1090319233;cdt.managedbuild.tool.gnu.cpp.compiler.input.2128721693">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
 	</storageModule>
 </cproject>

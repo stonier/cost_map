@@ -1,0 +1,5 @@
+<launch>
+    <node name="converter" type="from_ros_costmaps" pkg="cost_map_demos">
+    </node>
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find cost_map_demos)/rviz/from_ros_costmaps.rviz"/>
+</launch>
