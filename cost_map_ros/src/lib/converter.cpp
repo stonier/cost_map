@@ -192,7 +192,7 @@ void toImageBundle(const std::string& filename, const cost_map::CostMap& cost_ma
 // almost a carbon copy of grid_map::addLayerFromImage
 //
 bool addLayerFromROSImage(const sensor_msgs::Image& image,
-                          const std::string& layer,
+                          const std::string& layer_name,
                           cost_map::CostMap& cost_map
                           )
 {
@@ -234,7 +234,7 @@ bool addLayerFromROSImage(const sensor_msgs::Image& image,
     return false;
   }
 
-  cost_map.add(layer);
+  cost_map.add(layer_name);
 
   if (cost_map.getSize()(0) != image.height
       || cost_map.getSize()(1) != image.width) {
@@ -274,7 +274,7 @@ bool addLayerFromROSImage(const sensor_msgs::Image& image,
     // RULE 1 : scale only from 0-254 (remember 255 is reserved for NO_INFORMATION)
     // RULE 2 : invert the value as black on an image (grayscale: 0) typically represents an obstacle (cost: 254)
     cost_map::DataType value = static_cast<cost_map::DataType>(254.0 * ( 1.0 - (static_cast<double>(grayValue) / static_cast<double>(depth))));
-    cost_map.at(layer, *iterator) = value;
+    cost_map.at(layer_name, *iterator) = value;
   }
   return true;
 }
@@ -358,14 +358,44 @@ bool fromMessage(const cost_map_msgs::CostMap& message, cost_map::CostMap& cost_
 ** CostMap2DROS and Occupancy Grids
 *****************************************************************************/
 
-CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, const cost_map::Length& geometry) {
-  CostMapPtr cost_map = std::make_shared<CostMap>();
-  costmap_2d::Costmap2D costmap_subwindow;
-  cost_map::Length geometry_ = geometry;
-
+void fromCostMap2DROS(costmap_2d::Costmap2DROS& ros_costmap,
+                      const std::string& layer_name,
+                      cost_map::CostMap& cost_map) {
+  // preparation
   double resolution = ros_costmap.getCostmap()->getResolution();
   double original_size_x = ros_costmap.getCostmap()->getSizeInCellsX() * resolution;
   double original_size_y = ros_costmap.getCostmap()->getSizeInCellsY() * resolution;
+  cost_map::Length geometry(original_size_x, original_size_y);
+  cost_map::Position ros_map_origin(ros_costmap.getCostmap()->getOriginX(), ros_costmap.getCostmap()->getOriginY());
+  cost_map::Position new_cost_map_origin(ros_map_origin.x() + original_size_x/2, ros_map_origin.y() + original_size_y/2);
+
+  // cost map meta information
+  cost_map.setFrameId(ros_costmap.getGlobalFrameID());
+  cost_map.setTimestamp(ros::Time::now().toNSec());
+  cost_map.setGeometry(geometry, resolution, new_cost_map_origin);
+
+  // data
+  boost::lock_guard<costmap_2d::Costmap2D::mutex_t> lock(*(ros_costmap.getCostmap()->getMutex()));
+  addLayerFromCostMap2D(*(ros_costmap.getCostmap()), layer_name, cost_map);
+}
+
+void fromCostMap2DROS(costmap_2d::Costmap2DROS& ros_costmap,
+                      const cost_map::Length& geometry,
+                      const std::string& layer_name,
+                      cost_map::CostMap& cost_map)
+{
+  double resolution = ros_costmap.getCostmap()->getResolution();
+  double original_size_x = ros_costmap.getCostmap()->getSizeInCellsX() * resolution;
+  double original_size_y = ros_costmap.getCostmap()->getSizeInCellsY() * resolution;
+
+  if (geometry.x() == 0.0 || geometry.y() == 0.0 ||
+      ( geometry.x() == original_size_x && geometry.y() == original_size_y )
+      ) {
+    return fromCostMap2DROS(ros_costmap, layer_name, cost_map);
+  }
+
+  costmap_2d::Costmap2D costmap_subwindow;
+  cost_map::Length geometry_ = geometry;
 
   tf::Stamped<tf::Pose> tf_pose;
   if(!ros_costmap.getRobotPose(tf_pose))
@@ -378,67 +408,50 @@ CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, const cost_ma
   cost_map::Position robot_position(tf_pose.getOrigin().x() , tf_pose.getOrigin().y());
   cost_map::Position ros_map_origin(ros_costmap.getCostmap()->getOriginX(), ros_costmap.getCostmap()->getOriginY());
 
-  if (geometry_.x() == 0.0 || geometry_.y() == 0.0 ) {
-    geometry_ << original_size_x, original_size_y;
-  }
-  bool full_size_requested = geometry_.x() == original_size_x && geometry_.y() == original_size_y;
-
   /****************************************
   ** Where is the New Costmap Origin?
   ****************************************/
   cost_map::Position new_cost_map_origin;
 
-  if ( full_size_requested ) {
-    new_cost_map_origin <<
-        ros_map_origin.x() + original_size_x/2,
-        ros_map_origin.y() + original_size_y/2;
-  } else {
-    // Note:
-    //   You cannot directly use the robot pose as the new 'costmap centre'
-    //   since the underlying grid is not necessarily exactly aligned with
-    //   that (two cases to consider, rolling window and globally fixed).
-    //
-    // Relevant diagrams:
-    //  - https://github.com/ethz-asl/grid_map
+  // Note:
+  //   You cannot directly use the robot pose as the new 'costmap centre'
+  //   since the underlying grid is not necessarily exactly aligned with
+  //   that (two cases to consider, rolling window and globally fixed).
+  //
+  // Relevant diagrams:
+  //  - https://github.com/ethz-asl/grid_map
 
-    // Have to do the exact same as the ros costmap updateOrigin to end up with same position
-    // Don't use original_size_x here. getSizeInMeters is actually broken but the
-    // ros costmap uses it to set the origin. So we also have to do it to get the
-    // same behaviour. (See also updateOrigin call in LayeredCostmap)
-    double fake_origin_x = robot_position.x() - ros_costmap.getCostmap()->getSizeInMetersX() / 2;
-    double fake_origin_y = robot_position.y() - ros_costmap.getCostmap()->getSizeInMetersY() / 2;
+  // Have to do the exact same as the ros costmap updateOrigin to end up with same position
+  // Don't use original_size_x here. getSizeInMeters is actually broken but the
+  // ros costmap uses it to set the origin. So we also have to do it to get the
+  // same behaviour. (See also updateOrigin call in LayeredCostmap)
+  double fake_origin_x = robot_position.x() - ros_costmap.getCostmap()->getSizeInMetersX() / 2;
+  double fake_origin_y = robot_position.y() - ros_costmap.getCostmap()->getSizeInMetersY() / 2;
 
-    int fake_origin_cell_x, fake_origin_cell_y;
-    fake_origin_cell_x = int((fake_origin_x - ros_map_origin.x()) / resolution);
-    fake_origin_cell_y = int((fake_origin_y - ros_map_origin.y()) / resolution);
+  int fake_origin_cell_x, fake_origin_cell_y;
+  fake_origin_cell_x = int((fake_origin_x - ros_map_origin.x()) / resolution);
+  fake_origin_cell_y = int((fake_origin_y - ros_map_origin.y()) / resolution);
 
-    // compute the associated world coordinates for the origin cell
-    // because we want to keep things grid-aligned
-    double fake_origin_aligned_x, fake_origin_aligned_y;
-    fake_origin_aligned_x = ros_map_origin.x() + fake_origin_cell_x * resolution;
-    fake_origin_aligned_y = ros_map_origin.y() + fake_origin_cell_y * resolution;
+  // compute the associated world coordinates for the origin cell
+  // because we want to keep things grid-aligned
+  double fake_origin_aligned_x, fake_origin_aligned_y;
+  fake_origin_aligned_x = ros_map_origin.x() + fake_origin_cell_x * resolution;
+  fake_origin_aligned_y = ros_map_origin.y() + fake_origin_cell_y * resolution;
 
-    new_cost_map_origin <<
-        fake_origin_aligned_x + original_size_x / 2,
-        fake_origin_aligned_y + original_size_y / 2;
-  }
+  new_cost_map_origin <<
+      fake_origin_aligned_x + original_size_x / 2,
+      fake_origin_aligned_y + original_size_y / 2;
 
   /****************************************
   ** Initialise the CostMap
   ****************************************/
-  cost_map->setFrameId(ros_costmap.getGlobalFrameID());
-  cost_map->setTimestamp(ros::Time::now().toNSec());
-  cost_map->setGeometry(geometry_, resolution, new_cost_map_origin);
+  cost_map.setFrameId(ros_costmap.getGlobalFrameID());
+  cost_map.setTimestamp(ros::Time::now().toNSec());
+  cost_map.setGeometry(geometry_, resolution, new_cost_map_origin);
 
   /****************************************
   ** Copy Data
   ****************************************/
-  if( full_size_requested ) {
-    boost::lock_guard<costmap_2d::Costmap2D::mutex_t> lock(*(ros_costmap.getCostmap()->getMutex()));
-    copyCostmap2DData(*(ros_costmap.getCostmap()), cost_map);
-    return cost_map;
-  }
-
   double subwindow_bottom_left_x = new_cost_map_origin.x() - geometry_.x() / 2.0;
   double subwindow_bottom_left_y = new_cost_map_origin.y() - geometry_.y() / 2.0;
 
@@ -493,33 +506,34 @@ CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap, const cost_ma
     throw ecl::StandardException(LOC, ecl::OutOfRangeError, error_message.str());
   }
 
-  copyCostmap2DData(costmap_subwindow, cost_map);
-  return cost_map;
+  addLayerFromCostMap2D(costmap_subwindow, layer_name, cost_map);
 }
 
-void copyCostmap2DData(costmap_2d::Costmap2D& copied_cost_map, const CostMapPtr& target_cost_map)
+void addLayerFromCostMap2D(costmap_2d::Costmap2D& costmap_2d,
+                           const std::string& layer_name,
+                           CostMap& cost_map)
 {
-  if (copied_cost_map.getSizeInCellsX() != target_cost_map->getSize().x()
-      || copied_cost_map.getSizeInCellsY() != target_cost_map->getSize().y()) {
+  if (costmap_2d.getSizeInCellsX() != cost_map.getSize().x()
+      || costmap_2d.getSizeInCellsY() != cost_map.getSize().y()) {
 
     std::ostringstream error_message;
-    error_message << "Tried to copy Costmap2D data (" << copied_cost_map.getSizeInCellsX() << "x" << copied_cost_map.getSizeInCellsY()
-                  << ") to a differently sized cost_map (" << target_cost_map->getSize().x() << "x" << target_cost_map->getSize().y() << ")";
+    error_message << "Tried to copy Costmap2D data (" << costmap_2d.getSizeInCellsX() << "x" << costmap_2d.getSizeInCellsY()
+                  << ") to a differently sized cost_map (" << cost_map.getSize().x() << "x" << cost_map.getSize().y() << ")";
     throw ecl::StandardException(LOC, ecl::OutOfRangeError, error_message.str());
   }
 
-  unsigned char* subwindow_costs = copied_cost_map.getCharMap();
+  unsigned char* subwindow_costs = costmap_2d.getCharMap();
 
   // remember there is a different convention for indexing.
   //  - costmap_2d::CostMap starts from the bottom left
   //  - cost_map::CostMap   starts from the top left
-  cost_map::Matrix data(target_cost_map->getSize().x(), target_cost_map->getSize().y());
+  cost_map::Matrix data(cost_map.getSize().x(), cost_map.getSize().y());
 
-  unsigned int size = target_cost_map->getSize().x() * target_cost_map->getSize().y();
+  unsigned int size = cost_map.getSize().x() * cost_map.getSize().y();
   for ( int i=0, index = size-1; index >= 0; --index, ++i) {
     data(i) = subwindow_costs[index];
   }
-  target_cost_map->add("obstacle_costs", data);
+  cost_map.add(layer_name, data);
 }
 
 void toOccupancyGrid(const cost_map::CostMap& cost_map, const std::string& layer, nav_msgs::OccupancyGrid& msg) {
@@ -588,12 +602,12 @@ bool ROSCostMap2DServiceProvider::callback(
     cost_map_msgs::GetCostMap::Request  &request,
     cost_map_msgs::GetCostMap::Response &response)
 {
-  CostMapPtr cost_map;
   try {
+    CostMap cost_map;
     cost_map::Length geometry;
     geometry << request.length_x, request.length_y;
-    cost_map = fromROSCostMap2D(*ros_costmap, geometry);
-    toMessage(*cost_map, response.map);
+    fromCostMap2DROS(*ros_costmap, geometry, "obstacle_costs", cost_map);
+    toMessage(cost_map, response.map);
   } catch ( ecl::StandardException &e) {
     ROS_ERROR_STREAM("CostMap Service : " << e.what());
     return false;

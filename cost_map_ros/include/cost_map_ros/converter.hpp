@@ -108,7 +108,7 @@ bool fromMessage(const cost_map_msgs::CostMap& message, cost_map::CostMap& cost_
 *****************************************************************************/
 
 bool addLayerFromROSImage(const sensor_msgs::Image& image,
-                          const std::string& layer,
+                          const std::string& layer_name,
                           cost_map::CostMap& cost_map
                           );
 
@@ -121,6 +121,24 @@ bool addLayerFromROSImage(const sensor_msgs::Image& image,
  */
 
 /**
+ * @brief Converts a ROS costmap to a costmap object.
+ *
+ * This copies the complete costmap and all relevant details of the underlying
+ * Costmap2D object. Note that it does not transfer properties in the Costmap2DROS
+ * object such as the notion of the robot pose.
+ *
+ * @param[in] ros_costmap : a traditional ros costmap object.
+ * @param[in] layer_name : new costmaps have multiple layers, so important to specify a name
+ * @param[out] costmap : a cost_map::CostMap object
+ *
+ * @note We should, but cannot use a const for the ros costmap since it hasn't been very
+ * well designed. Treat it as such and do not change the internals inside.
+ */
+void fromCostMap2DROS(costmap_2d::Costmap2DROS& ros_costmap,
+                      const std::string& layer_name,
+                      cost_map::CostMap& cost_map);
+
+/**
  * @brief Converts a ROS costmap around the robot to a costmap object.
  *
  * This automatically affixes the cost map grid to the location of the robot
@@ -128,18 +146,21 @@ bool addLayerFromROSImage(const sensor_msgs::Image& image,
  * necessary is to specify how large the cost map should be. Take care that this
  * subwindow does not go off the edge of the underlying ros costmap!
  *
- * @param ros_costmap : a traditional ros costmap object (input).
- * @param geometry : size of the subwindow (mxm), use 0x0 to get the whole costmap.
- * @return shared pointer to the cost map object
+ * @param[in] ros_costmap : a traditional ros costmap object (input).
+ * @param[in] geometry : size of the subwindow (mxm)
+ * @param[in] layer_name : new costmaps have multiple layers, so important to specify a name
+ * @param[out] costmap : a cost_map::CostMap object
  *
  * @note We should, but cannot use a const for the ros costmap since it hasn't been very
  * well designed. Treat it as such and do not change the internals inside.
  */
-CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap,
-                            const cost_map::Length& geometry=cost_map::Length::Zero());
+void fromCostMap2DROS(costmap_2d::Costmap2DROS& ros_costmap,
+                      const cost_map::Length& geometry,
+                      const std::string& layer_name,
+                      cost_map::CostMap& cost_map);
 
 /**
- * @brief Copies all data from copied_cost_map to target_cost_map (have to be same size)
+ * @brief Copies all data from a CostMap2D object to the target cost map.
  *
  * The data will be put in a new layer called "obstacle_costs"
  *
@@ -149,7 +170,9 @@ CostMapPtr fromROSCostMap2D(costmap_2d::Costmap2DROS& ros_costmap,
  * @note We should, but cannot use a const for the ros Costmap2D since it hasn't been very
  * well designed. Treat it as such and do not change the internals inside.
  */
-void copyCostmap2DData(costmap_2d::Costmap2D& copied_cost_map, const CostMapPtr& target_cost_map);
+void addLayerFromCostMap2D(costmap_2d::Costmap2D& costmap_2d,
+                           const std::string& layer_name,
+                           CostMap& cost_map);
 
 void toOccupancyGrid(const cost_map::CostMap& cost_map, const std::string& layer, nav_msgs::OccupancyGrid& msg);
 

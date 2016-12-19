@@ -52,17 +52,16 @@ int main(int argc, char** argv)
   /********************
   ** New Costmaps
   ********************/
-  // full windows
-  cost_map::CostMapPtr cost_map_5x5 = cost_map::fromROSCostMap2D(*(ros_costmap_5x5.getROSCostmap()));
-  cost_map::CostMapPtr cost_map_4x4 = cost_map::fromROSCostMap2D(*(ros_costmap_4x4.getROSCostmap()));
+  cost_map::CostMap cost_map_5x5, cost_map_4x4, cost_map_5x5_3x3_offset, cost_map_5x5_3x3_centre;
+  cost_map::fromCostMap2DROS(*(ros_costmap_5x5.getROSCostmap()), "obstacle_costs", cost_map_5x5);
+  cost_map::fromCostMap2DROS(*(ros_costmap_4x4.getROSCostmap()), "obstacle_costs", cost_map_4x4);
   cost_map::Length geometry_3x3(3.0, 3.0);
-  cost_map::CostMapPtr cost_map_5x5_3x3_offset = cost_map::fromROSCostMap2D(*(ros_costmap_5x5_3x3_offset.getROSCostmap()), geometry_3x3);
-  cost_map::CostMapPtr cost_map_5x5_3x3_centre = cost_map::fromROSCostMap2D(*(ros_costmap_5x5_3x3_centre.getROSCostmap()), geometry_3x3);
-  // subwindows
+  cost_map::fromCostMap2DROS(*(ros_costmap_5x5_3x3_offset.getROSCostmap()), geometry_3x3, "obstacle_costs", cost_map_5x5_3x3_offset);
+  cost_map::fromCostMap2DROS(*(ros_costmap_5x5_3x3_centre.getROSCostmap()), geometry_3x3, "obstacle_costs", cost_map_5x5_3x3_centre);
 
-//  cost_map::Length geometry(0,0);
-//  cost_map::CostMapPtr cost_map = cost_map::fromROSCostMap2D(map_ros, geometry);
-
+  /********************
+  ** Publishers
+  ********************/
   ros::NodeHandle node_handle;
   ros::Publisher pub_5x5 = node_handle.advertise<nav_msgs::OccupancyGrid>("converted_5x5", 1, true);
   ros::Publisher pub_4x4 = node_handle.advertise<nav_msgs::OccupancyGrid>("converted_4x4", 1, true);
@@ -70,13 +69,13 @@ int main(int argc, char** argv)
   ros::Publisher pub_5x5_3x3_centre = node_handle.advertise<nav_msgs::OccupancyGrid>("converted_5x5_3x3_centre", 1, true);
 
   nav_msgs::OccupancyGrid occupancy_msg;
-  cost_map::toOccupancyGrid(*cost_map_5x5, cost_map_5x5->getLayers()[0], occupancy_msg);
+  cost_map::toOccupancyGrid(cost_map_5x5, cost_map_5x5.getLayers()[0], occupancy_msg);
   pub_5x5.publish(occupancy_msg);
-  cost_map::toOccupancyGrid(*cost_map_4x4, cost_map_4x4->getLayers()[0], occupancy_msg);
+  cost_map::toOccupancyGrid(cost_map_4x4, cost_map_4x4.getLayers()[0], occupancy_msg);
   pub_4x4.publish(occupancy_msg);
-  cost_map::toOccupancyGrid(*cost_map_5x5_3x3_offset, cost_map_5x5_3x3_offset->getLayers()[0], occupancy_msg);
+  cost_map::toOccupancyGrid(cost_map_5x5_3x3_offset, cost_map_5x5_3x3_offset.getLayers()[0], occupancy_msg);
   pub_5x5_3x3_offset.publish(occupancy_msg);
-  cost_map::toOccupancyGrid(*cost_map_5x5_3x3_centre, cost_map_5x5_3x3_centre->getLayers()[0], occupancy_msg);
+  cost_map::toOccupancyGrid(cost_map_5x5_3x3_centre, cost_map_5x5_3x3_centre.getLayers()[0], occupancy_msg);
   pub_5x5_3x3_centre.publish(occupancy_msg);
 
   /********************
