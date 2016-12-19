@@ -83,16 +83,16 @@ to make conversions from these to provide new style cost maps to other libraries
 
 ### Demo
 
+![From Ros Costmaps](cost_map_demos/doc/images/from_ros_costmaps/from_ros_costmaps.png)
+
 ```bash
 # load several ros costmaps and copy full/sub windows to new style costmaps
 roslaunch cost_map_demos from_ros_costmaps.launch --screen
 ```
 
-TODO : image here
-
 ### Library Usage
 
-* `cost_map::fromCostMap2DROS()` : convert a full window or subwindow around the robot pose to a cost_map::CostMap object
+* `cost_map::fromCostMap2DROS()` : convert a full window or a subwindow centred on the robot pose to a cost_map::CostMap object
 * `cost_map::addLayerFromCostMap2D()` : just copy the data from a Costmap2DROS object into a single layer
 
 See the [from_ros_costmaps demo program](https://github.com/stonier/cost_map/blob/devel/cost_map_demos/src/applications/from_ros_costmaps.cpp)
