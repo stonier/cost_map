@@ -22,6 +22,7 @@ void broadcastCostmap2DROSTestSuiteTransforms(TransformBroadcaster& broadcaster)
   broadcaster.add("base_link_4x4", tf::Vector3(1.0, -3.0, 0.0), tf::Quaternion(0, 0, 0, 1));
   broadcaster.add("base_link_5x5_3x3_offset", tf::Vector3(-3.7, 2.4, 0.0), tf::Quaternion(0, 0, 0, 1));
   broadcaster.add("base_link_5x5_3x3_centre", tf::Vector3(-3.5, -3.5, 0.0), tf::Quaternion(0, 0, 0, 1));
+  broadcaster.add("base_link_5x5_2_5x2_5_offset", tf::Vector3(-9.7, 2.4, 0.0), tf::Quaternion(0, 0, 0, 1));
   broadcaster.startBroadCastingThread();
 }
 
@@ -48,7 +49,8 @@ ROSCostmapServer::ROSCostmapServer(const std::string& name,
   private_node_handle.setParam(name + "/origin_y", origin.y());
   private_node_handle.setParam(name + "/width", width);
   private_node_handle.setParam(name + "/height", height);
-  private_node_handle.setParam(name + "/resolution", 1.0);
+  private_node_handle.setParam(name + "/plugins", std::vector<std::string>());
+  private_node_handle.setParam(name + "/resolution", 0.5);
   private_node_handle.setParam(name + "/robot_radius", 0.03); // clears 1 cell if inside, up to 4 cells on a vertex
   costmap = std::make_shared<ROSCostmap>(name, transform_listener);
 

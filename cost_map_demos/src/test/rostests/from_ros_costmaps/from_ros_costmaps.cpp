@@ -18,9 +18,9 @@
 
 TEST(CostMap2DROS, full_window) {
   std::cout << std::endl;
-  std::cout << "***********************************************************" << std::endl;
-  std::cout << "                 Copy Full Window" << std::endl;
-  std::cout << "***********************************************************" << std::endl;
+  ROS_INFO("***********************************************************");
+  ROS_INFO("                 Copy Full Window");
+  ROS_INFO("***********************************************************");
   // MAKE SURE THIS STAY IN SYNC WITH src/applications/from_ros_costmaps.cpp!
   // preparation
   std::string layer_name =  "obstacle_costs";
@@ -54,19 +54,43 @@ TEST(CostMap2DROS, full_window) {
 //    std::cout << std::endl;
 //  }
   // TODO a function which does the index conversion
-  ASSERT_EQ(cost_map_5x5.at(layer_name, cost_map::Index(1,4)), ros_costmap_5x5.getROSCostmap()->getCostmap()->getCost(3,0));
+  ASSERT_EQ(cost_map_5x5.at(layer_name, cost_map::Index(1,9)), ros_costmap_5x5.getROSCostmap()->getCostmap()->getCost(8,0));
   std::cout << std::endl;
 }
 
-TEST(CostMap2DROS, sub_window) {
+TEST(CostMap2DROS, cost_map_centres) {
   std::cout << std::endl;
-  std::cout << "***********************************************************" << std::endl;
-  std::cout << "                 Copy Sub Window" << std::endl;
-  std::cout << "***********************************************************" << std::endl;
-  cost_map::CostMap cost_map_5x5, cost_map_4x4;
+  ROS_INFO("***********************************************************");
+  ROS_INFO("                 Check Subwindow Centres");
+  ROS_INFO("***********************************************************");
+  ROS_INFO("Subwindows are centred as closely as possible to the robot");
+  ROS_INFO("pose, though not exactly. They still need to align with");
+  ROS_INFO("the underlying ros costmap so that they don't introduce a");
+  ROS_INFO("new kind of error. As a result, the centre is shifted from");
+  ROS_INFO("the robot pose to the nearest appropriate point which aligns");
+  ROS_INFO("the new cost map exactly on top of the original ros costmap.");
+  std::cout << std::endl;
+  std::string layer_name =  "obstacle_costs";
+  cost_map_demos::ROSCostmapServer ros_costmap_5x5_3x3_offset("five_by_five_three_by_three_offset", "base_link_5x5_3x3_offset", cost_map::Position(-6.0, 0.0), 5.0, 5.0);
+  cost_map_demos::ROSCostmapServer ros_costmap_5x5_3x3_centre("five_by_five_three_by_three_centre", "base_link_5x5_3x3_centre", cost_map::Position(-6.0, -6.0), 5.0, 5.0);
+  cost_map_demos::ROSCostmapServer ros_costmap_5x5_2_5x2_5_offset("five_by_five_twohalf_by_twohalf_offset", "base_link_5x5_2_5x2_5_offset", cost_map::Position(-12.0, 0.0), 5.0, 5.0);
+  cost_map::CostMap cost_map_5x5_3x3_offset, cost_map_5x5_3x3_centre, cost_map_5x5_2_5x2_5_offset;
+  cost_map::Length geometry_3x3(3.0, 3.0);
+  cost_map::fromCostMap2DROS(*(ros_costmap_5x5_3x3_offset.getROSCostmap()), geometry_3x3, layer_name, cost_map_5x5_3x3_offset);
+  cost_map::fromCostMap2DROS(*(ros_costmap_5x5_3x3_centre.getROSCostmap()), geometry_3x3, layer_name, cost_map_5x5_3x3_centre);
+  cost_map::Length geometry_2_5x2_5(2.5, 2.5);
+  cost_map::fromCostMap2DROS(*(ros_costmap_5x5_2_5x2_5_offset.getROSCostmap()), geometry_2_5x2_5, layer_name, cost_map_5x5_2_5x2_5_offset);
+  ROS_INFO_STREAM("  cost_map_5x5_3x3_offset : " << cost_map_5x5_3x3_offset.getPosition().transpose());
+  ROS_INFO_STREAM("  cost_map_5x5_3x3_offset : " << cost_map_5x5_3x3_centre.getPosition().transpose());
+  ROS_INFO_STREAM("  cost_map_5x5_3x3_offset : " << cost_map_5x5_2_5x2_5_offset.getPosition().transpose());
+  ASSERT_EQ(-3.5, cost_map_5x5_3x3_offset.getPosition().x());
+  ASSERT_EQ(2.5, cost_map_5x5_3x3_offset.getPosition().y());
+  ASSERT_EQ(-3.5, cost_map_5x5_3x3_centre.getPosition().x());
+  ASSERT_EQ(-3.5, cost_map_5x5_3x3_centre.getPosition().y());
+  ASSERT_EQ(-9.75, cost_map_5x5_2_5x2_5_offset.getPosition().x());
+  ASSERT_EQ(2.25, cost_map_5x5_2_5x2_5_offset.getPosition().y());
   std::cout << std::endl;
 }
-
 
 /*****************************************************************************
 ** Main program
@@ -80,7 +104,9 @@ int main(int argc, char **argv) {
   cost_map_demos::broadcastCostmap2DROSTestSuiteTransforms(broadcaster);
 
   testing::InitGoogleTest(&argc,argv);
-  return RUN_ALL_TESTS();
+  int result = RUN_ALL_TESTS();
+  broadcaster.shutdown();
+  return result;
 }
 
 
