@@ -14,6 +14,9 @@
 
 #include <costmap_2d/costmap_2d_ros.h>
 #include <iostream>
+#include <tf/transform_broadcaster.h>
+#include <tf/transform_listener.h>
+#include <thread>
 
 /*****************************************************************************
 ** Namespaces
@@ -22,7 +25,28 @@
 namespace cost_map_demos {
 
 /*****************************************************************************
-** Interfaces
+** Transforms
+*****************************************************************************/
+
+/**
+ * @brief Broadcast a set of transforms useful for various demos.
+ */
+class TransformBroadcaster {
+public:
+  TransformBroadcaster() {}
+  virtual ~TransformBroadcaster();
+  void add(const std::string& name, tf::Vector3 origin, const tf::Quaternion& orientation);
+
+  void startBroadCastingThread();
+  void broadcast();
+
+private:
+  std::map<std::string, tf::Transform> transforms;
+  std::thread broadcasting_thread;
+};
+
+/*****************************************************************************
+** Printing
 *****************************************************************************/
 
 /**

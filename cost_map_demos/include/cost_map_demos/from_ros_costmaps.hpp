@@ -16,9 +16,8 @@
 #include <costmap_2d/costmap_2d_ros.h>
 #include <memory>
 #include <string>
-#include <tf/transform_broadcaster.h>
-#include <tf/transform_listener.h>
-#include <thread>
+
+#include "utilities.hpp"
 
 /*****************************************************************************
 ** Namespaces
@@ -27,23 +26,8 @@
 namespace cost_map_demos {
 
 /*****************************************************************************
-** Interfaces
+** Costmap2DROS Demo/Test Classes
 *****************************************************************************/
-
-class TransformBroadcaster {
-public:
-  TransformBroadcaster() {}
-  virtual ~TransformBroadcaster();
-  void add(const std::string& name, tf::Vector3 origin, const tf::Quaternion& orientation);
-
-  void startBroadCastingThread();
-  void broadcast();
-
-  private:
-  std::map<std::string, tf::Transform> transforms;
-  std::thread broadcasting_thread;
-};
-
 /**
  * Some partial customation of various ros costmaps for use with
  * converter demos and tests.
@@ -72,6 +56,19 @@ private:
   ROSCostmapPtr costmap;
   tf::TransformListener transform_listener;
 };
+
+
+/*****************************************************************************
+** Costmap2DROS Demo/Test Suite Helpers
+*****************************************************************************/
+
+/**
+ * Broadcast a set of transform useful for the suite of Costmap2DROS
+ * converter demos and tests
+ *
+ * @param[in] broadcaster : uninitialised broadcaster object
+ */
+void broadcastCostmap2DROSTestSuiteTransforms(TransformBroadcaster& broadcaster);
 
 /*****************************************************************************
 ** Trailers

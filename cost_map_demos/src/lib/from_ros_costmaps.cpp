@@ -14,34 +14,15 @@
 namespace cost_map_demos {
 
 /*****************************************************************************
-** TransformBroadcaster
+** Costmap2DROS Test Suite Helpers
 *****************************************************************************/
 
-TransformBroadcaster::~TransformBroadcaster() {
-  broadcasting_thread.join();
-}
-
-void TransformBroadcaster::add(const std::string& name, tf::Vector3 origin, const tf::Quaternion& orientation) {
-  tf::Transform transform;
-  transform.setOrigin(origin);
-  transform.setRotation(orientation);
-  transforms.insert(std::pair<std::string, tf::Transform>(name, transform));
-}
-
-void TransformBroadcaster::startBroadCastingThread() {
-  broadcasting_thread = std::thread(&TransformBroadcaster::broadcast, this);
-}
-
-void TransformBroadcaster::broadcast() {
-  tf::TransformBroadcaster tf_broadcaster;
-  while(ros::ok())
-  {
-    for (std::pair<std::string, tf::Transform> p: transforms) {
-      tf::StampedTransform stamped_transform(p.second, ros::Time::now(), "map", p.first);
-      tf_broadcaster.sendTransform(stamped_transform);
-    }
-    ros::Duration(0.1).sleep();
-  }
+void broadcastCostmap2DROSTestSuiteTransforms(TransformBroadcaster& broadcaster) {
+  broadcaster.add("base_link_5x5", tf::Vector3(1.0,  1.0, 0.0), tf::Quaternion(0, 0, 0, 1));
+  broadcaster.add("base_link_4x4", tf::Vector3(1.0, -3.0, 0.0), tf::Quaternion(0, 0, 0, 1));
+  broadcaster.add("base_link_5x5_3x3_offset", tf::Vector3(-3.7, 2.4, 0.0), tf::Quaternion(0, 0, 0, 1));
+  broadcaster.add("base_link_5x5_3x3_centre", tf::Vector3(-3.5, -3.5, 0.0), tf::Quaternion(0, 0, 0, 1));
+  broadcaster.startBroadCastingThread();
 }
 
 /*****************************************************************************

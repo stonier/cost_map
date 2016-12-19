@@ -33,11 +33,7 @@ int main(int argc, char** argv)
   ** Transforms
   ********************/
   cost_map_demos::TransformBroadcaster broadcaster;
-  broadcaster.add("base_link_5x5", tf::Vector3(1.0,  1.0, 0.0), tf::Quaternion(0, 0, 0, 1));
-  broadcaster.add("base_link_4x4", tf::Vector3(1.0, -3.0, 0.0), tf::Quaternion(0, 0, 0, 1));
-  broadcaster.add("base_link_5x5_3x3_offset", tf::Vector3(-3.7, 2.4, 0.0), tf::Quaternion(0, 0, 0, 1));
-  broadcaster.add("base_link_5x5_3x3_centre", tf::Vector3(-3.5, -3.5, 0.0), tf::Quaternion(0, 0, 0, 1));
-  broadcaster.startBroadCastingThread();
+  cost_map_demos::broadcastCostmap2DROSTestSuiteTransforms(broadcaster);
 
   /********************
   ** ROS Costmaps

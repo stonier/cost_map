@@ -73,6 +73,7 @@
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include/cost_map_demos"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src/applications"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src/lib"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src/test"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
