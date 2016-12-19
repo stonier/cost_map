@@ -38,6 +38,7 @@ int main(int argc, char** argv)
   /********************
   ** ROS Costmaps
   ********************/
+  // MAKE SURE THIS STAY IN SYNC WITH src/tests/rostests/from_ros_costmaps/from_ros_costmaps.cpp!
   // The following should result in costmaps with strips of increasing cost in the x-direction,
   // but also 1-4 cells cleared by the footprint (see rviz)
   cost_map_demos::ROSCostmapServer ros_costmap_5x5("five_by_five", "base_link_5x5", cost_map::Position(0.0, 0.0), 5.0, 5.0);
@@ -48,6 +49,7 @@ int main(int argc, char** argv)
   /********************
   ** New Costmaps
   ********************/
+  // MAKE SURE THIS STAY IN SYNC WITH src/tests/rostests/from_ros_costmaps/from_ros_costmaps.cpp!
   cost_map::CostMap cost_map_5x5, cost_map_4x4, cost_map_5x5_3x3_offset, cost_map_5x5_3x3_centre;
   cost_map::fromCostMap2DROS(*(ros_costmap_5x5.getROSCostmap()), "obstacle_costs", cost_map_5x5);
   cost_map::fromCostMap2DROS(*(ros_costmap_4x4.getROSCostmap()), "obstacle_costs", cost_map_4x4);

@@ -13,11 +13,11 @@ but designed for use with costs where the data element is a byte (as opposed to 
 ## Packages Overview
 
 * ***cost_map*** : meta-package for the grid map library.
-* ***cost_map_core*** : algorithms of the cost map library, this package has no [ROS] dependencies.
-* ***cost_map_ros*** : converters and utilities for cost maps in a [ROS] ecosystem
+* ***cost_map_core*** : core interfaces and algorithms of the cost map library, this package has no [ROS] dependencies.
+* ***cost_map_ros*** : converters and utilities for cost maps in a [ROS] ecosystem - image bundles, CostMap2DROS, OccupancyGrid, CostMap messsages.
 * ***cost_map_msgs*** : [ROS] message definitions related to the [cost_map_msgs/CostMap] type.
 * ***cost_map_visualisations*** : helper nodes that bridge cost maps to [RViz].
-* ***cost_map_demos*** : several nodes for demonstration purposes.
+* ***cost_map_demos*** : several nodes for demonstration purposes and a test suite.
 
 ## Image Bundles
 
