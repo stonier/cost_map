@@ -83,6 +83,10 @@ The ROS Navistack uses `costmap_2d::Costmap2DROS` objects and it is sometimes ne
 to make conversions from these to provide new style cost maps to other libraries. Full conversions are possible
 but of special interest is to extract a costmap subwindow around the pose of the robot itself.
 
+### Costmap2DROS vs CostMap
+
+![Differences](cost_map_ros/doc/image_loading_coordinates.png)
+
 ### Costmap2DROS Demo
 
 Costmap2DROS | Full/Partial Copies
