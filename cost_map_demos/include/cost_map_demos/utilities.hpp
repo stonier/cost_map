@@ -12,6 +12,7 @@
 ** Includes
 *****************************************************************************/
 
+#include <atomic>
 #include <costmap_2d/costmap_2d_ros.h>
 #include <iostream>
 #include <tf/transform_broadcaster.h>
@@ -33,16 +34,18 @@ namespace cost_map_demos {
  */
 class TransformBroadcaster {
 public:
-  TransformBroadcaster() {}
+  TransformBroadcaster() : shutdown_flag(false) {}
   virtual ~TransformBroadcaster();
   void add(const std::string& name, tf::Vector3 origin, const tf::Quaternion& orientation);
 
   void startBroadCastingThread();
   void broadcast();
+  void shutdown();
 
 private:
   std::map<std::string, tf::Transform> transforms;
   std::thread broadcasting_thread;
+  std::atomic<bool> shutdown_flag;
 };
 
 /*****************************************************************************

@@ -44,6 +44,10 @@ TransformBroadcaster::~TransformBroadcaster() {
   broadcasting_thread.join();
 }
 
+void TransformBroadcaster::shutdown() {
+  shutdown_flag = true;
+}
+
 void TransformBroadcaster::add(const std::string& name, tf::Vector3 origin, const tf::Quaternion& orientation) {
   tf::Transform transform;
   transform.setOrigin(origin);
@@ -57,7 +61,7 @@ void TransformBroadcaster::startBroadCastingThread() {
 
 void TransformBroadcaster::broadcast() {
   tf::TransformBroadcaster tf_broadcaster;
-  while(ros::ok())
+  while(ros::ok() && !shutdown_flag )
   {
     for (std::pair<std::string, tf::Transform> p: transforms) {
       tf::StampedTransform stamped_transform(p.second, ros::Time::now(), "map", p.first);
