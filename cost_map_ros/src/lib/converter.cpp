@@ -125,6 +125,30 @@ bool addLayerFromROSImage(const sensor_msgs::Image& image,
 ** CostMap and GridMap
 *****************************************************************************/
 
+
+grid_map::GridMap toGridMap(const cost_map::CostMap cost_map)
+{
+  grid_map::GridMap grid_map;
+  grid_map.setGeometry(cost_map.getLength(), cost_map.getResolution(), cost_map.getPosition());
+  grid_map.setFrameId(cost_map.getFrameId());
+  grid_map.setTimestamp(cost_map.getTimestamp());
+  for (const std::string& layer_name : cost_map.getLayers()) {
+    const cost_map::Matrix& cost_map_data = cost_map[layer_name];
+    grid_map::Matrix grid_map_data(cost_map_data.rows(), cost_map_data.cols());
+    const cost_map::DataType *cost_map_ptr = cost_map_data.data();
+    float *grid_map_ptr = grid_map_data.data();
+    for (unsigned int i = 0; i < cost_map_data.size(); ++i ) {
+      *grid_map_ptr = 100.0 * static_cast<double>(*cost_map_ptr) / static_cast<double>(cost_map::NO_INFORMATION);
+      ++cost_map_ptr; ++grid_map_ptr;
+    }
+    grid_map.add(layer_name, grid_map_data);
+  }
+  return grid_map;
+}
+
+/*****************************************************************************
+** Messages
+*****************************************************************************/
 //
 // almost a carbon copy of grid_map::toMessage
 //
@@ -158,16 +182,6 @@ void toMessage(const cost_map::CostMap& cost_map, cost_map_msgs::CostMap& messag
 
   message.outer_start_index = cost_map.getStartIndex()(0);
   message.inner_start_index = cost_map.getStartIndex()(1);
-}
-
-grid_map::GridMap toGridMap(const cost_map::CostMap cost_map)
-{
-  grid_map::GridMap grid_map;
-  grid_map.setGeometry(cost_map.getLength(), cost_map.getResolution(), cost_map.getPosition());
-  grid_map.setFrameId(cost_map.getFrameId());
-  grid_map.setTimestamp(cost_map.getTimestamp());
-  // TODO fill in the data fields
-  return grid_map;
 }
 
 bool fromMessage(const cost_map_msgs::CostMap& message, cost_map::CostMap& cost_map)

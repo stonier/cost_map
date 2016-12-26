@@ -124,7 +124,7 @@ which illustrates how to use these api.
 
 ## Other Conversions
 
-* `cost_map::toGridMap()` : convert to a float based `grid_map::GridMap` object
+* `cost_map::toGridMap()` : convert to a float based `grid_map::GridMap` by normalising values between 0.0 (FREE_SPACE) and 100.0 (NO_INFORMATION))
 * `cost_map::toMessage()/fromMessage()` : convert between `cost_map::CostMap` and `cost_map_msgs::CostMap` types
 * `cost_map::addLayerFromROSImage()` : add a layer from `sensor_msgs::Image` type
 

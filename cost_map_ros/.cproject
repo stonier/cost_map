@@ -39,10 +39,10 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="include/cost_map_ros|src/applications|src/lib|include/cost_map" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include/cost_map_ros"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/applications"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/lib"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src/tests/gtests"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
