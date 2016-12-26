@@ -9,13 +9,15 @@ but designed for use with costs where the data element is a byte (as opposed to 
 2. [Conventions & Definitions](#conventions-and-definitions)
 3. [Image Bundles](#image-bundles)
 4. [Costmap2DROS Conversions](#costmap2dros-conversions)
-5. [Inflation Computers](#inflation-computers)
+5. [Other Conversions](#other-conversions)
+6. [Inflation Computers](#inflation-computers)
 
 ## Packages Overview
 
 * ***cost_map*** : meta-package for the grid map library.
 * ***cost_map_core*** : core interfaces and algorithms of the cost map library, this package has no [ROS] dependencies.
-* ***cost_map_ros*** : converters and utilities for cost maps in a [ROS] ecosystem - image bundles, CostMap2DROS, OccupancyGrid, CostMap messsages.
+* ***cost_map_ros*** : converters and utilities for cost maps in a [ROS] ecosystem - Image Bundles, CostMap2DROS, OccupancyGrid, CostMap messsages.
+* ***cost_map_cv*** : conversions from and to [OpenCV] image types.
 * ***cost_map_msgs*** : [ROS] message definitions related to the [cost_map_msgs/CostMap] type.
 * ***cost_map_visualisations*** : helper nodes that bridge cost maps to [RViz].
 * ***cost_map_demos*** : several nodes for demonstration purposes and a test suite.
@@ -120,6 +122,12 @@ roslaunch cost_map_demos from_ros_costmaps.launch --screen
 See the [from_ros_costmaps demo program](https://github.com/stonier/cost_map/blob/devel/cost_map_demos/src/applications/from_ros_costmaps.cpp)
 which illustrates how to use these api.
 
+## Other Conversions
+
+* `cost_map::toGridMap()` : convert to a float based `grid_map::GridMap` object
+* `cost_map::toMessage()/fromMessage()` : convert between `cost_map::CostMap` and `cost_map_msgs::CostMap` types
+* `cost_map::addLayerFromROSImage()` : add a layer from `sensor_msgs::Image` type
+
 ## Inflation Computers
 
 ### Inflation Demo
@@ -143,6 +151,7 @@ See the [inflation demo program](https://github.com/stonier/cost_map/blob/devel/
 which illustrates how to use these classes.
 
 [GridMap]: https://github.com/ethz-asl/grid_map
+[OpenCV]: http://opencv.org/
 [ROS]: http://www.ros.org
 [RViz]: http://wiki.ros.org/rviz
 [cost_map_msgs/CostMap]: http://docs.ros.org/api/cost_map_msgs/html/msg/CostMap.html
