@@ -44,7 +44,7 @@ public:
    * Dereference the iterator with const.
    * @return the value to which the iterator is pointing.
    */
-  const Eigen::Array2i& operator *() const;
+  const Index& operator *() const;
 
   /*!
    * Increase the iterator to the next element.
@@ -72,7 +72,7 @@ private:
    * @param[out] startIndex the start index of the submap.
    * @param[out] bufferSize the buffer size of the submap.
    */
-  void findSubmapParameters(const cost_map::Polygon& polygon, Eigen::Array2i& startIndex, Eigen::Array2i& bufferSize) const;
+  void findSubmapParameters(const cost_map::Polygon& polygon, Index& startIndex, Size& bufferSize) const;
 
   //! Polygon to iterate on.
   cost_map::Polygon polygon_;
@@ -81,11 +81,11 @@ private:
   std::shared_ptr<SubmapIterator> internalIterator_;
 
   //! Map information needed to get position from iterator.
-  Eigen::Array2d mapLength_;
-  Eigen::Vector2d mapPosition_;
+  Length mapLength_;
+  Position mapPosition_;
   double resolution_;
-  Eigen::Array2i bufferSize_;
-  Eigen::Array2i bufferStartIndex_;
+  Size bufferSize_;
+  Index bufferStartIndex_;
 };
 
 } /* namespace */
