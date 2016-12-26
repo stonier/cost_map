@@ -1,16 +1,12 @@
-/*
- * SubmapIterator.hpp
- *
- *  Created on: Sep 12, 2014
- *      Author: Péter Fankhauser
- *   Institute: ETH Zurich, Autonomous Systems Lab
+/**
+ * @file /cost_map_core/include/cost_map_core/iterators/submap_iterator.hpp
  */
 
 #pragma once
 
 #include "../common.hpp"
-#include "../CostMap.hpp"
-#include "../SubmapGeometry.hpp"
+#include "../cost_map.hpp"
+#include "../submap_geometry.hpp"
 
 namespace cost_map {
 

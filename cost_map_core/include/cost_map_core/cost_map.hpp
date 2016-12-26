@@ -1,9 +1,5 @@
-/*
- * GridMap.hpp
- *
- *  Created on: Jul 14, 2014
- *      Author: Péter Fankhauser
- *	 Institute: ETH Zurich, Autonomous Systems Lab
+/**
+ * @file /cost_map_core/include/cost_map_core/cost_map.hpp
  */
 
 #pragma once
@@ -15,7 +11,7 @@
 #include <Eigen/Core>
 #include <grid_map_core/BufferRegion.hpp>
 #include "common.hpp"
-#include "SubmapGeometry.hpp"
+#include "submap_geometry.hpp"
 
 namespace cost_map {
 

@@ -1,9 +1,5 @@
-/*
- * PolygonIterator.hpp
- *
- *  Created on: Sep 19, 2014
- *      Author: Péter Fankhauser
- *   Institute: ETH Zurich, Autonomous Systems Lab
+/**
+ * @file /cost_map_core/include/cost_map_core/iterators/polygon_iterator.hpp
  */
 
 #pragma once
@@ -12,8 +8,8 @@
 
 // unique_ptr
 #include <memory>
-#include "../iterators/SubmapIterator.hpp"
-#include "../CostMap.hpp"
+#include "../iterators/submap_iterator.hpp"
+#include "../cost_map.hpp"
 
 namespace cost_map {
 

@@ -1,13 +1,12 @@
-/*
- * GridMapIterator.hpp
- *
- *  Created on: Sep 22, 2014
- *      Author: Péter Fankhauser
- *   Institute: ETH Zurich, Autonomous Systems Lab
+/**
+ * @file /cost_map_core/src/lib/iterators/cost_map_iterator.cpp
  */
+/*****************************************************************************
+** Includes
+*****************************************************************************/
 
+#include <cost_map_core/iterators/costmap_iterator.hpp>
 #include <grid_map_core/GridMapMath.hpp>
-#include <cost_map_core/iterators/CostMapIterator.hpp>
 
 
 namespace cost_map {

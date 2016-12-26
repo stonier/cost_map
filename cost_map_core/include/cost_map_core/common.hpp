@@ -1,5 +1,5 @@
 /**
- * @file /include/cost_map_core/cost_map-core.hpp
+ * @file /include/cost_map_core/common.hpp
  */
 /*****************************************************************************
 ** Ifdefs

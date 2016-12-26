@@ -1,13 +1,12 @@
-/*
- * Circleterator.hpp
- *
- *  Created on: Nov 13, 2014
- *      Author: Péter Fankhauser
- *   Institute: ETH Zurich, Autonomous Systems Lab
+/**
+ * @file /cost_map_core/src/lib/iterators/circle_iterator.cpp
  */
+/*****************************************************************************
+** Includes
+*****************************************************************************/
 
+#include <cost_map_core/iterators/circle_iterator.hpp>
 #include <grid_map_core/GridMapMath.hpp>
-#include "../../../include/cost_map_core/iterators/CircleIterator.hpp"
 
 
 using namespace std;

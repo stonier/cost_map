@@ -1,13 +1,12 @@
-/*
- * SubmapIterator.hpp
- *
- *  Created on: Sep 22, 2014
- *      Author: Péter Fankhauser
- *   Institute: ETH Zurich, Autonomous Systems Lab
+/**
+ * @file /cost_map_core/src/lib/iterators/spiral_iterator.cpp
  */
+/*****************************************************************************
+** Includes
+*****************************************************************************/
 
 #include <grid_map_core/GridMapMath.hpp>
-#include "../../../include/cost_map_core/iterators/SubmapIterator.hpp"
+#include "../../../include/cost_map_core/iterators/submap_iterator.hpp"
 
 
 using namespace std;

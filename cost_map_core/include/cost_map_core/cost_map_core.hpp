@@ -16,8 +16,8 @@
 
 #include "common.hpp"
 #include "iterators/iterators.hpp"
-#include "SubmapGeometry.hpp"
-#include "CostMap.hpp"
+#include "submap_geometry.hpp"
+#include "cost_map.hpp"
 #include "extras.hpp"
 #include "operators/inflation.hpp"
 

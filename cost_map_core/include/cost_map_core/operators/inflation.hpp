@@ -12,7 +12,7 @@
 ** Includes
 *****************************************************************************/
 
-#include "../CostMap.hpp"
+#include "../cost_map.hpp"
 #include <limits>
 #include <queue>
 

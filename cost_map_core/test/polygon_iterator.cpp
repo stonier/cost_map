@@ -1,14 +1,11 @@
-/*
- * PolygonIteratorTest.cpp
- *
- *  Created on: Sep 19, 2014
- *      Author: Péter Fankhauser
- *	 Institute: ETH Zurich, Autonomous Systems Lab
+/**
+ * @file test/polygon_iterator.cpp
  */
+/*****************************************************************************
+** Includes
+*****************************************************************************/
 
 #include "../include/cost_map_core/common.hpp"
-#include "../include/cost_map_core/iterators/PolygonIterator.hpp"
-
 #include <Eigen/Core>
 
 // gtest
@@ -19,8 +16,9 @@
 
 // Vector
 #include <vector>
-#include "../include/cost_map_core/CostMap.hpp"
+#include "../include/cost_map_core/cost_map.hpp"
 #include <grid_map_core/Polygon.hpp>
+#include "../include/cost_map_core/iterators/polygon_iterator.hpp"
 
 using namespace std;
 using namespace Eigen;
@@ -150,4 +148,10 @@ TEST(PolygonIterator, TopLeftTriangle)
   // TODO Extend.
 }
 
+int main(int argc, char **argv)
+{
+  testing::InitGoogleTest(&argc, argv);
+  srand((int)time(0));
+  return RUN_ALL_TESTS();
+}
 

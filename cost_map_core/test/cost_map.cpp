@@ -1,16 +1,15 @@
-/*
- * CostMapTest.cpp
- *
- *  Created on: Aug 26, 2015
- *      Author: Péter Fankhauser
- *	 Institute: ETH Zurich, Autonomous Systems Lab
+/**
+ * @file /cost_map_core/test/cost_map.cpp
  */
+/*****************************************************************************
+** Includes
+*****************************************************************************/
 
 #include <gtest/gtest.h>
 
 // Math
 #include <math.h>
-#include "../include/cost_map_core/CostMap.hpp"
+#include "../include/cost_map_core/cost_map.hpp"
 
 using namespace std;
 using namespace cost_map;
@@ -133,4 +132,11 @@ TEST(AddDataFrom, copyData)
   EXPECT_DOUBLE_EQ(1, static_cast<int>(map1.atPosition("one", Position(2, 2))));
   EXPECT_FALSE(map1.isValid(index, "one"));
   EXPECT_DOUBLE_EQ(0, static_cast<int>(map1.atPosition("zero", Position(0.0, 0.0))));
+}
+
+int main(int argc, char **argv)
+{
+  testing::InitGoogleTest(&argc, argv);
+  srand((int)time(0));
+  return RUN_ALL_TESTS();
 }

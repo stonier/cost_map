@@ -1,16 +1,12 @@
-/*
- * LineIterator.hpp
- *
- *  Created on: Nov 13, 2014
- *      Author: Péter Fankhauser
- *   Institute: ETH Zurich, Autonomous Systems Lab
+/**
+ * @file /cost_map_core/include/cost_map_core/iterators/line_iterator.hpp
  */
 
 #pragma once
 
 #include <Eigen/Core>
-#include "../iterators/SubmapIterator.hpp"
-#include "../CostMap.hpp"
+#include "../iterators/submap_iterator.hpp"
+#include "../cost_map.hpp"
 
 namespace cost_map {
 

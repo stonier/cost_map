@@ -1,13 +1,12 @@
-/*
- * LineIterator.hpp
- *
- *  Created on: Nov 13, 2014
- *      Author: Péter Fankhauser
- *   Institute: ETH Zurich, Autonomous Systems Lab
+/**
+ * @file /cost_map_core/src/lib/iterators/line_iterator.cpp
  */
+/*****************************************************************************
+** Includes
+*****************************************************************************/
 
+#include <cost_map_core/iterators/line_iterator.hpp>
 #include <grid_map_core/GridMapMath.hpp>
-#include "../../../include/cost_map_core/iterators/LineIterator.hpp"
 
 
 using namespace std;

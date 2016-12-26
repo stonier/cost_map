@@ -1,10 +1,9 @@
-/*
- * test_grid_map.cpp
- *
- *  Created on: Feb 10, 2014
- *      Author: Péter Fankhauser
- *	 Institute: ETH Zurich, Autonomous Systems Lab
+/**
+ * @file test/cost_map_core.cpp
  */
+/*****************************************************************************
+** Includes
+*****************************************************************************/
 
 // gtest
 #include <gtest/gtest.h>

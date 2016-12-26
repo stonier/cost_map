@@ -1,9 +1,5 @@
-/*
- * SpiralIterator.hpp
- *
- *  Created on: Jul 7, 2015
- *      Author: Martin Wermelinger
- *   Institute: ETH Zurich, Autonomous Systems Lab
+/**
+ * @file /cost_map_core/include/cost_map_core/iterators/spiral_iterator.hpp
  */
 
 #pragma once
@@ -14,7 +10,7 @@
 #include <memory>
 #include <vector>
 
-#include "../CostMap.hpp"
+#include "../cost_map.hpp"
 
 namespace cost_map {
 

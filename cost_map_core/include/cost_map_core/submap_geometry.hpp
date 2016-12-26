@@ -1,15 +1,10 @@
-/*
- * SubmapGeometry.hpp
- *
- *  Created on: Aug 18, 2015
- *      Author: Péter Fankhauser
- *   Institute: ETH Zurich, Autonomous Systems Lab
+/**
+ * @file /cost_map_core/include/cost_map_core/submap_geometry.hpp
  */
 
 #pragma once
 
 #include "common.hpp"
-#include "CostMap.hpp"
 
 namespace cost_map {
 

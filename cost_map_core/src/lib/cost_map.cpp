@@ -1,20 +1,16 @@
-/*
- * GridMap.cpp
- *
- *  Created on: Jul 14, 2014
- *      Author: Péter Fankhauser
- *	 Institute: ETH Zurich, Autonomous Systems Lab
+/**
+ * @file src/lib/cost_map.cpp
  */
 
 #include <grid_map_core/GridMapMath.hpp>
-#include <cost_map_core/CostMap.hpp>
-#include <cost_map_core/iterators/CostMapIterator.hpp>
+#include <cost_map_core/cost_map.hpp>
+#include <cost_map_core/iterators/costmap_iterator.hpp>
 #include <iostream>
 #include <cassert>
 #include <math.h>
 #include <algorithm>
 #include <stdexcept>
-#include "../include/cost_map_core/SubmapGeometry.hpp"
+#include "../include/cost_map_core/submap_geometry.hpp"
 
 namespace cost_map {
 

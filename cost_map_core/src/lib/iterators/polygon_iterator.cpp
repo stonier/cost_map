@@ -1,13 +1,12 @@
-/*
- * PolygonIterator.hpp
- *
- *  Created on: Sep 19, 2014
- *      Author: Péter Fankhauser
- *   Institute: ETH Zurich, Autonomous Systems Lab
+/**
+ * @file /cost_map_core/src/lib/iterators/polygon_iterator.cpp
  */
+/*****************************************************************************
+** Includes
+*****************************************************************************/
 
+#include <cost_map_core/iterators/polygon_iterator.hpp>
 #include <grid_map_core/GridMapMath.hpp>
-#include "../../../include/cost_map_core/iterators/PolygonIterator.hpp"
 
 
 using namespace std;

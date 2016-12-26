@@ -1,14 +1,11 @@
-/*
- * EllipseIteratorTest.cpp
- *
- *  Created on: Dec 2, 2015
- *      Author: Péter Fankhauser
- *	 Institute: ETH Zurich, Autonomous Systems Lab
+/**
+ * @file test/ellipse_iterator.cpp
  */
+/*****************************************************************************
+** Includes
+*****************************************************************************/
 
 #include "../include/cost_map_core/common.hpp"
-#include "../include/cost_map_core/iterators/EllipseIterator.hpp"
-
 #include <Eigen/Core>
 
 // gtest
@@ -19,7 +16,8 @@
 
 // Vector
 #include <vector>
-#include "../include/cost_map_core/CostMap.hpp"
+#include "../include/cost_map_core/cost_map.hpp"
+#include "../include/cost_map_core/iterators/ellipse_iterator.hpp"
 
 using namespace std;
 using namespace Eigen;
@@ -57,3 +55,11 @@ TEST(EllipseIterator, OneCellWideEllipse)
   ++iterator;
   EXPECT_TRUE(iterator.isPastEnd());
 }
+
+int main(int argc, char **argv)
+{
+  testing::InitGoogleTest(&argc, argv);
+  srand((int)time(0));
+  return RUN_ALL_TESTS();
+}
+

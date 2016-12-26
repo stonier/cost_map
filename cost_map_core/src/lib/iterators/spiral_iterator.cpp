@@ -6,9 +6,8 @@
  *   Institute: ETH Zurich, Autonomous Systems Lab
  */
 
+#include <cost_map_core/iterators/spiral_iterator.hpp>
 #include <grid_map_core/GridMapMath.hpp>
-#include "../../../include/cost_map_core/iterators/SpiralIterator.hpp"
-
 #include <cmath>
 
 using namespace std;

@@ -1,13 +1,12 @@
-/*
- * SubmapIteratorTest.cpp
- *
- *  Created on: Sep 15, 2014
- *      Author: Péter Fankhauser
- *	 Institute: ETH Zurich, Autonomous Systems Lab
+/**
+ * @file test/submap_iterator.cpp
  */
+/*****************************************************************************
+** Includes
+*****************************************************************************/
 
 #include "../include/cost_map_core/common.hpp"
-#include "../include/cost_map_core/iterators/SubmapIterator.hpp"
+#include "../include/cost_map_core/iterators/submap_iterator.hpp"
 
 #include <Eigen/Core>
 
@@ -19,7 +18,7 @@
 
 // Vector
 #include <vector>
-#include "../include/cost_map_core/CostMap.hpp"
+#include "../include/cost_map_core/cost_map.hpp"
 
 using namespace std;
 using namespace Eigen;
@@ -163,4 +162,11 @@ TEST(SubmapIterator, CircularBuffer)
   EXPECT_EQ(1, (*iterator)(1));
   EXPECT_EQ(1, iterator.getSubmapIndex()(0));
   EXPECT_EQ(3, iterator.getSubmapIndex()(1));
+}
+
+int main(int argc, char **argv)
+{
+  testing::InitGoogleTest(&argc, argv);
+  srand((int)time(0));
+  return RUN_ALL_TESTS();
 }

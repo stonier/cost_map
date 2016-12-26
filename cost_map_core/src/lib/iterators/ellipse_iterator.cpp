@@ -1,14 +1,12 @@
-/*
- * EllipseIterator.hpp
- *
- *  Created on: Dec 2, 2015
- *      Author: Péter Fankhauser
- *   Institute: ETH Zurich, Autonomous Systems Lab
+/**
+ * @file /cost_map_core/src/lib/iterators/ellipse_iterator.cpp
  */
+/*****************************************************************************
+** Includes
+*****************************************************************************/
 
+#include <cost_map_core/iterators/ellipse_iterator.hpp>
 #include <grid_map_core/GridMapMath.hpp>
-#include "../../../include/cost_map_core/iterators/EllipseIterator.hpp"
-
 #include <math.h>
 #include <Eigen/Geometry>
 
