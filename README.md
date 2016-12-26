@@ -19,6 +19,16 @@ but designed for use with costs where the data element is a byte (as opposed to 
 * ***cost_map_visualisations*** : helper nodes that bridge cost maps to [RViz].
 * ***cost_map_demos*** : several nodes for demonstration purposes and a test suite.
 
+## Conventions & Definitions
+
+The core api is designed to maintain as close a compatibility to grid maps as possible. As such, all grid map conventions
+and definitions apply - an illustrative reference of these is provided as a convenience below. For further detail,
+please refer to the [GridMap README](https://github.com/ethz-asl/grid_map/blob/master/README.md).
+
+[![Layers](cost_map_core/doc/grid_map_layers.png)](cost_map_core/doc/grid_map_layers.pdf)
+
+[![Conventions](cost_map_core/doc/grid_map_conventions.png)](cost_map_core/doc/grid_map_conventions.pdf)
+
 ## Image Bundles
 
 ### About
@@ -85,7 +95,7 @@ but of special interest is to extract a costmap subwindow around the pose of the
 
 ### Costmap2DROS vs CostMap
 
-![Differences](cost_map_ros/doc/image_loading_coordinates.png)
+[![CostMap](cost_map_ros/doc/image_loading_coordinates_preview.png)](cost_map_ros/doc/image_loading_coordinates.png)
 
 ### Costmap2DROS Demo
 
@@ -118,7 +128,7 @@ roslaunch cost_map_demos inflations.launch --screen
 
 Obstacle Layer | Inflated Layer | Deflated Layer
 :---: | :---: | :---:
-[![Obstacle Layer](cost_map_demos/doc/images/inflation/obstacle_layer_preview.png)](cost_map_demos/doc/images/inflation/obstacle_layer.gif) | [![Inflated Layer](cost_map_demos/doc/images/inflation/inflation_layer_preview.png)](cost_map_demos/doc/images/inflation/inflation_layer.png) | [![Deflated Layer](cost_map_demos/doc/images/inflation/deflated_layer_preview.png)](cost_map_demos/doc/images/inflation/deflated_layer.png)
+[![Obstacle Layer](cost_map_demos/doc/images/inflation/obstacle_layer_preview.png)](cost_map_demos/doc/images/inflation/obstacle_layer.png) | [![Inflated Layer](cost_map_demos/doc/images/inflation/inflation_layer_preview.png)](cost_map_demos/doc/images/inflation/inflation_layer.png) | [![Deflated Layer](cost_map_demos/doc/images/inflation/deflated_layer_preview.png)](cost_map_demos/doc/images/inflation/deflated_layer.png)
 
 ### Inflation Classes
 
