@@ -121,6 +121,9 @@ void fromCostMap2DROS(costmap_2d::Costmap2DROS& ros_costmap,
  * @param[in] layer_name : new costmaps have multiple layers, so important to specify a name
  * @param[out] costmap : a cost_map::CostMap object
  *
+ * @throw std::runtime_error if it could not listen in to the robot pose (transform)
+ * @throw std::out_of_range if the geometry caused the subwindow to fall outside the underlying costmap boundaries
+ *
  * @note We should, but cannot use a const for the ros costmap since it hasn't been very
  * well designed. Treat it as such and do not change the internals inside.
  */
@@ -134,8 +137,10 @@ void fromCostMap2DROS(costmap_2d::Costmap2DROS& ros_costmap,
  *
  * The data will be put in a new layer called "obstacle_costs"
  *
- * @param copied_cost_map : a traditional ros Costmap2D object.
- * @param target_cost_map : Ptr to target cost_map.
+ * @param costmap_2d : a traditional ros Costmap2D object.
+ * @param cost_map : Ptr to target cost_map.
+ *
+ * @throw std::invalid_argument if the cost_map and costmap_2d have different geometry
  *
  * @note We should, but cannot use a const for the ros Costmap2D since it hasn't been very
  * well designed. Treat it as such and do not change the internals inside.

@@ -14,7 +14,6 @@ find_package(catkin
     COMPONENTS
         ecl_build
         ecl_console
-        ecl_exceptions
         costmap_2d
         cost_map_ros
         cost_map_visualisations
@@ -35,7 +34,6 @@ catkin_package(
     CATKIN_DEPENDS
         ecl_build
         ecl_console
-        ecl_exceptions
         costmap_2d
         cost_map_ros
         cost_map_visualisations

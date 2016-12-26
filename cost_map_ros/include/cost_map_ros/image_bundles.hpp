@@ -37,6 +37,8 @@ namespace cost_map {
  *
  * @param[in] filename : yaml file
  * @param[out] cost_map :
+ *
+ *@throw std::logic_error if the yaml couldn't be read, or the required yaml was not valid
  */
 void fromImageBundle(const std::string& filename, cost_map::CostMap& cost_map);
 /**

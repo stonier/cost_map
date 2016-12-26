@@ -9,12 +9,12 @@
 #include <cost_map_msgs/CostMap.h>
 #include <cv_bridge/cv_bridge.h>
 #include <ecl/console.hpp>
-#include <ecl/exceptions.hpp>
 #include <fstream>
 #include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <stdexcept>
 #include <yaml-cpp/yaml.h>
 
 #include "../../include/cost_map_ros/converter.hpp"
@@ -47,7 +47,7 @@ void fromImageBundle(const std::string& filename, cost_map::CostMap& cost_map)
         "frame_id", "centre_x", "centre_y",
         "resolution", "number_of_cells_x", "number_of_cells_y"} ) {
       if (!config[property]) {
-        throw ecl::StandardException(LOC, ecl::ConfigurationError, "missing required value '" + property + "'");
+        throw std::logic_error("missing required value '" + property + "'");
       }
     }
     frame_id = config["frame_id"].as<std::string>();
@@ -59,10 +59,10 @@ void fromImageBundle(const std::string& filename, cost_map::CostMap& cost_map)
       for ( unsigned int index = 0; index < config["layers"].size(); ++index ) {
         const YAML::Node& layer = config["layers"][index];
         if (!layer["layer_name"]) {
-          throw ecl::StandardException(LOC, ecl::ConfigurationError, "missing required value 'layer_name'");
+          throw std::logic_error("missing required value 'layer_name'");
         }
         if (!layer["layer_data"]) {
-          throw ecl::StandardException(LOC, ecl::ConfigurationError, "missing required value 'layer_data'");
+          throw std::logic_error("missing required value 'layer_data'");
         }
         layers.insert(std::pair<std::string, std::string>(
             layer["layer_name"].as<std::string>(),
@@ -71,7 +71,7 @@ void fromImageBundle(const std::string& filename, cost_map::CostMap& cost_map)
       }
     }
   } catch(const YAML::ParserException& e ) {
-    throw ecl::StandardException(LOC, ecl::InvalidObjectError, "failed to parse (bad) yaml '" + filename + "'");
+    throw std::logic_error("failed to parse (bad) yaml '" + filename + "'");
   }
   /****************************************
   ** Initialise the Cost Map

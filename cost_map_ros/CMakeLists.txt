@@ -18,7 +18,6 @@ find_package(catkin
         ecl_build
         ecl_command_line
         ecl_console
-        ecl_exceptions
         grid_map_core
         grid_map_ros
         grid_map_visualization
@@ -47,7 +46,6 @@ catkin_package(
         ecl_build
         ecl_command_line
         ecl_console
-        ecl_exceptions
         grid_map_core
         grid_map_ros
         grid_map_visualization

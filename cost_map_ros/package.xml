@@ -19,7 +19,6 @@
   <build_depend>ecl_build</build_depend>
   <build_depend>ecl_command_line</build_depend>
   <build_depend>ecl_console</build_depend>
-  <build_depend>ecl_exceptions</build_depend>
   <build_depend>grid_map_core</build_depend>
   <build_depend>grid_map_ros</build_depend>
   <build_depend>grid_map_visualization</build_depend>
@@ -35,7 +34,6 @@
   <run_depend>ecl_build</run_depend>
   <run_depend>ecl_command_line</run_depend>
   <run_depend>ecl_console</run_depend>
-  <run_depend>ecl_exceptions</run_depend>
   <run_depend>grid_map_core</run_depend>
   <run_depend>grid_map_ros</run_depend>
   <run_depend>grid_map_visualization</run_depend>

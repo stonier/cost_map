@@ -5,7 +5,6 @@
 ** Includes
 *****************************************************************************/
 
-#include <ecl/exceptions.hpp>
 #include <iostream>
 #include <ros/package.h>
 #include <string>
@@ -29,7 +28,7 @@ std::string resolveResourceName(const std::string& resource_name) {
   std::string delimiter = "/";
   int index = resource_name.find(delimiter);
   if ( index == std::string::npos ) {
-    throw ecl::StandardException(LOC, ecl::InvalidArgError, std::string("'") + resource_name + std::string("' is not a valid resource name."));
+    throw std::invalid_argument(std::string("'") + resource_name + std::string("' is not a valid resource name."));
   }
   std::string package = resource_name.substr(0, index);
   std::string name = resource_name.substr(index + delimiter.length());
@@ -56,7 +55,7 @@ std::string resolveResourceName(const std::string& resource_name) {
     }
   }
   // not found
-  throw ecl::StandardException(LOC, ecl::NotFoundError, std::string("resource name '") + resource_name + std::string("' is not available (try 'rospack plugins --attrib=image_resource cost_map_ros')."));
+  throw std::runtime_error(std::string("resource name '") + resource_name + std::string("' is not available (try 'rospack plugins --attrib=image_resource cost_map_ros')."));
 }
 
 /*****************************************************************************

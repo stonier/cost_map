@@ -11,7 +11,7 @@
 #include <cost_map_ros/image_bundles.hpp>
 #include <ecl/command_line.hpp>
 #include <ecl/console.hpp>
-#include <ecl/exceptions.hpp>
+#include <exception>
 
 #include <ros/init.h>
 #include <ros/ros.h>
@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
         rate.sleep();
       }
     }
-  } catch (const ecl::StandardException& e) {
+  } catch (const std::exception& e) {
     std::cout << ecl::red << "[ERROR] " << e.what() << ecl::reset << std::endl;
     return EXIT_FAILURE;
   }

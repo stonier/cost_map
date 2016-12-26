@@ -7,7 +7,7 @@
 
 #include <cost_map_ros/cost_map_ros.hpp>
 #include <ecl/console.hpp>
-#include <ecl/exceptions.hpp>
+#include <exception>
 #include <memory>
 #include <nav_msgs/OccupancyGrid.h>
 #include <ros/ros.h>
@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
             );
     cost_map::Deflate deflate;
     deflate("inflated_costs", "deflated_costs", *(loader->cost_map));
-  } catch (const ecl::StandardException& e) {
+  } catch (const std::exception& e) { // *spank* shouldn't do this...catch the type exactly!
     std::cout << ecl::red << "[ERROR] " << e.what() << ecl::reset << std::endl;
     return EXIT_FAILURE;
   }

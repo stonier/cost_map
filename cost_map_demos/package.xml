@@ -16,7 +16,6 @@
   <depend>costmap_2d</depend>
   <depend>ecl_build</depend>
   <depend>ecl_console</depend>
-  <depend>ecl_exceptions</depend>
   <depend>cost_map_ros</depend>
   <depend>cost_map_visualisations</depend>
   <depend>nav_msgs</depend>

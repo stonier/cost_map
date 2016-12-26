@@ -36,7 +36,8 @@ namespace cost_map {
  * @param[in] resource_name : ros package resource name
  * @return absolute path to the resource
  *
- * @exception ecl::StandardException with ecl::InvalidArgError if incorrect syntax or ecl::NotFoundError if not found.
+ * @throw std::invalid_argument if resource_name is the incorrect syntax
+ * @throw std::runtime_error if the resource could not be found
  */
 std::string resolveResourceName(const std::string& resource_name);
 

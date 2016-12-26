@@ -10,12 +10,12 @@
 #include <cost_map_core/cost_map_core.hpp>
 #include <cost_map_msgs/CostMap.h>
 #include <ecl/console.hpp>
-#include <ecl/exceptions.hpp>
 #include <limits>
 #include <map>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include <std_msgs/UInt8MultiArray.h>
+#include <stdexcept>
 #include <string>
 #include <tf/tf.h>
 #include "../../include/cost_map_ros/converter.hpp"
@@ -254,7 +254,7 @@ void fromCostMap2DROS(costmap_2d::Costmap2DROS& ros_costmap,
   {
     std::ostringstream error_message;
     error_message << "Could not get robot pose, not published?";
-    throw ecl::StandardException(LOC, ecl::OutOfRangeError, error_message.str());
+    throw std::runtime_error(error_message.str());
   }
 
   /****************************************
@@ -331,7 +331,7 @@ void fromCostMap2DROS(costmap_2d::Costmap2DROS& ros_costmap,
     std::ostringstream error_message;
     error_message << "Subwindow landed outside the costmap (max size: " << original_size_x << "x" << original_size_y
                   << "), aborting (you should ensure the robot travels inside the costmap bounds).";
-    throw ecl::StandardException(LOC, ecl::OutOfRangeError, error_message.str());
+    throw std::out_of_range(error_message.str());
   }
 
   addLayerFromCostMap2D(costmap_subwindow, layer_name, cost_map);
@@ -347,7 +347,7 @@ void addLayerFromCostMap2D(costmap_2d::Costmap2D& costmap_2d,
     std::ostringstream error_message;
     error_message << "Tried to copy Costmap2D data (" << costmap_2d.getSizeInCellsX() << "x" << costmap_2d.getSizeInCellsY()
                   << ") to a differently sized cost_map (" << cost_map.getSize().x() << "x" << cost_map.getSize().y() << ")";
-    throw ecl::StandardException(LOC, ecl::OutOfRangeError, error_message.str());
+    throw std::invalid_argument(error_message.str());
   }
 
   unsigned char* subwindow_costs = costmap_2d.getCharMap();
@@ -436,7 +436,10 @@ bool ROSCostMap2DServiceProvider::callback(
     geometry << request.length_x, request.length_y;
     fromCostMap2DROS(*ros_costmap, geometry, "obstacle_costs", cost_map);
     toMessage(cost_map, response.map);
-  } catch ( ecl::StandardException &e) {
+  } catch ( std::runtime_error &e) {
+    ROS_ERROR_STREAM("CostMap Service : " << e.what());
+    return false;
+  } catch ( std::out_of_range &e) {
     ROS_ERROR_STREAM("CostMap Service : " << e.what());
     return false;
   }
