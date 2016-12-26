@@ -2,5 +2,13 @@
 Changelog
 =========
 
+Forthcoming
+-----------
+* interpolations for atPosition
+* full implementation of line iterator
+* full implementation of polygon iterator
+* setPosition method for the CostMap class
+
 0.2.0 (2016-08-25)
 ------------------
+* initial spinoff from the grid_map library
