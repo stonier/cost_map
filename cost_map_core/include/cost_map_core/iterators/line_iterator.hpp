@@ -21,18 +21,18 @@ public:
   /*!
    * Constructor.
    * @param gridMap the grid map to iterate on.
-   * @param start the starting index of the line.
-   * @param end the ending index of the line.
+   * @param start the starting point of the line.
+   * @param end the ending point of the line.
    */
-  LineIterator(const cost_map::CostMap& gridMap, const Eigen::Array2i& start, const Eigen::Array2i& end);
+  LineIterator(const cost_map::CostMap& gridMap, const Position& start, const Position& end);
 
   /*!
    * Constructor.
    * @param gridMap the grid map to iterate on.
-   * @param start the starting point of the line.
-   * @param end the ending point of the line.
+   * @param start the starting index of the line.
+   * @param end the ending index of the line.
    */
-  LineIterator(const cost_map::CostMap& gridMap, const Eigen::Vector2d& start, const Eigen::Vector2d& end);
+  LineIterator(const cost_map::CostMap& gridMap, const Index& start, const Index& end);
 
   /*!
    * Assignment operator.
@@ -51,7 +51,7 @@ public:
    * Dereference the iterator with const.
    * @return the value to which the iterator is pointing.
    */
-  const Eigen::Array2i& operator *() const;
+  const Index& operator *() const;
 
   /*!
    * Increase the iterator to the next element.
@@ -66,18 +66,39 @@ public:
   bool isPastEnd() const;
 
 private:
+  /*!
+    * Construct function.
+    * @param cost_map the grid map to iterate on.
+    * @param start the starting index of the line.
+    * @param end the ending index of the line.
+    * @return true if successful, false otherwise.
+    */
+   bool initialize(const cost_map::CostMap& cost_map, const Index& start, const Index& end);
 
-  // TODO
-  void initializeParameters();
+   /*!
+    * Finds the index of a position on a line within the limits of the map.
+    * @param[in] cost_map the grid map that defines the map boundaries.
+    * @param[in] start the position that will be limited to the map range.
+    * @param[in] end the ending position of the line.
+    * @param[out] index the index of the moved start position.
+    * @return true if successful, false otherwise.
+    */
+   bool getIndexLimitedToMapRange(const cost_map::CostMap& cost_map, const Position& start,
+                                  const Position& end, Index& index);
+
+  /*!
+   * Computes the parameters requires for the line drawing algorithm.
+   */
+   void initializeIterationParameters();
 
   //! Current index.
-  Eigen::Array2i index_;
+  Index index_;
 
   //! Starting index of the line.
-  Eigen::Array2i start_;
+  Index start_;
 
   //! Ending index of the line.
-  Eigen::Array2i end_;
+  Index end_;
 
   //! Current cell number.
   unsigned int iCell_;
@@ -86,15 +107,15 @@ private:
   unsigned int nCells_;
 
   //! Helper variables for Bresenham Line Drawing algorithm.
-  Eigen::Array2i increment1_, increment2_;
+  Size increment1_, increment2_;
   int denominator_, numerator_, numeratorAdd_;
 
   //! Map information needed to get position from iterator.
-  Eigen::Array2d mapLength_;
-  Eigen::Vector2d mapPosition_;
+  Length mapLength_;
+  Position mapPosition_;
   double resolution_;
-  Eigen::Array2i bufferSize_;
-  Eigen::Array2i bufferStartIndex_;
+  Size bufferSize_;
+  Index bufferStartIndex_;
 };
 
 } /* namespace */
