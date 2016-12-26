@@ -1,0 +1,20 @@
+<package format="2">
+  <name>cost_map_cv</name>
+  <version>0.2.0</version>
+  <description>
+   Conversions between cost_maps and opencv images.
+  </description>
+  <url type="repository">https://github.com/stonier/cost_map</url>
+  <url type="bugtracker">https://github.com/stonier/cost_map/issues</url>
+  <maintainer email="d.stonier@gmail.com">Daniel Stonier</maintainer>
+  <license>BSD</license>
+  <author>Daniel Stonier</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>boost</depend>
+  <depend>libopencv-dev</depend>
+  <depend>cost_map_core</depend>
+  <depend>yaml-cpp</depend>
+
+</package>
