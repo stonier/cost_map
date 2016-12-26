@@ -6,9 +6,10 @@ but designed for use with costs where the data element is a byte (as opposed to 
 ## Table of Contents
 
 1. [Packages Overview](#packages-overview)
-2. [Image Bundles](#image-bundles)
-3. [Costmap2DROS Conversions](#costmap2dros-conversions)
-4. [Inflation Computers](#inflation-computers)
+2. [Conventions & Definitions](#conventions-and-definitions)
+3. [Image Bundles](#image-bundles)
+4. [Costmap2DROS Conversions](#costmap2dros-conversions)
+5. [Inflation Computers](#inflation-computers)
 
 ## Packages Overview
 
@@ -19,7 +20,9 @@ but designed for use with costs where the data element is a byte (as opposed to 
 * ***cost_map_visualisations*** : helper nodes that bridge cost maps to [RViz].
 * ***cost_map_demos*** : several nodes for demonstration purposes and a test suite.
 
-## Conventions & Definitions
+The source code is released under a [BSD 3-Clause license](LICENSE).
+
+## Conventions and Definitions
 
 The core api is designed to maintain as close a compatibility to grid maps as possible. As such, all grid map conventions
 and definitions apply - an illustrative reference of these is provided as a convenience below. For further detail,
@@ -33,9 +36,9 @@ please refer to the [GridMap README](https://github.com/ethz-asl/grid_map/blob/m
 
 ### About
 
-An image bundle is comprised of two parts - 1) meta-information about the costmap stored in a yaml file and
-2) layer data that is stored alongside in grayscale images. These enable a convenient means of
-saving/loading cost maps to and from files on disk.
+Image bundles allow for an easy way to load/save cost map information from/to files on disk. This
+data is stored in two parts - 1) meta-information about the costmap in a yaml file and
+2) layer data that is stored alongside in grayscale images. 
 
 A typical meta yaml for an image bundle:
 
