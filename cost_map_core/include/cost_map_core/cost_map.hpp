@@ -10,6 +10,7 @@
 // Eigen
 #include <Eigen/Core>
 #include <grid_map_core/BufferRegion.hpp>
+#include <grid_map_core/TypeDefs.hpp>
 #include "common.hpp"
 #include "submap_geometry.hpp"
 
@@ -176,8 +177,12 @@ public:
    * @param position the requested position.
    * @return the data of the cell.
    * @throw std::out_of_range if no map layer with name `layer` is present.
+   * @throw std::runtime_error if the specified interpolation method is not implemented.
    */
-  DataType atPosition(const std::string& layer, const Position& position) const;
+  DataType atPosition(const std::string& layer,
+                      const Position& position,
+                      grid_map::InterpolationMethods interpolation_method=grid_map::InterpolationMethods::INTER_NEAREST
+                      ) const;
 
   /*!
    * Get cell data for requested index.
@@ -440,6 +445,15 @@ public:
    * @param nRows the number of rows to reset.
    */
   void clearRows(unsigned int index, unsigned int nRows);
+
+  /*!
+   * Get cell data at requested position, linearly interpolated from 2x2 cells.
+   * @param layer the name of the layer to be accessed.
+   * @param position the requested position.
+   * @param value the data of the cell.
+   * @return true if linear interpolation was successful.
+   */
+  bool atPositionLinearInterpolated(const std::string& layer, const Position& position, float& value) const;
 
   /*!
    * Resize the buffer.

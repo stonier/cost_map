@@ -12,6 +12,8 @@
 #include <stdexcept>
 #include "../include/cost_map_core/submap_geometry.hpp"
 
+#include <Eigen/Dense>
+
 namespace cost_map {
 
 CostMap::CostMap(const std::vector<std::string>& layers)
@@ -165,13 +167,30 @@ DataType& CostMap::atPosition(const std::string& layer, const cost_map::Position
   throw std::out_of_range("CostMap::atPosition(...) : Position is out of range.");
 }
 
-DataType CostMap::atPosition(const std::string& layer, const cost_map::Position& position) const
+DataType CostMap::atPosition(const std::string& layer,
+                             const cost_map::Position& position,
+                             grid_map::InterpolationMethods interpolation_method
+                             ) const
 {
-  Eigen::Array2i index;
-  if (getIndex(position, index)) {
-    return at(layer, index);
+  if ( interpolation_method == grid_map::InterpolationMethods::INTER_LINEAR) {
+    float value;
+    if (atPositionLinearInterpolated(layer, position, value)) {
+      return value;
+    } else {
+      interpolation_method = grid_map::InterpolationMethods::INTER_NEAREST;
+    }
   }
-  throw std::out_of_range("CostMap::atPosition(...) : Position is out of range.");
+  if ( interpolation_method == grid_map::InterpolationMethods::INTER_NEAREST)
+  {
+    Index index;
+    if (getIndex(position, index)) {
+      return at(layer, index);
+    } else {
+      throw std::out_of_range("CostMap::atPosition(...) : position is out of range.");
+    }
+  }
+  // should have handled by here...
+  throw std::runtime_error("CostMap::atPosition(...) : specified interpolation method not implemented.");
 }
 
 DataType& CostMap::at(const std::string& layer, const cost_map::Index& index)
@@ -578,6 +597,51 @@ void CostMap::clearCols(unsigned int index, unsigned int nCols)
   for (auto& layer : layersToClear) {
     data_.at(layer).block(0, index, getSize()(0), nCols).setConstant(NO_INFORMATION);
   }
+}
+
+bool CostMap::atPositionLinearInterpolated(const std::string& layer, const Position& position,
+                                           float& value) const
+{
+  std::vector<Position> points(4);
+  std::vector<Index> indices(4);
+  getIndex(position, indices[0]);
+  getPosition(indices[0], points[0]);
+
+  if (position.x() >= points[0].x()) {
+    // Second point is above first point.
+    indices[1] = indices[0] + Index(-1, 0);
+    if (!getPosition(indices[1], points[1])) return false; // Check if still on map.
+  } else {
+    indices[1] = indices[0] + Index(1, 0);
+    if (!getPosition(indices[1], points[1])) return false;
+  }
+
+  if (position.y() >= points[0].y()) {
+    // Third point is right of first point.
+    indices[2] = indices[0] + Index(0, -1);
+    if (!getPosition(indices[2], points[2])) return false;
+  } else {
+    indices[2] = indices[0] + Index(0, 1);
+    if (!getPosition(indices[2], points[2])) return false;
+  }
+
+  indices[3].x() = indices[1].x();
+  indices[3].y() = indices[2].y();
+  if (!getPosition(indices[3], points[3])) return false;
+
+  Eigen::Vector4d b;
+  Eigen::Matrix4d A;
+
+  for (unsigned int i = 0; i < points.size(); ++i) {
+    b(i) = at(layer, indices[i]);
+    A.row(i) << 1, points[i].x(), points[i].y(), points[i].x() * points[i].y();
+  }
+
+  Eigen::Vector4d x = A.colPivHouseholderQr().solve(b);
+  //Eigen::Vector4d x = A.fullPivLu().solve(b);
+
+  value = x(0) + x(1) * position.x() + x(2) * position.y() + x(3) * position.x() * position.y();
+  return true;
 }
 
 void CostMap::resize(const Eigen::Array2i& size)
