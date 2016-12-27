@@ -16,7 +16,7 @@
 ** Tests
 *****************************************************************************/
 
-TEST(CostMap2DROS, full_window) {
+TEST(Costmap2DROS, full_window) {
   std::cout << std::endl;
   ROS_INFO("***********************************************************");
   ROS_INFO("                 Copy Full Window");
@@ -26,7 +26,7 @@ TEST(CostMap2DROS, full_window) {
   std::string layer_name =  "obstacle_costs";
   cost_map_demos::ROSCostmapServer ros_costmap_5x5("five_by_five", "base_link_5x5", cost_map::Position(0.0, 0.0), 5.0, 5.0);
   cost_map::CostMap cost_map_5x5, cost_map_4x4;
-  cost_map::fromCostMap2DROS(*(ros_costmap_5x5.getROSCostmap()), layer_name, cost_map_5x5);
+  cost_map::fromCostmap2DROS(*(ros_costmap_5x5.getROSCostmap()), layer_name, cost_map_5x5);
   // assert map properties
   ASSERT_EQ(cost_map_5x5.getFrameId(), ros_costmap_5x5.getROSCostmap()->getGlobalFrameID());
   ASSERT_EQ(cost_map_5x5.getLength().x(),
@@ -58,7 +58,7 @@ TEST(CostMap2DROS, full_window) {
   std::cout << std::endl;
 }
 
-TEST(CostMap2DROS, cost_map_centres) {
+TEST(Costmap2DROS, cost_map_centres) {
   std::cout << std::endl;
   ROS_INFO("***********************************************************");
   ROS_INFO("                 Check Subwindow Centres");
@@ -76,10 +76,10 @@ TEST(CostMap2DROS, cost_map_centres) {
   cost_map_demos::ROSCostmapServer ros_costmap_5x5_2_5x2_5_offset("five_by_five_twohalf_by_twohalf_offset", "base_link_5x5_2_5x2_5_offset", cost_map::Position(-12.0, 0.0), 5.0, 5.0);
   cost_map::CostMap cost_map_5x5_3x3_offset, cost_map_5x5_3x3_centre, cost_map_5x5_2_5x2_5_offset;
   cost_map::Length geometry_3x3(3.0, 3.0);
-  cost_map::fromCostMap2DROS(*(ros_costmap_5x5_3x3_offset.getROSCostmap()), geometry_3x3, layer_name, cost_map_5x5_3x3_offset);
-  cost_map::fromCostMap2DROS(*(ros_costmap_5x5_3x3_centre.getROSCostmap()), geometry_3x3, layer_name, cost_map_5x5_3x3_centre);
+  cost_map::fromCostmap2DROSAtRobotPose(*(ros_costmap_5x5_3x3_offset.getROSCostmap()), geometry_3x3, layer_name, cost_map_5x5_3x3_offset);
+  cost_map::fromCostmap2DROSAtRobotPose(*(ros_costmap_5x5_3x3_centre.getROSCostmap()), geometry_3x3, layer_name, cost_map_5x5_3x3_centre);
   cost_map::Length geometry_2_5x2_5(2.5, 2.5);
-  cost_map::fromCostMap2DROS(*(ros_costmap_5x5_2_5x2_5_offset.getROSCostmap()), geometry_2_5x2_5, layer_name, cost_map_5x5_2_5x2_5_offset);
+  cost_map::fromCostmap2DROSAtRobotPose(*(ros_costmap_5x5_2_5x2_5_offset.getROSCostmap()), geometry_2_5x2_5, layer_name, cost_map_5x5_2_5x2_5_offset);
   ROS_INFO_STREAM("  cost_map_5x5_3x3_offset : " << cost_map_5x5_3x3_offset.getPosition().transpose());
   ROS_INFO_STREAM("  cost_map_5x5_3x3_offset : " << cost_map_5x5_3x3_centre.getPosition().transpose());
   ROS_INFO_STREAM("  cost_map_5x5_3x3_offset : " << cost_map_5x5_2_5x2_5_offset.getPosition().transpose());

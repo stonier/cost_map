@@ -34,6 +34,10 @@ class SubmapGeometry;
 class CostMap
 {
 public:
+  // type traits for use with template methods/classes using GridMap as a template parameter
+  typedef cost_map::Matrix::Scalar DataType; /*!< Storage element type for this map. */
+  typedef cost_map::Matrix Matrix;           /*!< Storage container type for this map. */
+
   /*!
    * Constructor.
    * @param layers a vector of strings containing the definition/description of the data layer.

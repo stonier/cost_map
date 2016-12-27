@@ -28,7 +28,7 @@ namespace cost_map {
 *****************************************************************************/
   // the biggie - this one is different
   typedef Eigen::Matrix<unsigned char, Eigen::Dynamic, Eigen::Dynamic> Matrix;
-  typedef unsigned char DataType;
+  typedef Matrix::Scalar DataType;
   extern const unsigned char NO_INFORMATION;
   extern const unsigned char LETHAL_OBSTACLE;
   extern const unsigned char INSCRIBED_OBSTACLE;

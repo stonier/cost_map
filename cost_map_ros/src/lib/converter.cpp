@@ -17,8 +17,10 @@
 #include <std_msgs/UInt8MultiArray.h>
 #include <stdexcept>
 #include <string>
-#include <tf/tf.h>
 #include "../../include/cost_map_ros/converter.hpp"
+
+
+#include <grid_map_ros/Costmap2DConverter.hpp>
 
 /*****************************************************************************
 ** Namespaces
@@ -126,9 +128,8 @@ bool addLayerFromROSImage(const sensor_msgs::Image& image,
 *****************************************************************************/
 
 
-grid_map::GridMap toGridMap(const cost_map::CostMap cost_map)
+void toGridMap(const cost_map::CostMap cost_map, grid_map::GridMap& grid_map)
 {
-  grid_map::GridMap grid_map;
   grid_map.setGeometry(cost_map.getLength(), cost_map.getResolution(), cost_map.getPosition());
   grid_map.setFrameId(cost_map.getFrameId());
   grid_map.setTimestamp(cost_map.getTimestamp());
@@ -143,7 +144,6 @@ grid_map::GridMap toGridMap(const cost_map::CostMap cost_map)
     }
     grid_map.add(layer_name, grid_map_data);
   }
-  return grid_map;
 }
 
 /*****************************************************************************
@@ -214,168 +214,33 @@ bool fromMessage(const cost_map_msgs::CostMap& message, cost_map::CostMap& cost_
 ** CostMap2DROS and Occupancy Grids
 *****************************************************************************/
 
-void fromCostMap2DROS(costmap_2d::Costmap2DROS& ros_costmap,
+bool fromCostmap2DROS(costmap_2d::Costmap2DROS& ros_costmap,
                       const std::string& layer_name,
                       cost_map::CostMap& cost_map) {
-  // preparation
-  double resolution = ros_costmap.getCostmap()->getResolution();
-  double original_size_x = ros_costmap.getCostmap()->getSizeInCellsX() * resolution;
-  double original_size_y = ros_costmap.getCostmap()->getSizeInCellsY() * resolution;
-  cost_map::Length geometry(original_size_x, original_size_y);
-  cost_map::Position ros_map_origin(ros_costmap.getCostmap()->getOriginX(), ros_costmap.getCostmap()->getOriginY());
-  cost_map::Position new_cost_map_origin(ros_map_origin.x() + original_size_x/2, ros_map_origin.y() + original_size_y/2);
 
-  // cost map meta information
-  cost_map.setFrameId(ros_costmap.getGlobalFrameID());
-  cost_map.setTimestamp(ros::Time::now().toNSec());
-  cost_map.setGeometry(geometry, resolution, new_cost_map_origin);
-
-  // data
+  grid_map::Costmap2DConverter<cost_map::CostMap> converter;
   boost::lock_guard<costmap_2d::Costmap2D::mutex_t> lock(*(ros_costmap.getCostmap()->getMutex()));
-  addLayerFromCostMap2D(*(ros_costmap.getCostmap()), layer_name, cost_map);
+  converter.initializeFromCostmap2D(ros_costmap, cost_map);
+  if ( !converter.addLayerFromCostmap2D(ros_costmap, layer_name, cost_map) ) {
+    return false;
+  }
+  return true;
 }
 
-void fromCostMap2DROS(costmap_2d::Costmap2DROS& ros_costmap,
-                      const cost_map::Length& geometry,
-                      const std::string& layer_name,
-                      cost_map::CostMap& cost_map)
+bool fromCostmap2DROSAtRobotPose(costmap_2d::Costmap2DROS& ros_costmap,
+                                 const cost_map::Length& geometry,
+                                 const std::string& layer_name,
+                                 cost_map::CostMap& cost_map)
 {
-  /****************************************
-  ** Properties
-  ****************************************/
-
-  double resolution = ros_costmap.getCostmap()->getResolution();
-  // Note: don't use getSizeInMeters() here - it doesn't give the actual grid size...for
-  // some reason they designed it so that it cuts it short at the centre of the last cell
-  //            e.g. 10 cells, resolution 1.0 -> getSizeInMeters() == 9.5
-  double original_size_x = ros_costmap.getCostmap()->getSizeInCellsX() * resolution;
-  double original_size_y = ros_costmap.getCostmap()->getSizeInCellsY() * resolution;
-
-  /****************************************
-  ** Redirect if actually a full window
-  ****************************************/
-  if (geometry.x() == 0.0 || geometry.y() == 0.0 ||
-      ( geometry.x() == original_size_x && geometry.y() == original_size_y )
-      ) {
-    return fromCostMap2DROS(ros_costmap, layer_name, cost_map);
+  grid_map::Costmap2DConverter<cost_map::CostMap> converter;
+  boost::lock_guard<costmap_2d::Costmap2D::mutex_t> lock(*(ros_costmap.getCostmap()->getMutex()));
+  if ( !converter.initializeFromCostmap2DAtRobotPose(ros_costmap, geometry, cost_map) ) {
+    return false;
   }
-
-  /****************************************
-  ** Get the Robot Pose Transform
-  ****************************************/
-  tf::Stamped<tf::Pose> tf_pose;
-  if(!ros_costmap.getRobotPose(tf_pose))
-  {
-    std::ostringstream error_message;
-    error_message << "Could not get robot pose, not published?";
-    throw std::runtime_error(error_message.str());
+  if (!converter.addLayerFromCostmap2DAtRobotPose(ros_costmap, layer_name, cost_map) ) {
+    return false;
   }
-
-  /****************************************
-  ** Asserts
-  ****************************************/
-  // TODO check the robot pose is in the window
-
-  /****************************************
-  ** Where is the New Costmap Origin?
-  ****************************************/
-  cost_map::Position robot_position(tf_pose.getOrigin().x() , tf_pose.getOrigin().y());
-  cost_map::Position ros_map_origin(ros_costmap.getCostmap()->getOriginX(), ros_costmap.getCostmap()->getOriginY());
-  cost_map::Position new_cost_map_origin;
-
-  // Note:
-  //   You cannot directly use the robot pose as the new 'costmap centre'
-  //   since the underlying grid is not necessarily exactly aligned with
-  //   that (two cases to consider, rolling window and globally fixed).
-  //
-  // Relevant diagrams:
-  //  - https://github.com/ethz-asl/grid_map
-
-  // Have to do the exact same as the ros costmap updateOrigin to end up with same position
-  // Don't use original_size_x here. getSizeInMeters is actually broken but the
-  // ros costmap uses it to set the origin. So we also have to do it to get the
-  // same behaviour. (See also updateOrigin call in LayeredCostmap)
-
-  // float versions of the cell co-ordinates, use static_cast<int> to get the indices
-  cost_map::Position robot_cell_position = (robot_position - ros_map_origin)/resolution;
-
-  // if there is an odd number of cells
-  //   centre of the new grid map in the centre of the current cell
-  // if there is an even number of cells
-  //   centre of the new grid map at the closest vertex between cells
-  // of the current cell
-  int number_of_cells_x = geometry.x()/resolution;
-  int number_of_cells_y = geometry.y()/resolution;
-  if ( number_of_cells_x % 2 ) { // odd
-    new_cost_map_origin(0) = std::floor(robot_cell_position.x())*resolution + resolution/2.0 + ros_map_origin.x();
-  } else {
-    new_cost_map_origin(0) = std::round(robot_cell_position.x())*resolution + ros_map_origin.x();
-  }
-  if ( number_of_cells_y % 2 ) { // odd
-    new_cost_map_origin(1) = std::floor(robot_cell_position.y())*resolution + resolution/2.0 + ros_map_origin.y();
-  } else {
-    new_cost_map_origin(1) = std::round(robot_cell_position.y())*resolution + ros_map_origin.y();
-  }
-
-  /****************************************
-  ** Initialise the CostMap
-  ****************************************/
-  cost_map.setFrameId(ros_costmap.getGlobalFrameID());
-  cost_map.setTimestamp(ros::Time::now().toNSec());
-  cost_map.setGeometry(geometry, resolution, new_cost_map_origin);
-
-  /****************************************
-  ** Copy Data
-  ****************************************/
-  bool is_valid_window = false;
-  costmap_2d::Costmap2D costmap_subwindow;
-  {
-    boost::lock_guard<costmap_2d::Costmap2D::mutex_t> lock(*(ros_costmap.getCostmap()->getMutex()));
-
-    is_valid_window = costmap_subwindow.copyCostmapWindow(
-                            *(ros_costmap.getCostmap()),
-                            new_cost_map_origin.x() - geometry.x() / 2.0, // subwindow_bottom_left_x
-                            new_cost_map_origin.y() - geometry.y() / 2.0, // subwindow_bottom_left_y
-                            geometry.x(),
-                            geometry.y());
-  }
-
-  if ( !is_valid_window ) {
-    // handle differently - e.g. copy the internal part only and lethal elsewhere, but other parts would have to handle being outside too
-    std::ostringstream error_message;
-    error_message << "Subwindow landed outside the costmap (max size: " << original_size_x << "x" << original_size_y
-                  << "), aborting (you should ensure the robot travels inside the costmap bounds).";
-    throw std::out_of_range(error_message.str());
-  }
-
-  addLayerFromCostMap2D(costmap_subwindow, layer_name, cost_map);
-}
-
-void addLayerFromCostMap2D(costmap_2d::Costmap2D& costmap_2d,
-                           const std::string& layer_name,
-                           CostMap& cost_map)
-{
-  if (costmap_2d.getSizeInCellsX() != cost_map.getSize().x()
-      || costmap_2d.getSizeInCellsY() != cost_map.getSize().y()) {
-
-    std::ostringstream error_message;
-    error_message << "Tried to copy Costmap2D data (" << costmap_2d.getSizeInCellsX() << "x" << costmap_2d.getSizeInCellsY()
-                  << ") to a differently sized cost_map (" << cost_map.getSize().x() << "x" << cost_map.getSize().y() << ")";
-    throw std::invalid_argument(error_message.str());
-  }
-
-  unsigned char* subwindow_costs = costmap_2d.getCharMap();
-
-  // remember there is a different convention for indexing.
-  //  - costmap_2d::CostMap starts from the bottom left
-  //  - cost_map::CostMap   starts from the top left
-  cost_map::Matrix data(cost_map.getSize().x(), cost_map.getSize().y());
-
-  unsigned int size = cost_map.getSize().x() * cost_map.getSize().y();
-  for ( int i=0, index = size-1; index >= 0; --index, ++i) {
-    data(i) = subwindow_costs[index];
-  }
-  cost_map.add(layer_name, data);
+  return true;
 }
 
 void toOccupancyGrid(const cost_map::CostMap& cost_map, const std::string& layer, nav_msgs::OccupancyGrid& msg) {
@@ -431,32 +296,25 @@ void toOccupancyGrid(const cost_map::CostMap& cost_map, const std::string& layer
     msg.data[nCells - index - 1] = value;
   }
 }
-
-ROSCostMap2DServiceProvider::ROSCostMap2DServiceProvider(costmap_2d::Costmap2DROS* ros_costmap,
+Costmap2DROSServiceProvider::Costmap2DROSServiceProvider(costmap_2d::Costmap2DROS* ros_costmap,
                                                          const std::string& service_name)
 : ros_costmap(ros_costmap)
 {
   ros::NodeHandle private_nodehandle("~");
-  service = private_nodehandle.advertiseService(service_name, &ROSCostMap2DServiceProvider::callback, this);
+  service = private_nodehandle.advertiseService(service_name, &Costmap2DROSServiceProvider::callback, this);
 }
 
-bool ROSCostMap2DServiceProvider::callback(
+bool Costmap2DROSServiceProvider::callback(
     cost_map_msgs::GetCostMap::Request  &request,
     cost_map_msgs::GetCostMap::Response &response)
 {
-  try {
-    CostMap cost_map;
-    cost_map::Length geometry;
-    geometry << request.length_x, request.length_y;
-    fromCostMap2DROS(*ros_costmap, geometry, "obstacle_costs", cost_map);
-    toMessage(cost_map, response.map);
-  } catch ( std::runtime_error &e) {
-    ROS_ERROR_STREAM("CostMap Service : " << e.what());
-    return false;
-  } catch ( std::out_of_range &e) {
-    ROS_ERROR_STREAM("CostMap Service : " << e.what());
-    return false;
+  CostMap cost_map;
+  cost_map::Length geometry;
+  geometry << request.length_x, request.length_y;
+  if ( !fromCostmap2DROSAtRobotPose(*ros_costmap, geometry, "obstacle_costs", cost_map) ) {
+    ROS_ERROR_STREAM("CostMap Service : failed to convert from Costmap2DROS");
   }
+  toMessage(cost_map, response.map);
   return true;
 }
 

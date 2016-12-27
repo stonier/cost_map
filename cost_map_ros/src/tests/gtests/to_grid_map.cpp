@@ -19,7 +19,8 @@ TEST(ToGridMap, creation)
   cost_map.setGeometry(cost_map::Length(3.0, 4.0), 1.0, cost_map::Position(0.0, 0.0));
   cost_map.add("free_space", cost_map::FREE_SPACE);
   cost_map.add("no_information", cost_map::NO_INFORMATION);
-  grid_map::GridMap grid_map = cost_map::toGridMap(cost_map);
+  grid_map::GridMap grid_map;
+  cost_map::toGridMap(cost_map, grid_map);
   EXPECT_EQ(grid_map.getSize().x(), cost_map.getSize().x());
   EXPECT_EQ(grid_map.getSize().y(), cost_map.getSize().y());
   EXPECT_EQ(2, grid_map.getLayers().size());

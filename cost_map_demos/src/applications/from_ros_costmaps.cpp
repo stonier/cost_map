@@ -52,13 +52,13 @@ int main(int argc, char** argv)
   ********************/
   // MAKE SURE THIS STAY IN SYNC WITH src/tests/rostests/from_ros_costmaps/from_ros_costmaps.cpp!
   cost_map::CostMap cost_map_5x5, cost_map_4x4, cost_map_5x5_3x3_offset, cost_map_5x5_3x3_centre, cost_map_5x5_2_5x2_5_offset;
-  cost_map::fromCostMap2DROS(*(ros_costmap_5x5.getROSCostmap()), "obstacle_costs", cost_map_5x5);
-  cost_map::fromCostMap2DROS(*(ros_costmap_4x4.getROSCostmap()), "obstacle_costs", cost_map_4x4);
+  cost_map::fromCostmap2DROS(*(ros_costmap_5x5.getROSCostmap()), "obstacle_costs", cost_map_5x5);
+  cost_map::fromCostmap2DROS(*(ros_costmap_4x4.getROSCostmap()), "obstacle_costs", cost_map_4x4);
   cost_map::Length geometry_3x3(3.0, 3.0);
-  cost_map::fromCostMap2DROS(*(ros_costmap_5x5_3x3_offset.getROSCostmap()), geometry_3x3, "obstacle_costs", cost_map_5x5_3x3_offset);
-  cost_map::fromCostMap2DROS(*(ros_costmap_5x5_3x3_centre.getROSCostmap()), geometry_3x3, "obstacle_costs", cost_map_5x5_3x3_centre);
+  cost_map::fromCostmap2DROSAtRobotPose(*(ros_costmap_5x5_3x3_offset.getROSCostmap()), geometry_3x3, "obstacle_costs", cost_map_5x5_3x3_offset);
+  cost_map::fromCostmap2DROSAtRobotPose(*(ros_costmap_5x5_3x3_centre.getROSCostmap()), geometry_3x3, "obstacle_costs", cost_map_5x5_3x3_centre);
   cost_map::Length geometry_2_5x2_5(2.5, 2.5);
-  cost_map::fromCostMap2DROS(*(ros_costmap_5x5_2_5x2_5_offset.getROSCostmap()), geometry_2_5x2_5, "obstacle_costs", cost_map_5x5_2_5x2_5_offset);
+  cost_map::fromCostmap2DROSAtRobotPose(*(ros_costmap_5x5_2_5x2_5_offset.getROSCostmap()), geometry_2_5x2_5, "obstacle_costs", cost_map_5x5_2_5x2_5_offset);
 
   /********************
   ** Publishers
