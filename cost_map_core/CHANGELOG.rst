@@ -2,8 +2,8 @@
 Changelog
 =========
 
-Forthcoming
------------
+0.3.0 (2016-12-27)
+------------------
 * interpolations for atPosition
 * full implementation of line iterator
 * full implementation of polygon iterator
