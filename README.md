@@ -97,8 +97,8 @@ classes which illustrate how the command line utilities use these api.
 ## Costmap2DROS Conversions
 
 The ROS Navistack uses `costmap_2d::Costmap2DROS` objects and it is sometimes necessary
-to make conversions from these to provide new style cost maps to other libraries. Full conversions are possible
-but of special interest is to extract a costmap subwindow around the pose of the robot itself.
+to make conversions from these to provide new style cost maps to other libraries. Methods are
+available for both full map conversion as well as subwindows centred on the pose of the robot itself.
 
 ### Costmap2DROS vs CostMap
 
