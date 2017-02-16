@@ -28,13 +28,18 @@ The source code is released under a [BSD 3-Clause license](LICENSE).
 
 The core `cost_map::CostMap` class is designed to maintain as close a compatibility
 to grid maps as possible. This compatibility extends to conventions, definitions and API.
-For convenience, an illustrative reference of a few
-conventions is provided below. For further detail, please refer to the 
-[GridMap README](https://github.com/ethz-asl/grid_map/blob/master/README.md).
+For convenience, an illustrative reference of a few of the conventions that hold for both
+cost maps and grid maps is provided below.
 
 [![Layers](cost_map_core/doc/grid_map_layers.png)](cost_map_core/doc/grid_map_layers.pdf)
 
 [![Conventions](cost_map_core/doc/grid_map_conventions.png)](cost_map_core/doc/grid_map_conventions.pdf)
+
+Please refer to the [GridMap README](https://github.com/ethz-asl/grid_map/blob/master/README.md) for a
+more comprehensive outline of what is possible with cost maps and grid maps.
+
+Doxygen documentation for the cost map API's is served via the [ROS wiki](http://wiki.ros.org/cost_map).
+Select the *Code API* link for the relevant release/package.
 
 ## Image Bundles
 
