@@ -21,23 +21,6 @@ find_package(PkgConfig)
 pkg_check_modules(YAML_CPP yaml-cpp>=0.5)
 
 ##############################################################################
-# Catkin
-##############################################################################
-
-catkin_package(
-    INCLUDE_DIRS
-        include
-    LIBRARIES
-        ${PROJECT_NAME}
-    CATKIN_DEPENDS
-        cost_map_core
-    DEPENDS
-        Boost
-        YAML_CPP
-        OpenCV
-    )
-
-##############################################################################
 # Project Configuration
 ##############################################################################
 
@@ -66,6 +49,23 @@ find_package(OpenCV REQUIRED)
 # fixes this for us
 include_directories(${OpenCV_INCLUDE_DIRS})
 add_definitions(${OpenCV_DEFINITIONS})
+
+##############################################################################
+# Exports
+##############################################################################
+
+catkin_package(
+    INCLUDE_DIRS
+        include
+    LIBRARIES
+        ${PROJECT_NAME}
+    CATKIN_DEPENDS
+        cost_map_core
+    DEPENDS
+        Boost
+        YAML_CPP
+        OpenCV
+    )
 
 ##############################################################################
 # Project Sources
