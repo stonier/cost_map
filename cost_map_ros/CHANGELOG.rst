@@ -2,8 +2,8 @@
 Changelog
 =========
 
-Forthcoming
------------
+0.3.1 (2017-02-16)
+------------------
 * minor api name fixes for Costmap2D references
 
 0.3.0 (2016-12-27)
