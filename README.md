@@ -1,12 +1,12 @@
 # Cost Map
 
 This is a C++ library directly analogous to ETHZ ASL's [GridMap] library,
-but designed for use with costs where the data element is a byte (as opposed to grid_map's doubles).
+but designed for use with costs where the data element is an unsigned byte (as opposed to grid_map's doubles).
 
 ## Table of Contents
 
 1. [Packages Overview](#packages-overview)
-2. [Conventions & Definitions](#conventions-and-definitions)
+2. [CostMap](#costmap)
 3. [Image Bundles](#image-bundles)
 4. [Costmap2DROS Conversions](#costmap2dros-conversions)
 5. [Other Conversions](#other-conversions)
@@ -24,11 +24,13 @@ but designed for use with costs where the data element is a byte (as opposed to 
 
 The source code is released under a [BSD 3-Clause license](LICENSE).
 
-## Conventions and Definitions
+## CostMap
 
-The core api is designed to maintain as close a compatibility to grid maps as possible. As such, all grid map conventions
-and definitions apply - an illustrative reference of these is provided as a convenience below. For further detail,
-please refer to the [GridMap README](https://github.com/ethz-asl/grid_map/blob/master/README.md).
+The core `cost_map::CostMap` class is designed to maintain as close a compatibility
+to grid maps as possible. This compatibility extends to conventions, definitions and API.
+For convenience, an illustrative reference of a few
+conventions is provided below. For further detail, please refer to the 
+[GridMap README](https://github.com/ethz-asl/grid_map/blob/master/README.md).
 
 [![Layers](cost_map_core/doc/grid_map_layers.png)](cost_map_core/doc/grid_map_layers.pdf)
 
@@ -38,9 +40,9 @@ please refer to the [GridMap README](https://github.com/ethz-asl/grid_map/blob/m
 
 ### About
 
-An image bundle consists of data on file stored in two parts - 1) meta-information about a costmap in
-a yaml file and 2) layer data that is stored alongside in grayscale images. Methods on these
-provide an easy way to load and save cost maps from and to files on disk. 
+Image bundles provide an easy way to load and save cost maps to and from files on disk. 
+An image bundle consists of data stored in two parts - 1) meta-information about a costmap in
+a yaml file and 2) layer data that is stored alongside in grayscale images. 
 
 A typical meta yaml for an image bundle:
 
