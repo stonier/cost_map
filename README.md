@@ -129,7 +129,7 @@ layers:
     layer_data: can_be_some_other_name.png
 ```
 
-See [cost_map_ros/image_bundles/example.yaml](https://github.com/stonier/cost_map/blob/devel/cost_map_ros/image_bundles/example.yaml) for a real example.
+See [cost_map_ros/image_bundles/example.yaml](cost_map_ros/image_bundles/example.yaml) for a real example.
 
 ### ImageBundle Demo
 
@@ -156,7 +156,7 @@ rosrun cost_map_ros save_image_bundle /foo/cost_map foo.yaml
 * `cost_map::toImageBundle(...)` : save a cost map to an image bundle
 * `cost_map::fromImageBundle(...)` : load an image bundle into a cost map object
 
-See the [LoadImageBundle](https://github.com/stonier/cost_map/blob/devel/cost_map_ros/src/lib/image_bundles.cpp#L203)/[SaveImageBundle](https://github.com/stonier/cost_map/blob/devel/cost_map_ros/src/lib/image_bundles.cpp#L235)
+See the [LoadImageBundle](cost_map_ros/src/lib/image_bundles.cpp#L203)/[SaveImageBundle](cost_map_ros/src/lib/image_bundles.cpp#L235)
 classes which illustrate how the command line utilities use these api.
 
 ## Costmap2DROS Conversions
@@ -186,7 +186,7 @@ roslaunch cost_map_demos from_ros_costmaps.launch --screen
 * `cost_map::fromCostmap2DROS(...)` : create a cost map from a Costmap2DROS
 * `cost_map::fromCostmap2DROSAtRobotPose(...)` : create a cost map from a subwindow around the robot pose in a Costmap2DROS
 
-See the [from_ros_costmaps demo program](https://github.com/stonier/cost_map/blob/devel/cost_map_demos/src/applications/from_ros_costmaps.cpp)
+See the [from_ros_costmaps demo program](cost_map_demos/src/applications/from_ros_costmaps.cpp)
 which illustrates how to use these api. Additionally you can directly use the `grid_map::Costmap2DConverter` template class for more atomic operations.
 
 ## Other Conversions
@@ -213,7 +213,7 @@ Obstacle Layer | Inflated Layer | Deflated Layer
 * `cost_map::ROSInflationComputer` : emulates the ROS inflation algorithm
 * `cost_map::Deflate` : functor reverses an inflation computation
 
-See the [inflation demo program](https://github.com/stonier/cost_map/blob/devel/cost_map_demos/src/applications/inflation.cpp)
+See the [inflation demo program](cost_map_demos/src/applications/inflations.cpp)
 which illustrates how to use these classes.
 
 [GridMap]: https://github.com/ethz-asl/grid_map
