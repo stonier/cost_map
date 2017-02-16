@@ -1,7 +1,7 @@
 # Cost Map
 
 This is a C++ library directly analogous to ETHZ ASL's [GridMap] library,
-but designed for use with costs where the data element is an unsigned byte (as opposed to grid_map's doubles).
+but designed for use with costs where the data element is an unsigned char (as opposed to grid_map's doubles).
 
 ## Table of Contents
 
@@ -39,7 +39,7 @@ Please refer to the [GridMap README](https://github.com/ethz-asl/grid_map/blob/m
 more comprehensive outline of what is possible with cost maps and grid maps.
 
 Doxygen documentation for the cost map API's is served via the [ROS wiki](http://wiki.ros.org/cost_map).
-Select the *Code API* link for the relevant release/package. For example, the [kinetic release doxygen for cost_map_core](http://docs.ros.org/kinetic/api/cost_map_core/html/annotated.html).
+Select the *Code API* link for the relevant release/package. For example, [kinetic - cost_map_core](http://docs.ros.org/kinetic/api/cost_map_core/html/annotated.html).
 
 ## Image Bundles
 
