@@ -89,7 +89,7 @@ rosrun cost_map_ros save_image_bundle /foo/cost_map foo.yaml
 * `cost_map::toImageBundle(...)` : save a cost map to an image bundle
 * `cost_map::fromImageBundle(...)` : load an image bundle into a cost map object
 
-See the [LoadImageBundle/SaveImageBundle](https://github.com/stonier/cost_map/blob/devel/cost_map_ros/src/lib/image_bundles.cpp)
+See the [LoadImageBundle](https://github.com/stonier/cost_map/blob/devel/cost_map_ros/src/lib/image_bundles.cpp#L203)/[SaveImageBundle](https://github.com/stonier/cost_map/blob/devel/cost_map_ros/src/lib/image_bundles.cpp#L235)
 classes which illustrate how the command line utilities use these api.
 
 ## Costmap2DROS Conversions
