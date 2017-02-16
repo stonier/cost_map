@@ -213,7 +213,7 @@ Obstacle Layer | Inflated Layer | Deflated Layer
 * `cost_map::ROSInflationComputer` : emulates the ROS inflation algorithm
 * `cost_map::Deflate` : functor reverses an inflation computation
 
-See the [inflation demo program](cost_map_demos/src/applications/inflation.cpp)
+See the [inflation demo program](cost_map_demos/src/applications/inflations.cpp)
 which illustrates how to use these classes.
 
 [GridMap]: https://github.com/ethz-asl/grid_map
