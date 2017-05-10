@@ -138,6 +138,8 @@ class Costmap2DROSServiceProvider {
 public:
   Costmap2DROSServiceProvider(costmap_2d::Costmap2DROS* ros_costmap,
                               const std::string& service_name="get_cost_map");
+  ROSCostMap2DServiceProvider(costmap_2d::Costmap2DROS* ros_costmap, ros::NodeHandle& node_handle,
+                              const std::string& service_name="get_cost_map");
 
   bool callback(cost_map_msgs::GetCostMap::Request  &req,
                 cost_map_msgs::GetCostMap::Response &res);
