@@ -19,6 +19,7 @@ find_package(catkin
         ecl_command_line
         ecl_console
         grid_map_core
+        grid_map_costmap_2d
         grid_map_ros
         grid_map_visualization
         nav_msgs
@@ -80,6 +81,7 @@ catkin_package(
         ecl_command_line
         ecl_console
         grid_map_core
+        grid_map_costmap_2d
         grid_map_ros
         grid_map_visualization
         nav_msgs

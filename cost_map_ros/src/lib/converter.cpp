@@ -20,7 +20,7 @@
 #include "../../include/cost_map_ros/converter.hpp"
 
 
-#include <grid_map_ros/Costmap2DConverter.hpp>
+#include <grid_map_costmap_2d/grid_map_costmap_2d.hpp>
 
 /*****************************************************************************
 ** Namespaces
