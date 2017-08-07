@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>cost_map</name>
-  <version>0.3.1</version>
+  <version>0.3.2</version>
   <description>
    Meta-package for the universal cost map library.
   </description>

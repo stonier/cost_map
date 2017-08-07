@@ -1,6 +1,6 @@
 <package>
   <name>cost_map_visualisations</name>
-  <version>0.3.1</version>
+  <version>0.3.2</version>
   <description>
    Visualisation tools for cost maps.
   </description>

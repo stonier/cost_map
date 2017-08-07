@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>cost_map_msgs</name>
-  <version>0.3.1</version>
+  <version>0.3.2</version>
   <description>Definition of cost map messages (related to the grid map message type).</description>
   <maintainer email="d.stonier@gmail.com">Daniel Stonier</maintainer>
   <license>BSD</license>
