@@ -19,7 +19,6 @@
 #include <string>
 #include "../../include/cost_map_ros/converter.hpp"
 
-
 #include <grid_map_costmap_2d/grid_map_costmap_2d.hpp>
 
 /*****************************************************************************
@@ -304,15 +303,15 @@ Costmap2DROSServiceProvider::Costmap2DROSServiceProvider(costmap_2d::Costmap2DRO
   service = private_nodehandle.advertiseService(service_name, &Costmap2DROSServiceProvider::callback, this);
 }
 
-ROSCostMap2DServiceProvider::ROSCostMap2DServiceProvider(costmap_2d::Costmap2DROS* ros_costmap,
+Costmap2DROSServiceProvider::Costmap2DROSServiceProvider(costmap_2d::Costmap2DROS* ros_costmap,
                                                          ros::NodeHandle& node_handle,
                                                          const std::string& service_name)
 : ros_costmap(ros_costmap)
 {
-  service = node_handle.advertiseService(service_name, &ROSCostMap2DServiceProvider::callback, this);
+  service = node_handle.advertiseService(service_name, &Costmap2DROSServiceProvider::callback, this);
 }
 
-bool ROSCostMap2DServiceProvider::callback(
+bool Costmap2DROSServiceProvider::callback(
     cost_map_msgs::GetCostMap::Request  &request,
     cost_map_msgs::GetCostMap::Response &response)
 {

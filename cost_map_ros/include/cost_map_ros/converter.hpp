@@ -25,6 +25,7 @@
 // grid maps
 #include <grid_map_core/grid_map_core.hpp>
 #include <grid_map_ros/grid_map_ros.hpp>
+#include <grid_map_costmap_2d/grid_map_costmap_2d.hpp>
 #include <cost_map_core/cost_map_core.hpp>
 #include <cost_map_msgs/CostMap.h>
 #include <cost_map_msgs/GetCostMap.h>
@@ -138,7 +139,7 @@ class Costmap2DROSServiceProvider {
 public:
   Costmap2DROSServiceProvider(costmap_2d::Costmap2DROS* ros_costmap,
                               const std::string& service_name="get_cost_map");
-  ROSCostMap2DServiceProvider(costmap_2d::Costmap2DROS* ros_costmap, ros::NodeHandle& node_handle,
+  Costmap2DROSServiceProvider(costmap_2d::Costmap2DROS* ros_costmap, ros::NodeHandle& node_handle,
                               const std::string& service_name="get_cost_map");
 
   bool callback(cost_map_msgs::GetCostMap::Request  &req,
