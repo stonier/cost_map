@@ -2,6 +2,10 @@
 Changelog
 =========
 
+0.3.3 (2018-01-01)
+------------------
+* refactor for grid_map_core api changes (trivial)
+
 0.3.0 (2016-12-27)
 ------------------
 * interpolations for atPosition

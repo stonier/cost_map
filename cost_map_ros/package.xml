@@ -1,6 +1,6 @@
 <package>
   <name>cost_map_ros</name>
-  <version>0.3.2</version>
+  <version>0.3.3</version>
   <description>
    Cost maps, following the style of ethz-asl's grid_map library.
   </description>
