@@ -84,8 +84,8 @@ void CircleIterator::findSubmapParameters(const Position& center, const double r
 {
   Position topLeft = center.array() + radius;
   Position bottomRight = center.array() - radius;
-  grid_map::limitPositionToRange(topLeft, mapLength_, mapPosition_);
-  grid_map::limitPositionToRange(bottomRight, mapLength_, mapPosition_);
+  grid_map::boundPositionToRange(topLeft, mapLength_, mapPosition_);
+  grid_map::boundPositionToRange(bottomRight, mapLength_, mapPosition_);
   grid_map::getIndexFromPosition(startIndex, topLeft, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
   Index endIndex;
   grid_map::getIndexFromPosition(endIndex, bottomRight, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);

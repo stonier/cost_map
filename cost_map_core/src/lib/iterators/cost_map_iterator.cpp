@@ -16,7 +16,7 @@ CostMapIterator::CostMapIterator(const cost_map::CostMap& gridMap)
   size_ = gridMap.getSize();
   startIndex_ = gridMap.getStartIndex();
   endIndex_ = startIndex_ + gridMap.getSize() - Eigen::Array2i::Ones();
-  grid_map::mapIndexWithinRange(endIndex_, size_);
+  grid_map::boundIndexToRange(endIndex_, size_);
   index_ = startIndex_;
   isPastEnd_ = false;
 }

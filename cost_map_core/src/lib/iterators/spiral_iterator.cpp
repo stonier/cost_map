@@ -27,7 +27,7 @@ SpiralIterator::SpiralIterator(const cost_map::CostMap& gridMap, const Eigen::Ve
   bufferSize_ = gridMap.getSize();
   gridMap.getIndex(center_, indexCenter_);
   nRings_ = std::ceil(radius_ / resolution_);
-  if (grid_map::checkIfIndexWithinRange(indexCenter_, bufferSize_)) pointsRing_.push_back(indexCenter_);
+  if (grid_map::checkIfIndexInRange(indexCenter_, bufferSize_)) pointsRing_.push_back(indexCenter_);
   else generateRing();
 }
 
@@ -86,7 +86,7 @@ void SpiralIterator::generateRing()
   do {
     pointInMap.x() = point.x() + indexCenter_.x();
     pointInMap.y() = point.y() + indexCenter_.y();
-    if (grid_map::checkIfIndexWithinRange(pointInMap, bufferSize_)) {
+    if (grid_map::checkIfIndexInRange(pointInMap, bufferSize_)) {
       if (distance_ == nRings_ || distance_ == nRings_ - 1) {
         if (isInside(pointInMap))
           pointsRing_.push_back(pointInMap);

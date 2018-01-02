@@ -82,8 +82,8 @@ void PolygonIterator::findSubmapParameters(const cost_map::Polygon& polygon, Ind
     topLeft = topLeft.array().max(vertex.array());
     bottomRight = bottomRight.array().min(vertex.array());
   }
-  grid_map::limitPositionToRange(topLeft, mapLength_, mapPosition_);
-  grid_map::limitPositionToRange(bottomRight, mapLength_, mapPosition_);
+  grid_map::boundPositionToRange(topLeft, mapLength_, mapPosition_);
+  grid_map::boundPositionToRange(bottomRight, mapLength_, mapPosition_);
   grid_map::getIndexFromPosition(startIndex, topLeft, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);
   Index endIndex;
   grid_map::getIndexFromPosition(endIndex, bottomRight, mapLength_, mapPosition_, resolution_, bufferSize_, bufferStartIndex_);

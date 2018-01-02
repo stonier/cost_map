@@ -346,7 +346,7 @@ bool CostMap::move(const cost_map::Position& position, std::vector<BufferRegion>
         int endIndex = startIndex - sign + indexShift(i);
         int nCells = abs(indexShift(i));
         int index = (sign > 0 ? startIndex : endIndex);
-        grid_map::mapIndexWithinRange(index, getSize()(i));
+        grid_map::boundIndexToRange(index, getSize()(i));
 
         if (index + nCells <= getSize()(i)) {
           // One region to drop.
@@ -385,7 +385,7 @@ bool CostMap::move(const cost_map::Position& position, std::vector<BufferRegion>
 
   // Update information.
   startIndex_ += indexShift;
-  grid_map::mapIndexWithinRange(startIndex_, getSize());
+  grid_map::boundIndexToRange(startIndex_, getSize());
   position_ += alignedPositionShift;
 
   // Check if map has been moved at all.
