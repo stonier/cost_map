@@ -276,11 +276,38 @@ bool fromOccupancyGrid(const nav_msgs::OccupancyGrid& occupancy_grid,
     cost_map.setGeometry(length, resolution, position);
   }
 
+   // Occupancy probabilities are in the range [0,100].  Unknown is -1.
+  const float cellMin = 0;
+  const float cellMax = 98;
+
+  const float data_minimum = 0;
+  const float data_maximum = 252;
+  const float data_range = data_maximum - data_minimum;
+
   cost_map::Matrix data(size(0), size(1));
   for (std::vector<int8_t>::const_reverse_iterator iterator = occupancy_grid.data.rbegin();
       iterator != occupancy_grid.data.rend(); ++iterator) {
     size_t i = std::distance(occupancy_grid.data.rbegin(), iterator);
-    data(i) = *iterator != -1 ? *iterator : NAN;
+    float value;
+    if (*iterator == -1)
+    {
+      value = cost_map::NO_INFORMATION;
+    }
+    else if (*iterator == 100)
+    {
+      value = cost_map::LETHAL_OBSTACLE;
+    }
+    else if (*iterator == 99)
+    {
+      value = cost_map::INSCRIBED_OBSTACLE;
+    }
+    else 
+    {
+      value = (*iterator - cellMin) / (cellMax - cellMin);
+      value = data_minimum + std::min(std::max(0.0f, value), 1.0f) * data_range;
+    }
+
+    data(i) = value;
   }
 
   cost_map.add(layer, data);
