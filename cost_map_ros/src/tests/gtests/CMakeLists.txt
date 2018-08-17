@@ -12,3 +12,4 @@ endmacro(cost_map_ros_add_gtest)
 ##############################################################################
 
 cost_map_ros_add_gtest(to_grid_map)
+cost_map_ros_add_gtest(from_occupancy_grid)

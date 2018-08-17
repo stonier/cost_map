@@ -242,7 +242,80 @@ bool fromCostmap2DROSAtRobotPose(costmap_2d::Costmap2DROS& ros_costmap,
   return true;
 }
 
-void toOccupancyGrid(const cost_map::CostMap& cost_map, const std::string& layer, nav_msgs::OccupancyGrid& msg) {
+bool fromOccupancyGrid(const nav_msgs::OccupancyGrid& occupancy_grid,
+                       const std::string& layer, cost_map::CostMap& cost_map)
+{
+  const Size size(occupancy_grid.info.width, occupancy_grid.info.height);
+  const double resolution = occupancy_grid.info.resolution;
+  const Length length = resolution * size.cast<double>();
+  const std::string& frameId = occupancy_grid.header.frame_id;
+  Position position(occupancy_grid.info.origin.position.x, occupancy_grid.info.origin.position.y);
+  // Different conventions of center of map.
+  position += 0.5 * length.matrix();
+
+  const auto& orientation = occupancy_grid.info.origin.orientation;
+  if (orientation.w != 1.0 && !(orientation.x == 0 && orientation.y == 0
+      && orientation.z == 0 && orientation.w == 0)) {
+    ROS_WARN_STREAM("Conversion of occupancy grid: Cost maps do not support orientation.");
+    ROS_INFO_STREAM("Orientation of occupancy grid: " << std::endl << occupancy_grid.info.origin.orientation);
+    return false;
+  }
+
+  if (size.prod() != occupancy_grid.data.size())
+  {
+    ROS_WARN_STREAM("Conversion of occupancy grid: Size of data does not correspond to width * height.");
+    return false;
+  }
+
+  if ((cost_map.getSize() != size).any() || cost_map.getResolution() != resolution
+    || (cost_map.getLength() != length).any() || cost_map.getPosition() != position
+    || cost_map.getFrameId() != frameId || !cost_map.getStartIndex().isZero())
+  {
+    cost_map.setTimestamp(occupancy_grid.header.stamp.toNSec());
+    cost_map.setFrameId(frameId);
+    cost_map.setGeometry(length, resolution, position);
+  }
+
+   // Occupancy probabilities are in the range [0,100].  Unknown is -1.
+  const float cellMin = 0;
+  const float cellMax = 98;
+
+  const float data_minimum = 0;
+  const float data_maximum = 252;
+  const float data_range = data_maximum - data_minimum;
+
+  cost_map::Matrix data(size(0), size(1));
+  for (std::vector<int8_t>::const_reverse_iterator iterator = occupancy_grid.data.rbegin();
+      iterator != occupancy_grid.data.rend(); ++iterator) {
+    size_t i = std::distance(occupancy_grid.data.rbegin(), iterator);
+    float value;
+    if (*iterator == -1)
+    {
+      value = cost_map::NO_INFORMATION;
+    }
+    else if (*iterator == 100)
+    {
+      value = cost_map::LETHAL_OBSTACLE;
+    }
+    else if (*iterator == 99)
+    {
+      value = cost_map::INSCRIBED_OBSTACLE;
+    }
+    else 
+    {
+      value = (*iterator - cellMin) / (cellMax - cellMin);
+      value = data_minimum + std::min(std::max(0.0f, value), 1.0f) * data_range;
+    }
+
+    data(i) = value;
+  }
+
+  cost_map.add(layer, data);
+  return true;
+}
+
+void toOccupancyGrid(const cost_map::CostMap& cost_map, const std::string& layer, nav_msgs::OccupancyGrid& msg)
+{
   msg.header.frame_id = cost_map.getFrameId();
   msg.header.stamp.fromNSec(cost_map.getTimestamp());
   msg.info.map_load_time = msg.header.stamp;  // Same as header stamp as we do not load the map.

@@ -130,6 +130,9 @@ bool fromCostmap2DROSAtRobotPose(costmap_2d::Costmap2DROS& ros_costmap,
                                  const std::string& layer_name,
                                  cost_map::CostMap& cost_map);
 
+bool fromOccupancyGrid(const nav_msgs::OccupancyGrid& occupancy_grid,
+                       const std::string& layer, cost_map::CostMap& cost_map);
+
 void toOccupancyGrid(const cost_map::CostMap& cost_map, const std::string& layer, nav_msgs::OccupancyGrid& msg);
 
 /**
