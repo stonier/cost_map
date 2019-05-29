@@ -18,8 +18,8 @@ namespace cost_map {
 ** Implementation
 *****************************************************************************/
 
-void Inflate::operator()(const std::string layer_source,
-                         const std::string layer_destination,
+void Inflate::operator()(const std::string& layer_source,
+                         const std::string& layer_destination,
                          const float& inflation_radius,
                          const InflationComputer& inflation_computer,
                          CostMap& cost_map
@@ -40,6 +40,7 @@ void Inflate::operator()(const std::string layer_source,
     cell_inflation_radius_ = new_cell_inflation_radius;
     computeCaches(cost_map.getResolution(), inflation_computer);
   }
+  cost_map::Matrix& data_destination = cost_map.get(layer_destination);
 
   // eigen is default column storage, so iterate over the rows most quickly
   // if we want to make it robust, check for data_source.IsRowMajor
@@ -47,8 +48,7 @@ void Inflate::operator()(const std::string layer_source,
     for (unsigned int i = 0; i < number_of_rows; ++i) {
       unsigned char cost = data_source(i, j);
       if (cost == LETHAL_OBSTACLE) {
-        unsigned int index = j*number_of_rows + i;
-        enqueue(cost_map.get(layer_source), cost_map.get(layer_destination), i, j, i, j);
+        enqueue(data_source, data_destination, i, j, i, j);
       }
     }
   }
@@ -67,31 +67,39 @@ void Inflate::operator()(const std::string layer_source,
 
     // attempt to put the neighbors of the current cell onto the queue
     if (mx > 0) {
-      enqueue(cost_map.get(layer_source), cost_map.get(layer_destination), mx - 1, my, sx, sy);
+      enqueue(data_source, data_destination, mx - 1, my, sx, sy);
     }
     if (my > 0) {
-      enqueue(cost_map.get(layer_source), cost_map.get(layer_destination), mx, my - 1, sx, sy);
+      enqueue(data_source, data_destination, mx, my - 1, sx, sy);
     }
     if (mx < size_x - 1) {
-      enqueue(cost_map.get(layer_source), cost_map.get(layer_destination), mx + 1, my, sx, sy);
+      enqueue(data_source, data_destination, mx + 1, my, sx, sy);
     }
     if (my < size_y - 1) {
-      enqueue(cost_map.get(layer_source), cost_map.get(layer_destination), mx, my + 1, sx, sy);
+      enqueue(data_source, data_destination, mx, my + 1, sx, sy);
     }
   }
 }
 
+inline
 void Inflate::enqueue(const cost_map::Matrix& data_source,
                       cost_map::Matrix& data_destination,
                       unsigned int mx, unsigned int my,
                       unsigned int src_x, unsigned int src_y
                       )
 {
+  // index is calculated only once, based on the fact that the matrixes are column-major
+  // keep in mind that x means "row" whilst y means "column"
+  const unsigned int map_index =  mx + my*data_source.rows();
   // set the cost of the cell being inserted
-  if (!seen_(mx, my))
+  if (!seen_(map_index))
   {
     // we compute our distance table one cell further than the inflation radius dictates so we can make the check below
-    double distance = distanceLookup(mx, my, src_x, src_y);
+    const unsigned int dx = abs((int)mx - (int)src_x);
+    const unsigned int dy = abs((int)my - (int)src_y);
+    const unsigned int cache_index =  dx + dy*cached_distances_.rows();
+
+    const double distance = cached_distances_(cache_index);
 
     // we only want to put the cell in the queue if it is within the inflation radius of the obstacle point
     if (distance > cell_inflation_radius_) {
@@ -99,48 +107,35 @@ void Inflate::enqueue(const cost_map::Matrix& data_source,
     }
 
     // assign the cost associated with the distance from an obstacle to the cell
-    unsigned char cost = costLookup(mx, my, src_x, src_y);
-    unsigned char old_cost = data_source(mx, my);
+    const unsigned char cost = cached_costs_(cache_index);
+    const unsigned char old_cost = data_source(map_index);
 
     if (old_cost == NO_INFORMATION && cost >= INSCRIBED_OBSTACLE)
-      data_destination(mx, my) = cost;
+      data_destination(map_index) = cost;
     else
-      data_destination(mx, my) = std::max(old_cost, cost);
+      data_destination(map_index) = std::max(old_cost, cost);
 
     // push the cell data onto the queue and mark
-    seen_(mx, my) = true;
-    CellData data(distance, mx, my, src_x, src_y);
-    inflation_queue_.push(data);
+    seen_(map_index) = true;
+    inflation_queue_.emplace(distance, mx, my, src_x, src_y);
   }
 }
 
-double Inflate::distanceLookup(int mx, int my, int src_x, int src_y)
-{
-  unsigned int dx = abs(mx - src_x);
-  unsigned int dy = abs(my - src_y);
-  return cached_distances_(dx, dy);
-}
-
-unsigned char Inflate::costLookup(int mx, int my, int src_x, int src_y)
-{
-  unsigned int dx = abs(mx - src_x);
-  unsigned int dy = abs(my - src_y);
-  return cached_costs_(dx, dy);
-}
 
 void Inflate::computeCaches(const float& resolution, const InflationComputer& compute_cost)
 {
-  cached_costs_.resize(cell_inflation_radius_ + 2, cell_inflation_radius_ + 2);
-  cached_distances_.resize(cell_inflation_radius_ + 2, cell_inflation_radius_ + 2);
+  unsigned cache_size = cell_inflation_radius_ + 2;
+  cached_costs_.resize(cache_size, cache_size);
+  cached_distances_.resize(cache_size, cache_size);
 
-  for (unsigned int i = 0; i <= cell_inflation_radius_ + 1; ++i) {
-    for (unsigned int j = 0; j <= cell_inflation_radius_ + 1; ++j) {
+  for (unsigned int i = 0; i < cache_size; ++i) {
+    for (unsigned int j = 0; j < cache_size; ++j) {
       cached_distances_(i,j) = std::hypot(i, j);
     }
   }
 
-  for (unsigned int i = 0; i <= cell_inflation_radius_ + 1; ++i) {
-    for (unsigned int j = 0; j <= cell_inflation_radius_ + 1; ++j) {
+  for (unsigned int i = 0; i < cache_size; ++i) {
+    for (unsigned int j = 0; j < cache_size; ++j) {
       cached_costs_(i, j) = compute_cost(resolution*cached_distances_(i, j));
     }
   }

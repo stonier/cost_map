@@ -88,8 +88,8 @@ public:
    * @param cost_map
    * @throw std::out_of_range if no map layer with name `layer` is present.
    */
-  void operator()(const std::string layer_source,
-               const std::string layer_destination,
+  void operator()(const std::string& layer_source,
+               const std::string& layer_destination,
                const float& inflation_radius,
                const InflationComputer& inflation_computer,
                CostMap& cost_map
@@ -136,25 +136,6 @@ private:
                unsigned int src_x, unsigned int src_y
                );
 
-  /**
-   * @brief  Lookup pre-computed distances
-   * @param mx The x coordinate of the current cell
-   * @param my The y coordinate of the current cell
-   * @param src_x The x coordinate of the source cell
-   * @param src_y The y coordinate of the source cell
-   * @return
-   */
-  double distanceLookup(int mx, int my, int src_x, int src_y);
-
-  /**
-   * @brief  Lookup pre-computed costs
-   * @param mx The x coordinate of the current cell
-   * @param my The y coordinate of the current cell
-   * @param src_x The x coordinate of the source cell
-   * @param src_y The y coordinate of the source cell
-   * @return
-   */
-  unsigned char costLookup(int mx, int my, int src_x, int src_y);
   void computeCaches(const float& resolution, const InflationComputer& compute_cost);
 
   Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> seen_;
